@@ -1,9 +1,10 @@
 body{
 	font:Verdana,sans-serif,serif;
-	background-color:#808080;
+	background-color:#C0C0C0;
 	text-align:center;
 }
 canvas{
-	border:1px solid #000;
 	background-color:#FFF;
+	box-shadow:0 0 4px #000;
+	border-radius:4px;
 }

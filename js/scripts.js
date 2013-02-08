@@ -1,4 +1,58 @@
-blocks = [];
+// 0 = Tyhjä
+// 1 = Tie eteenpäin
+// 2 = Mutka, vasen
+// 3 = Mutka, oikea
+// 4 = Risteys
+// 5 = Silta
+// 6 = Alikulku
+// 7 = Kuilu
+// 8 = Varattu
+// 9 = Varattu
+
+var blocks = {
+	"-1x0"	:	0,
+	"-1x-1"	:	0,
+	"-1x-2"	:	0,
+	"-1x-3"	:	0,
+	"-1x-4"	:	0,
+	"-1x-5"	:	0,
+	"-1x0"	:	0,
+	"-1x1"	:	0,
+	"-1x2"	:	1,
+	"-1x3"	:	0,
+	"-1x4"	:	0,
+	"-1x5"	:	0,
+	"0x-1"	:	0,
+	"1x-1"	:	0,
+	"2x-1"	:	0,
+	"3x-1"	:	0,
+	"4x-1"	:	0,
+	"5x-1"	:	0,
+	"0x0"	:	0,
+	"1x0"	:	0,
+	"2x0"	:	1,
+	"3x0"	:	0,
+	"4x0"	:	0,
+	"5x0"	:	0,
+	"0x1"	:	0,
+	"1x1"	:	0,
+	"2x1"	:	1,
+	"3x1"	:	0,
+	"4x1"	:	0,
+	"5x1"	:	0,
+	"0x2"	:	0,
+	"1x2"	:	0,
+	"2x2"	:	1,
+	"3x2"	:	0,
+	"4x2"	:	0,
+	"5x2"	:	0,
+	"0x3"	:	0,
+	"1x3"	:	0,
+	"2x3"	:	0,
+	"3x3"	:	0,
+	"4x3"	:	0,
+	"5x3"	:	0
+};
 
 $(function(){
 	function game(){
@@ -10,11 +64,24 @@ $(function(){
 			return false;
 		}
 	}
-	var img = new Image();
-	img.onload = function(){
-		setInterval(piirra,1);
-	};
-	img.src="img/test.png";
+	
+	var pawn = new Image();
+	pawn.src="img/stick.png";
+	
+	function lataa_kuva(kuva){
+		var img = new Image();
+		img.src="img/"+kuva+".png";
+		//img.onload=function(){
+			return img;
+		//}
+	}
+
+	var images = [
+		lataa_kuva("blank"),
+		lataa_kuva("brown")
+	];
+	
+	setInterval(piirra,1);
 	
 	var siirto = 0;
 	function piirra(){
@@ -25,8 +92,10 @@ $(function(){
 		}
 		for(ia=-1;ia<4;ia++){
 			for(ib=-1;ib<6;ib++){
-				blocks.push(game().drawImage(img,ib*192,ia*192+siirto));
+				//console.log(ib+"x"+ia+" = "+blocks[ib+"x"+ia]);
+				game().drawImage(images[blocks[ib+"x"+ia]],ib*192,ia*192+siirto);
 			}
 		}
+		game().drawImage(pawn,384,192);
 	}
 });

@@ -24,7 +24,7 @@ var blocks = {
 	"-1x5"	:	0,
 	"0x-1"	:	0,
 	"1x-1"	:	0,
-	"2x-1"	:	0,
+	"2x-1"	:	1,
 	"3x-1"	:	0,
 	"4x-1"	:	0,
 	"5x-1"	:	0,
@@ -78,7 +78,10 @@ $(function(){
 
 	var images = [
 		lataa_kuva("blank"),
-		lataa_kuva("brown")
+		lataa_kuva("brown"),
+		lataa_kuva("left"),
+		lataa_kuva("right"),
+		lataa_kuva("risteys")
 	];
 	
 	setInterval(piirra,1);
@@ -89,6 +92,33 @@ $(function(){
 		siirto += 1;
 		if(siirto>=192){
 			siirto=0;
+			var satunnaisluku = Math.ceil(Math.random()*8);
+			blocks["0x-1"]=0;
+			blocks["1x-1"]=0;
+			blocks["3x-1"]=0;
+			blocks["4x-1"]=0;
+			switch(satunnaisluku){
+				case 1:case 2:case 3:case 4:case 5:
+					blocks["2x-1"]=1;
+				break;
+				case 6:
+					blocks["2x-1"]=2;
+					blocks["1x-1"]=1;
+					blocks["0x-1"]=1;
+				break;
+				case 7:
+					blocks["2x-1"]=3;
+					blocks["3x-1"]=1;
+					blocks["4x-1"]=1;
+				break;
+				case 8:
+					blocks["2x-1"]=4;
+					blocks["1x-1"]=1;
+					blocks["0x-1"]=1;
+					blocks["3x-1"]=1;
+					blocks["4x-1"]=1;
+				break;
+			}
 		}
 		for(ia=-1;ia<4;ia++){
 			for(ib=-1;ib<6;ib++){

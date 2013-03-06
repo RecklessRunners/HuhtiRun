@@ -65,31 +65,76 @@ $(function(){
 		}
 	}
 	
-	var pawn = new Image();
-	pawn.src="img/stick.png";
+	var ukko = new Image();
+	ukko.src="img/stick.png";
 	
-	function lataa_kuva(kuva){
+	function lataaKuva(kuva){
 		var img = new Image();
 		img.src="img/"+kuva+".png";
 		//img.onload=function(){
 			return img;
 		//}
 	}
+	function lataaLintu(){
+		var taulu = [];
 
+		for(i=0;i<9;i++){
+			var img = new Image();			
+			img.src="img/Lint"+i+".png";
+			taulu.push(img);
+		}
+		
+		//img.onload=function(){
+		return taulu;
+		//}
+	}
+	
 	var images = [
-		lataa_kuva("blank"),
-		lataa_kuva("brown"),
-		lataa_kuva("left"),
-		lataa_kuva("right"),
-		lataa_kuva("risteys")
+		lataaKuva("blank"),
+		lataaKuva("brown"),
+		lataaKuva("left"),
+		lataaKuva("right"),
+		lataaKuva("risteys")
 	];
+	
+	var lintu = lataaLintu();
+	var iLintu=0;
+	var iLintuMax=8;
+	
+	//2D-taulukko [5x4 vai 5x5], jossa on referenssit kuviin
+	var maasto = new Array(5);
+	for (var i=1; i<6; i++){
+		maasto[i] = new Array(3);
+		//Lataa kuvat:
+		for (var j=1; j<5; j++){
+			//console.log( i + " " + j );
+			maasto[i][j] = lataaKuva("risteys");
+		}
+	}
 	
 	setInterval(piirra,1);
 	
-	var siirto = 0;
+	var siirtoY = 0;
+	
+	
 	function piirra(){
 		game().clearRect(0,0,960,576);
-		siirto += 1;
+
+
+		
+		
+		for (var i=1; i<6; i++){
+			for (var j=1; j<5; j++){
+				game().drawImage(maasto[i][j], (i-1)*192, (j-1)*192 + siirtoY);
+			}
+		}
+
+		siirtoY++;
+		if (siirtoY>192){
+			siirtoY=0;
+		}
+		
+/* 		siirto += 1;
 		if(siirto>=192){
 			siirto=0;
 			var satunnaisluku = Math.ceil(Math.random()*8);
@@ -123,9 +168,23 @@ $(function(){
 		for(ia=-1;ia<4;ia++){
 			for(ib=-1;ib<6;ib++){
 				//console.log(ib+"x"+ia+" = "+blocks[ib+"x"+ia]);
-				game().drawImage(images[blocks[ib+"x"+ia]],ib*192,ia*192+siirto);
+				//game().drawImage(images[blocks[ib+"x"+ia]],ib*192,ia*192+siirto);
 			}
 		}
-		game().drawImage(pawn,384,192);
+ */		
+
+		//
+		
+		//
+		//Linnun piirtäminen. Muut viholliset menee samalla tavalla.
+		game().drawImage(lintu[iLintu],184,102);
+		iLintu++;
+		if (iLintu > iLintuMax){
+			iLintu = 0;
+		}
+
+		//Pelihahmo samalla tavalla
+		game().drawImage(ukko,384,192);
+		
 	}
 });

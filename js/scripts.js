@@ -9,6 +9,9 @@
 // 8 = Varattu
 // 9 = Varattu
 
+var ukkoId=1;
+var vihuId=1;
+
 var blocks = {
 	"-1x0"	:	0,
 	"-1x-1"	:	0,
@@ -66,7 +69,10 @@ $(function(){
 	}
 	
 	var ukko = new Image();
-	ukko.src="img/stick.png";
+	ukko.src="img/stick1.png";
+	
+	var vihu = new Image();
+	vihu.src="img/vihollinen1.png";
 	
 	function lataaKuva(kuva){
 		var img = new Image();
@@ -148,6 +154,8 @@ $(function(){
 	
 	setInterval(paivita,30);
 	
+	var iVihu = 0;
+	
 	var siirtoY = 0;
 	var iUkko = 0;
 	var ukkoX = 384;
@@ -156,9 +164,20 @@ $(function(){
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
+		ukkoId+=1;
+		if(ukkoId==4){
+			ukkoId=1;
+		}
+		vihuId+=1;
+		if(vihuId==6){
+			vihuId=1;
+		}
+		ukko.src="img/stick"+ukkoId+".png";
+		vihu.src="img/vihu"+ukkoId+".png";
 		//Piirrä oliota ja asioita. 
 		piirraMaasto(siirtoY);
 		piirraUkko(iUkko,ukkoX,ukkoY);
+		piirraVihu(iVihu,ukkoX,ukkoY+224);
 		piirraLintu(iLintu,lintuX,lintuY);
 		//
 		//Aloita päivittäminen:
@@ -197,10 +216,10 @@ $(function(){
 			iLintu = 0;
 		}
 		lintuX += 3;
-		lintuY += lintuK+24*Math.sin(lintuX*4);
-		if(lintuX>$("canvas").width()+256){
-			lintuX=-256;
-			lintuY=Math.random()*384;
+		lintuY += lintuK+16*Math.sin(lintuX*.1);
+		if(lintuX>$("canvas").width()+512){
+			lintuX=-512;
+			lintuY=(Math.random()*($("canvas").height()/2))+$("canvas").height()/4;
 			lintuK=(Math.random()-.5)*3;
 			console.log(lintuK);
 		}
@@ -221,6 +240,10 @@ $(function(){
 	function piirraLintu(iLintu,x,y){
 		//Linnun piirtäminen. Muut viholliset menee samalla tavalla.
 		game().drawImage(lintu[iLintu],x,y);
+	}
+	
+	function piirraVihu(iVihu,x,y){
+		game().drawImage(vihu,x,y);
 	}
 	
 	function piirraUkko(iUkko,x,y){

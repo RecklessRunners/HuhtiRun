@@ -75,6 +75,23 @@ $(function(){
 			return img;
 		//}
 	}
+	
+	
+	function lataaTieSuoraan(){
+		var taulu = [];
+
+		for(i=0;i<1;i++){
+			var img = new Image();			
+			img.src="img/tiesuoraan"+i+".png";
+			taulu.push(img);
+		}
+		
+		//img.onload=function(){
+		return taulu;
+		//}
+		
+	}
+	
 	function lataaLintu(){
 		var taulu = [];
 
@@ -83,10 +100,7 @@ $(function(){
 			img.src="img/Lint"+i+".png";
 			taulu.push(img);
 		}
-		
-		//img.onload=function(){
 		return taulu;
-		//}
 	}
 	
 	var images = [
@@ -97,94 +111,121 @@ $(function(){
 		lataaKuva("risteys")
 	];
 	
+	
+	var tieSuoraan = lataaTieSuoraan();
+	
 	var lintu = lataaLintu();
 	var iLintu=0;
-	var iLintuMax=8;
+	var lintuX = 0;
+	var lintuY = 128;
+	var lintuK = 1.25;
+	//var iLintuMax=8;
 	
 	//2D-taulukko [5x4 vai 5x5], jossa on referenssit kuviin
 	var maasto = new Array(5);
-	for (var i=1; i<6; i++){
-		maasto[i] = new Array(3);
-		//Lataa kuvat:
-		for (var j=1; j<5; j++){
-			//console.log( i + " " + j );
-			maasto[i][j] = lataaKuva("risteys");
-		}
-	}
-	
-	setInterval(piirra,1);
-	
-	var siirtoY = 0;
-	
-	
-	function piirra(){
-		game().clearRect(0,0,960,576);
-
-
+	for (var i=0; i<maasto.length; i++){ //X-suuntaan
+		maasto[i] = new Array(4);
 		
-		
-		for (var i=1; i<6; i++){
-			for (var j=1; j<5; j++){
-				game().drawImage(maasto[i][j], (i-1)*192, (j-1)*192 + siirtoY);
+		//Generoi maasto eli lataa kuvat:
+		//Tehdään suora tie:
+		for (var j=0; j<maasto[i].length; j++){
+			if ( i == 2 ){
+				//Keskelle tie.
+				maasto[i][j] = tieSuoraan[0]; //Satunnainen tie.
+			}else{
+				maasto[i][j] = lataaKuva("brown"); //Satunnainen ei-tie.
+				//Tai mahdollisesti tyhjä paikka.
 			}
 		}
-
+	}
+	var ylinRivi = new Array( maasto.length );
+	ylinRivi[0] = "tausta";
+	ylinRivi[0] = "tausta";
+	ylinRivi[2] = "tieylos";
+	ylinRivi[0] = "tausta";
+	ylinRivi[0] = "tausta";
+	
+	
+	setInterval(paivita,30);
+	
+	var siirtoY = 0;
+	var iUkko = 0;
+	var ukkoX = 384;
+	var ukkoY = 192;
+	var ukkoLiikkuuX = 0;
+	
+	//Hoitaa kaiken päivityksen 
+	function paivita(){
+		//Piirrä oliota ja asioita. 
+		piirraMaasto(siirtoY);
+		piirraUkko(iUkko,ukkoX,ukkoY);
+		piirraLintu(iLintu,lintuX,lintuY);
+		//
+		//Aloita päivittäminen:
+		
+		// Ukko
+		$("*").keydown(function(e) {
+			switch(e.keyCode){
+				//Vasen
+				case 37:
+				case 60:
+					ukkoLiikkuuX = -7.5;
+				break;
+				// oikea	
+				case 39:	
+				case 68:
+					ukkoLiikkuuX = 7.5;
+				break;
+			}
+		}).keyup(function(e){
+			ukkoLiikkuuX = 0;
+		});
+		if(ukkoX<384 || ukkoX > 576){
+			console.log("You died!");
+		}
+		ukkoX += ukkoLiikkuuX;
+		
+		//Maasto
 		siirtoY++;
 		if (siirtoY>192){
 			siirtoY=0;
 		}
 		
-/* 		siirto += 1;
-		if(siirto>=192){
-			siirto=0;
-			var satunnaisluku = Math.ceil(Math.random()*8);
-			blocks["0x-1"]=0;
-			blocks["1x-1"]=0;
-			blocks["3x-1"]=0;
-			blocks["4x-1"]=0;
-			switch(satunnaisluku){
-				case 1:case 2:case 3:case 4:case 5:
-					blocks["2x-1"]=1;
-				break;
-				case 6:
-					blocks["2x-1"]=2;
-					blocks["1x-1"]=1;
-					blocks["0x-1"]=1;
-				break;
-				case 7:
-					blocks["2x-1"]=3;
-					blocks["3x-1"]=1;
-					blocks["4x-1"]=1;
-				break;
-				case 8:
-					blocks["2x-1"]=4;
-					blocks["1x-1"]=1;
-					blocks["0x-1"]=1;
-					blocks["3x-1"]=1;
-					blocks["4x-1"]=1;
-				break;
-			}
-		}
-		for(ia=-1;ia<4;ia++){
-			for(ib=-1;ib<6;ib++){
-				//console.log(ib+"x"+ia+" = "+blocks[ib+"x"+ia]);
-				//game().drawImage(images[blocks[ib+"x"+ia]],ib*192,ia*192+siirto);
-			}
-		}
- */		
-
-		//
-		
-		//
-		//Linnun piirtäminen. Muut viholliset menee samalla tavalla.
-		game().drawImage(lintu[iLintu],184,102);
+		//Lintu
 		iLintu++;
-		if (iLintu > iLintuMax){
+		if (iLintu >= lintu.length){
 			iLintu = 0;
 		}
+		lintuX += 3;
+		lintuY += lintuK+24*Math.sin(lintuX*4);
+		if(lintuX>$("canvas").width()+256){
+			lintuX=-256;
+			lintuY=Math.random()*384;
+			lintuK=(Math.random()-.5)*3;
+			console.log(lintuK);
+		}
 
-		//Pelihahmo samalla tavalla
-		game().drawImage(ukko,384,192);
+		//Maaston päivitys:
 		
 	}
+	
+	function piirraMaasto(siirtoY){
+		for (var i=0; i<maasto.length; i++){
+			for (var j=0; j<maasto[i].length; j++){
+				game().drawImage(maasto[i][j], i*192, (j-1)*192 + siirtoY);
+			}
+		}
+	}
+	
+	
+	function piirraLintu(iLintu,x,y){
+		//Linnun piirtäminen. Muut viholliset menee samalla tavalla.
+		game().drawImage(lintu[iLintu],x,y);
+	}
+	
+	function piirraUkko(iUkko,x,y){
+		//Pelihahmo samalla tavalla
+		game().drawImage(ukko,x,y);
+	}
+
 });

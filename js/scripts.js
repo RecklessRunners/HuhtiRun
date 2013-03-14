@@ -1,61 +1,3 @@
-// 0 = Tyhjä
-// 1 = Tie eteenpäin
-// 2 = Mutka, vasen
-// 3 = Mutka, oikea
-// 4 = Risteys
-// 5 = Silta
-// 6 = Alikulku
-// 7 = Kuilu
-// 8 = Varattu
-// 9 = Varattu
-
-var ukkoId=1;
-var vihuId=1;
-
-var blocks = {
-	"-1x0"	:	0,
-	"-1x-1"	:	0,
-	"-1x-2"	:	0,
-	"-1x-3"	:	0,
-	"-1x-4"	:	0,
-	"-1x-5"	:	0,
-	"-1x0"	:	0,
-	"-1x1"	:	0,
-	"-1x2"	:	1,
-	"-1x3"	:	0,
-	"-1x4"	:	0,
-	"-1x5"	:	0,
-	"0x-1"	:	0,
-	"1x-1"	:	0,
-	"2x-1"	:	1,
-	"3x-1"	:	0,
-	"4x-1"	:	0,
-	"5x-1"	:	0,
-	"0x0"	:	0,
-	"1x0"	:	0,
-	"2x0"	:	1,
-	"3x0"	:	0,
-	"4x0"	:	0,
-	"5x0"	:	0,
-	"0x1"	:	0,
-	"1x1"	:	0,
-	"2x1"	:	1,
-	"3x1"	:	0,
-	"4x1"	:	0,
-	"5x1"	:	0,
-	"0x2"	:	0,
-	"1x2"	:	0,
-	"2x2"	:	1,
-	"3x2"	:	0,
-	"4x2"	:	0,
-	"5x2"	:	0,
-	"0x3"	:	0,
-	"1x3"	:	0,
-	"2x3"	:	0,
-	"3x3"	:	0,
-	"4x3"	:	0,
-	"5x3"	:	0
-};
 
 $(function(){
 	function game(){
@@ -68,11 +10,7 @@ $(function(){
 		}
 	}
 	
-	var ukko = new Image();
-	ukko.src="img/stick1.png";
-	
-	var vihu = new Image();
-	vihu.src="img/vihollinen1.png";
+
 	
 	function lataaKuva(kuva){
 		var img = new Image();
@@ -100,7 +38,6 @@ $(function(){
 	
 	function lataaLintu(){
 		var taulu = [];
-
 		for(i=0;i<9;i++){
 			var img = new Image();			
 			img.src="img/Lint"+i+".png";
@@ -108,6 +45,28 @@ $(function(){
 		}
 		return taulu;
 	}
+
+	function lataaUkko(){
+		var taulu = [];
+		for(i=0;i<3;i++){
+			var img = new Image();			
+			img.src="img/stick"+i+".png";
+			taulu.push(img);
+		}
+		return taulu;
+	}
+
+	function lataaVihu(){
+		var taulu = [];
+		for(i=0;i<5;i++){
+			var img = new Image();			
+			img.src="img/vihu"+i+".png";
+			taulu.push(img);
+		}
+		return taulu;
+	}
+
+	
 	
 	var images = [
 		lataaKuva("blank"),
@@ -117,6 +76,7 @@ $(function(){
 		lataaKuva("risteys")
 	];
 	
+
 	
 	var tieSuoraan = lataaTieSuoraan();
 	
@@ -126,7 +86,19 @@ $(function(){
 	var lintuY = 128;
 	var lintuK = 1.25;
 	//var iLintuMax=8;
+
+
+	var ukko = lataaUkko();
+	var iUkko=0;
+	var ukkoX = 384;
+	var ukkoY = 192;
+
 	
+	var vihu = lataaVihu();
+	var iVihu=1;
+	var vihuX = 384; 
+	var vihuSiirtyma = 256;
+
 	//2D-taulukko [5x4 vai 5x5], jossa on referenssit kuviin
 	var maasto = new Array(5);
 	for (var i=0; i<maasto.length; i++){ //X-suuntaan
@@ -152,32 +124,33 @@ $(function(){
 	ylinRivi[0] = "tausta";
 	
 	
-	setInterval(paivita,25);
-	
-	var iVihu = 0;
-	
-	var siirtoY = 0;
-	var iUkko = 0;
-	var ukkoX = 384;
-	var ukkoY = 192;
 	var ukkoLiikkuuX = 0;
+	var siirtoY = 0;	
+	setInterval(paivita,25);
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
-		ukkoId+=1;
-		if(ukkoId==4){
-			ukkoId=1;
+		// Pelin lopetustestaus
+
+		// Siirtää vihollista hitaasti taaksepäin
+		vihuSiirtyma = Math.min(256,vihuSiirtyma+.375);
+		
+		iUkko+=1;
+		if(iUkko>=ukko.length){
+			iUkko=0;
 		}
-		vihuId+=1;
-		if(vihuId==6){
-			vihuId=1;
+		iVihu+=1;
+		if(iVihu>=vihu.length){
+			iVihu=0;
 		}
-		ukko.src="img/stick"+ukkoId+".png";
-		vihu.src="img/vihu"+ukkoId+".png";
+		
+		
 		//Piirrä oliota ja asioita. 
 		piirraMaasto(siirtoY);
+		
+		piirraVihu(iVihu,vihuX,ukkoY+vihuSiirtyma);
 		piirraUkko(iUkko,ukkoX,ukkoY);
-		piirraVihu(iVihu,ukkoX,ukkoY+224);
+		vihuX = ukkoX; 
 		piirraLintu(iLintu,lintuX,lintuY);
 		//
 		//Aloita päivittäminen:
@@ -199,10 +172,14 @@ $(function(){
 		}).keyup(function(e){
 			ukkoLiikkuuX = 0;
 		});
+		
+		//Ukon paikan tarkistus. . . 
 		if(ukkoX<352 || ukkoX > 432){
 			ukkoX=384;
+			vihuSiirtyma -= 128; 
 		}
 		ukkoX += ukkoLiikkuuX;
+		
 		
 		//Maasto
 		siirtoY+=4;
@@ -221,11 +198,17 @@ $(function(){
 			lintuX=-512;
 			lintuY=(Math.random()*($("canvas").height()/2))+$("canvas").height()/4;
 			lintuK=(Math.random()-.5)*6;
-			console.log(lintuK);
+			//console.log(lintuK);
 		}
 
 		//Maaston päivitys:
-		
+
+				if(vihuSiirtyma < 128){
+			//alert("Hävisit pelin! :(");
+			vihuSiirtyma=0;
+			game().font = 'bold 64px sans-serif';
+			game().fillText("Hävisit pelin!",256,128);
+		}
 	}
 	
 	function piirraMaasto(siirtoY){
@@ -237,18 +220,19 @@ $(function(){
 	}
 	
 	
-	function piirraLintu(iLintu,x,y){
+	function piirraLintu(i,x,y){
 		//Linnun piirtäminen. Muut viholliset menee samalla tavalla.
-		game().drawImage(lintu[iLintu],x,y);
+		game().drawImage(lintu[i],x,y);
 	}
 	
-	function piirraVihu(iVihu,x,y){
-		game().drawImage(vihu,x,y);
+	function piirraVihu(i,x,y){
+		game().drawImage(vihu[i],x,y);
 	}
 	
-	function piirraUkko(iUkko,x,y){
+	function piirraUkko(i,x,y){
 		//Pelihahmo samalla tavalla
-		game().drawImage(ukko,x,y);
+		game().drawImage(ukko[i],x,y);
 	}
+	
 
 });

@@ -152,7 +152,7 @@ $(function(){
 	ylinRivi[0] = "tausta";
 	
 	
-	setInterval(paivita,30);
+	setInterval(paivita,25);
 	
 	var iVihu = 0;
 	
@@ -187,7 +187,7 @@ $(function(){
 			switch(e.keyCode){
 				//Vasen
 				case 37:
-				case 60:
+				case 65:
 					ukkoLiikkuuX = -7.5;
 				break;
 				// oikea	
@@ -199,13 +199,13 @@ $(function(){
 		}).keyup(function(e){
 			ukkoLiikkuuX = 0;
 		});
-		if(ukkoX<384 || ukkoX > 576){
-			console.log("You died!");
+		if(ukkoX<352 || ukkoX > 432){
+			ukkoX=384;
 		}
 		ukkoX += ukkoLiikkuuX;
 		
 		//Maasto
-		siirtoY++;
+		siirtoY+=4;
 		if (siirtoY>192){
 			siirtoY=0;
 		}
@@ -215,12 +215,12 @@ $(function(){
 		if (iLintu >= lintu.length){
 			iLintu = 0;
 		}
-		lintuX += 3;
+		lintuX += 8;
 		lintuY += lintuK+16*Math.sin(lintuX*.1);
 		if(lintuX>$("canvas").width()+512){
 			lintuX=-512;
 			lintuY=(Math.random()*($("canvas").height()/2))+$("canvas").height()/4;
-			lintuK=(Math.random()-.5)*3;
+			lintuK=(Math.random()-.5)*6;
 			console.log(lintuK);
 		}
 

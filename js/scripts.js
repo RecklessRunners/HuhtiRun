@@ -1,4 +1,3 @@
-
 $(function(){
 	function game(){
 		var canvas = $("canvas")[0];
@@ -9,9 +8,7 @@ $(function(){
 			return false;
 		}
 	}
-	
 
-	
 	function lataaKuva(kuva){
 		var img = new Image();
 		img.src="img/"+kuva+".png";
@@ -35,6 +32,8 @@ $(function(){
 		//}
 		
 	}
+	
+	// TODO: Siirrä oliomuotoon.
 	
 	function lataaLintu(){
 		var taulu = [];
@@ -65,8 +64,8 @@ $(function(){
 		}
 		return taulu;
 	}
-
 	
+	// Q: Tarvetta?
 	
 	var images = [
 		lataaKuva("blank"),
@@ -76,24 +75,22 @@ $(function(){
 		lataaKuva("risteys")
 	];
 	
-
-	
 	var tieSuoraan = lataaTieSuoraan();
 	
+	var hengissa = true;
+	
 	var lintu = lataaLintu();
-	var iLintu=0;
-	var lintuX = 0;
-	var lintuY = 128;
-	var lintuK = 1.25;
+	var iLintu=0; // Linnun animaatio - framen n:o
+	var lintuX = 0; // Linnun sijainti X
+	var lintuY = 128; // Linnun sijainti Y
+	var lintuK = 1.25; // Linnun kallistuskulma (px)
 	//var iLintuMax=8;
-
-
+	
 	var ukko = lataaUkko();
 	var iUkko=0;
 	var ukkoX = 384;
 	var ukkoY = 192;
 
-	
 	var vihu = lataaVihu();
 	var iVihu=1;
 	var vihuX = 384; 
@@ -116,6 +113,7 @@ $(function(){
 			}
 		}
 	}
+	
 	var ylinRivi = new Array( maasto.length );
 	ylinRivi[0] = "tausta";
 	ylinRivi[0] = "tausta";
@@ -123,13 +121,15 @@ $(function(){
 	ylinRivi[0] = "tausta";
 	ylinRivi[0] = "tausta";
 	
-	
 	var ukkoLiikkuuX = 0;
 	var siirtoY = 0;	
 	setInterval(paivita,25);
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
+		if(Math.ceil(Math.random()*16)==16){
+			vihuSiirtyma -= Math.floor(4/256*vihuSiirtyma);
+		}
 		// Pelin lopetustestaus
 
 		// Siirtää vihollista hitaasti taaksepäin
@@ -152,18 +152,16 @@ $(function(){
 		piirraUkko(iUkko,ukkoX,ukkoY);
 		vihuX = ukkoX; 
 		piirraLintu(iLintu,lintuX,lintuY);
-		//
-		//Aloita päivittäminen:
 		
-		// Ukko
+		// Pelaajan ohjauskomennot
 		$("*").keydown(function(e) {
 			switch(e.keyCode){
-				//Vasen
+				// Vasemmalle
 				case 37:
 				case 65:
 					ukkoLiikkuuX = -7.5;
 				break;
-				// oikea	
+				// Oikealle
 				case 39:	
 				case 68:
 					ukkoLiikkuuX = 7.5;
@@ -173,21 +171,21 @@ $(function(){
 			ukkoLiikkuuX = 0;
 		});
 		
-		//Ukon paikan tarkistus. . . 
+		// Pelaajan X-sijainnin varmistus
 		if(ukkoX<352 || ukkoX > 432){
 			ukkoX=384;
-			vihuSiirtyma -= 128; 
+			vihuSiirtyma -= 96; 
 		}
 		ukkoX += ukkoLiikkuuX;
 		
 		
-		//Maasto
+		// Maaston liikuttaminen
 		siirtoY+=4;
 		if (siirtoY>192){
 			siirtoY=0;
 		}
 		
-		//Lintu
+		// Linnun liikerata
 		iLintu++;
 		if (iLintu >= lintu.length){
 			iLintu = 0;
@@ -198,16 +196,46 @@ $(function(){
 			lintuX=-512;
 			lintuY=(Math.random()*($("canvas").height()/2))+$("canvas").height()/4;
 			lintuK=(Math.random()-.5)*6;
-			//console.log(lintuK);
 		}
 
-		//Maaston päivitys:
-
-				if(vihuSiirtyma < 128){
-			//alert("Hävisit pelin! :(");
+		// Kun vihu saa pelaajan kiinni
+		if(vihuSiirtyma<96){
+			// Ajasta uuden pelin alkaminen
+			if(hengissa){
+				hengissa=false;
+				setTimeout(function(){
+					vihuSiirtyma=256;
+					hengissa=true;
+				},5000);
+			}
+		
+			// Muuta Canvas harmaasävyiseksi ja tummenna sitä hieman
+			var imgd = game().getImageData(0, 0, $("canvas").width(), $("canvas").height());
+			var pix = imgd.data;
+			for (var i = 0, n = pix.length; i < n; i += 4) {
+				var grayscale = pix[i] * .3 + pix[i+1] * .59 + pix[i+2] * .11;
+				var sat = Math.random()*64-32;
+				pix[i] = grayscale - sat - 32;
+				pix[i+1] = grayscale - sat - 32;
+				pix[i+2] = grayscale - sat - 32;
+			}
+			game().putImageData(imgd, 0, 0);
+			
+			// Aseta vihu pelaajan alle
 			vihuSiirtyma=0;
-			game().font = 'bold 64px sans-serif';
-			game().fillText("Hävisit pelin!",256,128);
+			
+			// Kirjoita tekstit
+			game().fillStyle = "#000";
+			game().font = "bold 64px sans-serif";
+			game().fillText("Henki pois!",257,129);
+			game().fillStyle = "#FFF";
+			game().fillText("Henki pois!",256,128);
+			
+			game().fillStyle = "#000";
+			game().font = "16px sans-serif";
+			game().fillText("Yritä keskittyä seuraavalla pelikerralla hieman paremmin",257,193);
+			game().fillStyle = "#FFF";
+			game().fillText("Yritä keskittyä seuraavalla pelikerralla hieman paremmin",256,192);
 		}
 	}
 	
@@ -219,9 +247,9 @@ $(function(){
 		}
 	}
 	
+	// TODO: Siirrä oliomuotoon.
 	
 	function piirraLintu(i,x,y){
-		//Linnun piirtäminen. Muut viholliset menee samalla tavalla.
 		game().drawImage(lintu[i],x,y);
 	}
 	
@@ -230,9 +258,6 @@ $(function(){
 	}
 	
 	function piirraUkko(i,x,y){
-		//Pelihahmo samalla tavalla
 		game().drawImage(ukko[i],x,y);
 	}
-	
-
 });

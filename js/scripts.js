@@ -39,7 +39,7 @@ $(function(){
 		var taulu = [];
 		for(i=0;i<9;i++){
 			var img = new Image();			
-			img.src="img/Lint"+i+".png";
+			img.src="img/lintu"+i+".png";
 			taulu.push(img);
 		}
 		return taulu;
@@ -49,7 +49,7 @@ $(function(){
 		var taulu = [];
 		for(i=0;i<3;i++){
 			var img = new Image();			
-			img.src="img/stick"+i+".png";
+			img.src="img/ukko"+i+".png";
 			taulu.push(img);
 		}
 		return taulu;
@@ -222,20 +222,20 @@ $(function(){
 			game().putImageData(imgd, 0, 0);
 			
 			// Aseta vihu pelaajan alle
-			vihuSiirtyma=0;
+			vihuSiirtyma=95;
 			
 			// Kirjoita tekstit
 			game().fillStyle = "#000";
 			game().font = "bold 64px sans-serif";
-			game().fillText("Henki pois!",257,129);
+			game().fillText("Henki pois :-(",65,129);
 			game().fillStyle = "#FFF";
-			game().fillText("Henki pois!",256,128);
+			game().fillText("Henki pois :-(",64,128);
 			
 			game().fillStyle = "#000";
 			game().font = "16px sans-serif";
-			game().fillText("Yritä keskittyä seuraavalla pelikerralla hieman paremmin",257,193);
+			game().fillText("Yritä keskittyä seuraavalla pelikerralla hieman paremmin",65,193);
 			game().fillStyle = "#FFF";
-			game().fillText("Yritä keskittyä seuraavalla pelikerralla hieman paremmin",256,192);
+			game().fillText("Yritä keskittyä seuraavalla pelikerralla hieman paremmin",64,192);
 		}
 	}
 	

@@ -1,4 +1,12 @@
 $(function(){
+	// Etunollat
+	function pad(number,length) {
+		var str = ''+number;
+		while (str.length < length) {
+			str = '0' + str;
+		}
+		return str;
+	}
 	function game(){
 		var canvas = $("canvas")[0];
 		if(canvas.getContext){
@@ -95,25 +103,27 @@ $(function(){
 	var iVihu=1;
 	var vihuX = 384; 
 	var vihuSiirtyma = 256;
+	
+	var pisteet = 0;
 
-	//2D-taulukko [5x4 vai 5x5], jossa on referenssit kuviin
+	// 2D-taulukko [5x3], jossa on referenssit kuviin
 	var maasto = new Array(5);
-	for (var i=0; i<maasto.length; i++){ //X-suuntaan
+	for (var i=0; i<maasto.length; i++){ // X-suuntaan
 		maasto[i] = new Array(4);
 		
-		//Generoi maasto eli lataa kuvat:
-		//Tehdään suora tie:
-		for (var j=0; j<maasto[i].length; j++){
-			if ( i == 2 ){
-				//Keskelle tie.
+		// Generoi maasto eli lataa kuvat:
+		// Tehdään suora tie:
+
+		for(var j=0; j<maasto[i].length; j++){ // Y-suuntaan
+			if(i == 2){
+				// Keskelle tie.
 				maasto[i][j] = tieSuoraan[0]; //Satunnainen tie.
 			}else{
 				maasto[i][j] = lataaKuva("brown"); //Satunnainen ei-tie.
-				//Tai mahdollisesti tyhjä paikka.
+				// Tai mahdollisesti tyhjä paikka.
 			}
 		}
 	}
-	
 	var ylinRivi = new Array( maasto.length );
 	ylinRivi[0] = "tausta";
 	ylinRivi[0] = "tausta";
@@ -127,6 +137,7 @@ $(function(){
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
+		pisteet += .5;
 		if(Math.ceil(Math.random()*16)==16){
 			vihuSiirtyma -= Math.floor(4/256*vihuSiirtyma);
 		}
@@ -174,7 +185,8 @@ $(function(){
 		// Pelaajan X-sijainnin varmistus
 		if(ukkoX<352 || ukkoX > 432){
 			ukkoX=384;
-			vihuSiirtyma -= 96; 
+			vihuSiirtyma -= 96;
+			pisteet += 25; // Uhkarohkeuspisteet
 		}
 		ukkoX += ukkoLiikkuuX;
 		
@@ -183,6 +195,25 @@ $(function(){
 		siirtoY+=4;
 		if (siirtoY>192){
 			siirtoY=0;
+			var maasto = new Array(5);
+			for (var i=maasto.length; i<=0; i--){ // X-suuntaan
+				console.log("fuck");
+				maasto[i] = new Array(3);
+				
+				// Generoi maasto eli lataa kuvat:
+				// Tehdään suora tie:
+
+				for(var j=maasto[i].length; j<=0; j--){ // Y-suuntaan
+					console.log(i + "x"+j); // Miksei tule konsoliin mitään?
+					if(i == 2){
+						// Keskelle tie.
+						maasto[i][j] = tieSuoraan[0]; //Satunnainen tie.
+					}else{
+						maasto[i][j] = lataaKuva("brown"); //Satunnainen ei-tie.
+						// Tai mahdollisesti tyhjä paikka.
+					}
+				}
+			}
 		}
 		
 		// Linnun liikerata
@@ -198,8 +229,17 @@ $(function(){
 			lintuK=(Math.random()-.5)*6;
 		}
 
+		if(hengissa){
+			game().fillStyle = "#000";
+			game().font = "24px sans-serif";
+			game().fillText((Math.floor(pisteet/50)*50)+" m",33,33);
+			game().fillStyle = "#FFF";
+			game().fillText((Math.floor(pisteet/50)*50)+" m",32,32);
+		}
+		
 		// Kun vihu saa pelaajan kiinni
 		if(vihuSiirtyma<96){
+			
 			// Ajasta uuden pelin alkaminen
 			if(hengissa){
 				hengissa=false;

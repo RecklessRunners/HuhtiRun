@@ -1,3 +1,6 @@
+// 20.fi/9621
+
+
 $(function(){
 	// Etunollat
 	function pad(number,length) {
@@ -29,17 +32,26 @@ $(function(){
 	function lataaTieSuoraan(){
 		var taulu = [];
 
-		for(i=0;i<2;i++){
+		for(i=0;i<6;i++){
 			var img = new Image();			
 			img.src="img/tiesuoraan"+i+".png";
 			taulu.push(img);
 		}
-		
-		//img.onload=function(){
 		return taulu;
-		//}
-		
 	}
+
+
+	function lataaTausta(){
+		var taulu = [];
+
+		for(i=0;i<4;i++){
+			var img = new Image();			
+			img.src="img/tausta"+i+".png";
+			taulu.push(img);
+		}
+		return taulu;
+	}
+
 	
 	// TODO: Siirrä oliomuotoon.
 	
@@ -73,17 +85,9 @@ $(function(){
 		return taulu;
 	}
 	
-	// Q: Tarvetta?
-	
-	var images = [
-		lataaKuva("blank"),
-		lataaKuva("brown"),
-		lataaKuva("left"),
-		lataaKuva("right"),
-		lataaKuva("risteys")
-	];
 	
 	var tieSuoraan = lataaTieSuoraan();
+	var taustaKuva = lataaTausta();
 	
 	var hengissa = true;
 	
@@ -121,9 +125,8 @@ $(function(){
 				maasto[i][j] = tieSuoraan[0]; //Satunnainen tie.
                 maastomuoto[i][j] = 'suoraan';
 			}else{
-				maasto[i][j] = lataaKuva("brown"); //Satunnainen ei-tie.
-                maastomuoto[i][j] = 'tyhja'
-				// Tai mahdollisesti tyhjä paikka.
+				maasto[i][j] = taustaKuva[0]; //Satunnainen ei-tie.
+                maastomuoto[i][j] = 'tausta'
 
 			}
 		}
@@ -209,12 +212,8 @@ $(function(){
             }
 
             //Päivitetään ylin rivi.
-            var j=0;
-		    if(Math.random()>0.5){
-			    j=1;
-		    }
             for (var i=0; i < maasto.length; i++){
-                maasto[i][0]= tieSuoraan[j];
+                maasto[i][0]= tieSuoraan[Math.floor( Math.random()*tieSuoraan.length )];
             }
             //Päivitys funtsittu, eli ok. 
             //1. Suoraan / käännös oikealle / käännös vasemmalle

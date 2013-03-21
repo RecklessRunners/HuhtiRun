@@ -27,11 +27,9 @@ $(function(){
 			return img;
 		//}
 	}
-	
-	
+
 	function lataaTieSuoraan(){
 		var taulu = [];
-
 		for(i=0;i<6;i++){
 			var img = new Image();			
 			img.src="img/tiesuoraan"+i+".png";
@@ -39,11 +37,19 @@ $(function(){
 		}
 		return taulu;
 	}
-
+	
+	function lataaMutkat(){
+		var taulu = [];
+		for(i=0;i<2;i++){
+			var img = new Image();			
+			img.src="img/kaannosv"+i+".png";
+			taulu.push(img);
+		}
+		return taulu;
+	}
 
 	function lataaTausta(){
 		var taulu = [];
-
 		for(i=0;i<4;i++){
 			var img = new Image();			
 			img.src="img/tausta"+i+".png";
@@ -87,9 +93,12 @@ $(function(){
 	
 	
 	var tieSuoraan = lataaTieSuoraan();
+	var tieMutkat = lataaMutkat();
 	var taustaKuva = lataaTausta();
 	
 	var hengissa = true;
+	
+	var biomi = 0; // Biomi on maaston tyyppi (0 = peltotie, 1 = asfaltti, ...)
 	
 	var lintu = lataaLintu();
 	var iLintu=0; // Linnun animaatio - framen n:o
@@ -102,13 +111,14 @@ $(function(){
 	var iUkko=0;
 	var ukkoX = 384;
 	var ukkoY = 192;
+	var pelaajaNopeus = 6;
 
 	var vihu = lataaVihu();
 	var iVihu=1;
 	var vihuX = 384; 
 	var vihuSiirtyma = 256;
 	
-	var pisteet = 0;
+	var matka = 0;
 
 	// 2D-taulukko [5x4], jossa on referenssit kuviin
 	var maasto = new Array(5);
@@ -138,7 +148,7 @@ $(function(){
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
-		pisteet += .5;
+		matka += .375;
 		if(Math.ceil(Math.random()*16)==16){
 			vihuSiirtyma -= Math.floor(4/256*vihuSiirtyma);
 		}
@@ -187,41 +197,93 @@ $(function(){
 		if(ukkoX<352 || ukkoX > 432){
 			ukkoX=384;
 			vihuSiirtyma -= 96;
-			pisteet += 25; // Uhkarohkeuspisteet
+			matka += 25; // Uhkarohkeusmatka
 		}
 		ukkoX += ukkoLiikkuuX;
 		
 		
 		// Maaston liikuttaminen
-		siirtoY+=4;
+		siirtoY+=pelaajaNopeus;
 		if (siirtoY>192){
 			siirtoY=0;
 
-            //
-            // Maaston päivitys
-            //
-            //
-            
-            //Kopioidaan ylemmät rivit alempaan
-            for (var j=maasto[0].length-1; j>0; j--){
-                for (var i=0; i < maasto.length; i++){
-                    //console.log("J I : " + j +" " +i  );
-                   maasto[i][j]=maasto[i][j-1]; 
-                   maastomuoto[i][j]=maastomuoto[i][j-1];
-              }
-            }
+			// Maaston päivitys
+			
+			// Kopioidaan ylemmät rivit alempaan
+			for (var j=maasto[0].length-1; j>0; j--){
+				for (var i=0; i < maasto.length; i++){
+					//console.log("J I : " + j +" " +i  );
+					maasto[i][j]=maasto[i][j-1]; 
+					maastomuoto[i][j]=maastomuoto[i][j-1];
+				}
+			}
 
-            //Päivitetään ylin rivi.
-            for (var i=0; i < maasto.length; i++){
-                maasto[i][0]= tieSuoraan[Math.floor( Math.random()*tieSuoraan.length )];
-            }
-            //Päivitys funtsittu, eli ok. 
-            //1. Suoraan / käännös oikealle / käännös vasemmalle
-            // i=0 => Ei vasemmalle
-            // i=4 => Ei oikealle
-            //2. Tee välisuorat
-            //3. Päivitä maasto / maastomuoto. 
-
+            // Päivitetään ylin rivi.
+			for (var i=0; i < maasto.length; i++){
+				// Markovin ketju
+				switch(Math.round(Math.random()*15)){
+					case 1:
+						biomi = Math.round(Math.random());
+					break;
+					case 2:
+					case 3:
+					case 4:
+					case 5:
+					case 6:
+					case 7:
+					case 8:
+					case 9:
+					case 10:
+					case 11:
+					case 12:
+						switch(biomi){
+							case 0:
+								maasto[i][0] = tieSuoraan[0]; // Peltotie suoraan
+								break;
+							case 1:
+								maasto[i][0] = tieSuoraan[2]; // Asfaltti suoraan
+							break;
+						}
+					break;
+					case 13:
+						switch(biomi){
+							case 0:
+								maasto[i][0] = tieSuoraan[1]; // Kaatunut puu, peltotie
+								break;
+							case 1:
+								maasto[i][0] = tieSuoraan[5]; // Kivi tien reunassa, asfaltti
+							break;
+						}
+					break;
+					case 14:
+						switch(biomi){
+							case 0:
+								maasto[i][0] = tieSuoraan[4]; // Rotko keskellä peltotietä
+								break;
+							case 1:
+								maasto[i][0] = tieSuoraan[3]; // Asfaltti suoraan
+							break;
+						}
+					break;
+					case 15:
+						switch(biomi){
+							case 0:
+								maasto[i][0] = tieMutkat[0]; // Rotko keskellä peltotietä
+								break;
+							case 1:
+								maasto[i][0] = tieMutkat[1]; // Asfaltti suoraan
+							break;
+						}
+					break;
+				}
+				//maasto[i][0] = tieSuoraan[Math.floor(Math.random()*tieSuoraan.length)];
+			}
+			// Päivitys funtsittu, eli ok. 
+			// 1. Suoraan / käännös oikealle / käännös vasemmalle
+			// 	i=0 => Ei vasemmalle
+			// 	i=4 => Ei oikealle
+			// 2. Tee välisuorat
+			// 3. Päivitä maasto / maastomuoto
 		}
 		
 		// Linnun liikerata
@@ -237,23 +299,30 @@ $(function(){
 			lintuK=(Math.random()-.5)*6;
 		}
 
+		// Kirjoita matka näytölle 250 metrin välein
 		if(hengissa){
-			game().fillStyle = "#000";
-			game().font = "24px sans-serif";
-			game().fillText((Math.floor(pisteet/50)*50)+" m",33,33);
-			game().fillStyle = "#FFF";
-			game().fillText((Math.floor(pisteet/50)*50)+" m",32,32);
+			var pyorista250 = Math.floor(matka/250)*250;
+			if(matka >= 250 && matka >= pyorista250 && matka <= pyorista250+50){
+				game().fillStyle = "#000";
+				game().font = "64px sans-serif";
+				game().fillText(pyorista250+" m",385,129);
+				game().fillStyle = "#FFF";
+				game().fillText(pyorista250+" m",384,128);
+			}
 		}
 		
 		// Kun vihu saa pelaajan kiinni
 		if(vihuSiirtyma<96){
-			
+			// Pysäytä maaston liikkuminen
+			pelaajaNopeus = 0;
+		
 			// Ajasta uuden pelin alkaminen
 			if(hengissa){
 				hengissa=false;
 				setTimeout(function(){
 					vihuSiirtyma=256;
 					hengissa=true;
+					pelaajaNopeus=6;
 				},5000);
 			}
 		
@@ -263,9 +332,9 @@ $(function(){
 			for (var i = 0, n = pix.length; i < n; i += 4) {
 				var grayscale = pix[i] * .3 + pix[i+1] * .59 + pix[i+2] * .11;
 				var sat = Math.random()*64-32;
-				pix[i] = grayscale - sat - 32;
-				pix[i+1] = grayscale - sat - 32;
-				pix[i+2] = grayscale - sat - 32;
+				pix[i] = grayscale - sat;
+				pix[i+1] = grayscale - sat;
+				pix[i+2] = grayscale - sat;
 			}
 			game().putImageData(imgd, 0, 0);
 			

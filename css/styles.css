@@ -1,11 +1,25 @@
+@import url(http://fonts.googleapis.com/css?family=Oxygen:400,700);
+
 body{
 	font:Verdana,sans-serif,serif;
-	background-color:#C0C0C0;
+	background-color:#303030;
 	text-align:center;
+	color:#FFF;
+	font-family: 'Oxygen', sans-serif;
+	background-image:url(../img/bg.png);
+}
+a{
+	color:#0080FF;
+	text-decoration:none;
 }
 canvas{
 	background-color:#FFF;
 	box-shadow:0 0 16px rgba(0,0,0,.25);
 	border-radius:4px;
 	margin-top:16px;
+}
+#fork-button{
+	position:absolute;
+	right:16px;
+	top:16px;
 }

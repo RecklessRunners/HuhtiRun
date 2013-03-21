@@ -29,7 +29,7 @@ $(function(){
 	function lataaTieSuoraan(){
 		var taulu = [];
 
-		for(i=0;i<1;i++){
+		for(i=0;i<2;i++){
 			var img = new Image();			
 			img.src="img/tiesuoraan"+i+".png";
 			taulu.push(img);
@@ -106,11 +106,12 @@ $(function(){
 	
 	var pisteet = 0;
 
-	// 2D-taulukko [5x3], jossa on referenssit kuviin
+	// 2D-taulukko [5x4], jossa on referenssit kuviin
 	var maasto = new Array(5);
+    var maastomuoto = new Array( maasto.length );
 	for (var i=0; i<maasto.length; i++){ // X-suuntaan
 		maasto[i] = new Array(4);
-		
+		maastomuoto[i] = new Array( maasto[i].length );
 		// Generoi maasto eli lataa kuvat:
 		// Tehdään suora tie:
 
@@ -118,18 +119,15 @@ $(function(){
 			if(i == 2){
 				// Keskelle tie.
 				maasto[i][j] = tieSuoraan[0]; //Satunnainen tie.
+                maastomuoto[i][j] = 'suoraan';
 			}else{
 				maasto[i][j] = lataaKuva("brown"); //Satunnainen ei-tie.
+                maastomuoto[i][j] = 'tyhja'
 				// Tai mahdollisesti tyhjä paikka.
+
 			}
 		}
 	}
-	var ylinRivi = new Array( maasto.length );
-	ylinRivi[0] = "tausta";
-	ylinRivi[0] = "tausta";
-	ylinRivi[2] = "tieylos";
-	ylinRivi[0] = "tausta";
-	ylinRivi[0] = "tausta";
 	
 	var ukkoLiikkuuX = 0;
 	var siirtoY = 0;	
@@ -195,25 +193,36 @@ $(function(){
 		siirtoY+=4;
 		if (siirtoY>192){
 			siirtoY=0;
-			var maasto = new Array(5);
-			for (var i=maasto.length; i<=0; i--){ // X-suuntaan
-				console.log("fuck");
-				maasto[i] = new Array(3);
-				
-				// Generoi maasto eli lataa kuvat:
-				// Tehdään suora tie:
 
-				for(var j=maasto[i].length; j<=0; j--){ // Y-suuntaan
-					console.log(i + "x"+j); // Miksei tule konsoliin mitään?
-					if(i == 2){
-						// Keskelle tie.
-						maasto[i][j] = tieSuoraan[0]; //Satunnainen tie.
-					}else{
-						maasto[i][j] = lataaKuva("brown"); //Satunnainen ei-tie.
-						// Tai mahdollisesti tyhjä paikka.
-					}
-				}
-			}
+            //
+            // Maaston päivitys
+            //
+            //
+            
+            //Kopioidaan ylemmät rivit alempaan
+            for (var j=maasto[0].length-1; j>0; j--){
+                for (var i=0; i < maasto.length; i++){
+                    //console.log("J I : " + j +" " +i  );
+                   maasto[i][j]=maasto[i][j-1]; 
+                   maastomuoto[i][j]=maastomuoto[i][j-1];
+              }
+            }
+
+            //Päivitetään ylin rivi.
+            var j=0;
+		    if(Math.random()>0.5){
+			    j=1;
+		    }
+            for (var i=0; i < maasto.length; i++){
+                maasto[i][0]= tieSuoraan[j];
+            }
+            //Päivitys funtsittu, eli ok. 
+            //1. Suoraan / käännös oikealle / käännös vasemmalle
+            // i=0 => Ei vasemmalle
+            // i=4 => Ei oikealle
+            //2. Tee välisuorat
+            //3. Päivitä maasto / maastomuoto. 
+
 		}
 		
 		// Linnun liikerata

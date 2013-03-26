@@ -20,100 +20,51 @@ $(function(){
 		}
 	}
 
-	function lataaKuva(kuva){
-		var img = new Image();
-		img.src="img/"+kuva+".png";
-		//img.onload=function(){
-			return img;
-		//}
-	}
-
-	function lataaTieSuoraan(){
-		var taulu = [];
-		for(i=0;i<6;i++){
-			var img = new Image();			
-			img.src="img/tiesuoraan"+i+".png";
-			taulu.push(img);
-		}
-		return taulu;
-	}
 	
-	function lataaMutkat(){
-		var taulu = [];
-		for(i=0;i<2;i++){
-			var img = new Image();			
-			img.src="img/kaannosv"+i+".png";
-			taulu.push(img);
-		}
-		return taulu;
-	}
 
-	function lataaTausta(){
-		var taulu = [];
-		for(i=0;i<4;i++){
-			var img = new Image();			
-			img.src="img/tausta"+i+".png";
-			taulu.push(img);
-		}
-		return taulu;
-	}
 
 	
 	// TODO: Siirrä oliomuotoon.
 	
-	function lataaLintu(){
-		var taulu = [];
-		for(i=0;i<9;i++){
-			var img = new Image();			
-			img.src="img/lintu"+i+".png";
-			taulu.push(img);
-		}
-		return taulu;
-	}
 
-	function lataaUkko(){
-		var taulu = [];
-		for(i=0;i<3;i++){
-			var img = new Image();			
-			img.src="img/ukko"+i+".png";
-			taulu.push(img);
-		}
-		return taulu;
-	}
 
-	function lataaVihu(){
-		var taulu = [];
-		for(i=0;i<5;i++){
-			var img = new Image();			
-			img.src="img/vihu"+i+".png";
-			taulu.push(img);
-		}
-		return taulu;
-	}
-	
-	
-	var tieSuoraan = lataaTieSuoraan();
-	var tieMutkat = lataaMutkat();
-	var taustaKuva = lataaTausta();
-	
+
+    function lataaKuvat(nimi, nmax){
+        var taulu = [];
+        for(var i=0;i<=nmax;i++){
+            var img = new Image();
+            img.src="img/"+nimi+i+".png";
+            taulu.push(img);
+        }
+        return taulu;
+    }
+
+	var tieSuoraan = lataaKuvat('tiesuoraan', 5 );
+	var tieVasemmalle = lataaKuvat('kaannosv',1 );
+	var tieOikealle = lataaKuvat('kaannoso',1 );
+	var taustaKuva = lataaKuvat('tausta', 4);
+    var tieVaakaan = lataaKuvat('tievaaka', 1);
+    var tieOikeaYlos = lataaKuvat('kaannosoy', 0);
+    var tieVasenYlos = lataaKuvat('kaannosvy', 0);
+
 	var hengissa = true;
 	
 	var biomi = 0; // Biomi on maaston tyyppi (0 = peltotie, 1 = asfaltti, ...)
 	
-	var lintu = lataaLintu();
+	var lintu = lataaKuvat('lintu', 8);
 	var iLintu=0; // Linnun animaatio - framen n:o
 	var lintuX = 0; // Linnun sijainti X
 	var lintuY = 128; // Linnun sijainti Y
 	var lintuK = 1.25; // Linnun kallistuskulma (px)
 	//var iLintuMax=8;
 	
-	var ukko = lataaUkko();
+	var ukko = lataaKuvat('ukko', 2);
 	var iUkko=0;
 	var ukkoX = 384;
 	var ukkoY = 192;
 	var pelaajaNopeus = 6;
 
-	var vihu = lataaVihu();
+	var vihu = lataaKuvat('vihu', 4);
 	var iVihu=1;
 	var vihuX = 384; 
 	var vihuSiirtyma = 256;
@@ -122,7 +73,8 @@ $(function(){
 
 	// 2D-taulukko [5x4], jossa on referenssit kuviin
 	var maasto = new Array(5);
-    var maastomuoto = new Array( maasto.length );
+    var maastomuoto = new Array( maasto.length ); //Tarvitaan lopetusehtoon
+    var tie = 2; //Missä on ylimmänrivin tie matkalla ylöspäin.
 	for (var i=0; i<maasto.length; i++){ // X-suuntaan
 		maasto[i] = new Array(4);
 		maastomuoto[i] = new Array( maasto[i].length );
@@ -141,7 +93,77 @@ $(function(){
 			}
 		}
 	}
-	
+
+
+    function jatkaTieOikeaan(ind){
+
+        //Arvotaan, kuinka kauas mennään oikeaan, eli arvotaan indeksi, jossa käännytään ylös
+        ylos = Math.floor( Math.random()*(5-1-ind) ) + ind +1 ;
+
+        maasto[ind][0] = tieOikealle[Math.floor(Math.random()*tieOikealle.length)];
+        //Täytetään välit suorilla
+        for (var i=ind+1; i<ylos; i++){
+            console.log("OIKEAAN" + i);
+            maasto[i][0] = tieVaakaan[Math.floor(Math.random()*tieVaakaan.length)];
+        }
+        maasto[ylos][0] = tieOikeaYlos[Math.floor(Math.random()*tieOikeaYlos.length)]; 
+
+        console.log(ind + " OIKEAAN " + ylos);
+
+        //Täytetään muut taustalla
+        var iTausta = [0, 1, 2, 3, 4];
+        iTausta.splice(ind, ylos-ind+1);
+        for ( var i in iTausta ){
+          maasto[iTausta[i]][0] = taustaKuva[Math.floor(Math.random()*taustaKuva.length)]; 
+        }
+
+
+        return ylos;
+    }
+
+
+    function jatkaTieVasempaan(ind){
+
+        //Arvotaan, kuinka kauas mennään vasempaan, eli arvotaan indeksi, jossa käännytään ylös
+        ylos = Math.floor( Math.random()*(ind-1) );
+
+        maasto[ind][0] = tieVasemmalle[Math.floor(Math.random()*tieVasemmalle.length)];
+        //Täytetään välit suorilla
+        for (var i=ylos+1; i<ind; i++){
+            console.log("VASEMPAAN" + i);
+            maasto[i][0] = tieVaakaan[Math.floor(Math.random()*tieVaakaan.length)];
+        }
+        maasto[ylos][0] = tieVasenYlos[Math.floor(Math.random()*tieVasenYlos.length)]; 
+
+        console.log(ind + " VASEMPAAN " + ylos);
+
+        //Täytetään muut taustalla
+        var iTausta = [0, 1, 2, 3, 4];
+        iTausta.splice(ylos, ind-ylos+1);
+        for ( var i in iTausta ){
+          maasto[iTausta[i]][0] = taustaKuva[Math.floor(Math.random()*taustaKuva.length)]; 
+        }
+
+        return ylos;
+    }
+
+    function jatkaTieYlos(ind){
+
+        maasto[ind][0] = tieSuoraan[Math.floor(Math.random()*tieSuoraan.length)];
+
+        
+        //Täytetään muut taustalla
+        var iTausta = [0, 1, 2, 3, 4];
+        iTausta.splice(ind, 1);
+        for ( var i in iTausta ){
+          maasto[iTausta[i]][0] = taustaKuva[Math.floor(Math.random()*taustaKuva.length)]; 
+        }
+
+
+        return ind;
+    }
+
+
 	var ukkoLiikkuuX = 0;
 	var siirtoY = 0;	
 	setInterval(paivita,25);
@@ -220,70 +242,52 @@ $(function(){
 
             // Päivitetään ylin rivi.
 			for (var i=0; i < maasto.length; i++){
-				// Markovin ketju
-				switch(Math.round(Math.random()*15)){
-					case 1:
-						biomi = Math.round(Math.random());
-					break;
-					case 2:
-					case 3:
-					case 4:
-					case 5:
-					case 6:
-					case 7:
-					case 8:
-					case 9:
-					case 10:
-					case 11:
-					case 12:
-						switch(biomi){
-							case 0:
-								maasto[i][0] = tieSuoraan[0]; // Peltotie suoraan
-								break;
-							case 1:
-								maasto[i][0] = tieSuoraan[2]; // Asfaltti suoraan
-							break;
-						}
-					break;
-					case 13:
-						switch(biomi){
-							case 0:
-								maasto[i][0] = tieSuoraan[1]; // Kaatunut puu, peltotie
-								break;
-							case 1:
-								maasto[i][0] = tieSuoraan[5]; // Kivi tien reunassa, asfaltti
-							break;
-						}
-					break;
-					case 14:
-						switch(biomi){
-							case 0:
-								maasto[i][0] = tieSuoraan[4]; // Rotko keskellä peltotietä
-								break;
-							case 1:
-								maasto[i][0] = tieSuoraan[3]; // Asfaltti suoraan
-							break;
-						}
-					break;
-					case 15:
-						switch(biomi){
-							case 0:
-								maasto[i][0] = tieMutkat[0]; // Rotko keskellä peltotietä
-								break;
-							case 1:
-								maasto[i][0] = tieMutkat[1]; // Asfaltti suoraan
-							break;
-						}
-					break;
-				}
 				//maasto[i][0] = tieSuoraan[Math.floor(Math.random()*tieSuoraan.length)];
 			}
+
+
+
 			// Päivitys funtsittu, eli ok. 
 			// 1. Suoraan / käännös oikealle / käännös vasemmalle
 			// 	i=0 => Ei vasemmalle
 			// 	i=4 => Ei oikealle
 			// 2. Tee välisuorat
 			// 3. Päivitä maasto / maastomuoto
+
+            // If on nopein:
+            // http://stackoverflow.com/questions/6665997/switch-statement-for-greater-than-less-than/12259830#12259830
+            //
+            var Suunta = Math.random();
+
+            if (tie == 0){
+                //Vasen reuna: ylös tai oikealle
+                if (Suunta < 0.5){ //Oikealle
+                    tie = jatkaTieOikeaan(tie);
+                }else{ //Ylös
+                    tie = jatkaTieYlos(tie); 
+                    
+                }
+            }else
+            if (tie==4){
+                //Oikea reuna; ylös tai vasemmalle
+                if (Suunta < 0.5){ //Vasemmalle
+                    tie = jatkaTieVasempaan(tie);
+                }else{ //Ylös
+                    tie = jatkaTieYlos(tie);
+                }
+            }else{
+            //Tie on oikean ja vasemman reunan välissä
+                if (Suunta < 0.4){
+                    //Vasemmalle
+                    tie = jatkaTieVasempaan(tie);
+                }else
+                if (Suunta < 0.8){ //Oikealle
+                    tie = jatkaTieOikeaan(tie); 
+                }else{ //Ylos
+                    tie = jatkaTieYlos(tie);
+                }
+            }
+
 		}
 		
 		// Linnun liikerata
@@ -298,7 +302,7 @@ $(function(){
 			lintuY=(Math.random()*($("canvas").height()/2))+$("canvas").height()/4;
 			lintuK=(Math.random()-.5)*6;
 		}
-
+74
 		// Kirjoita matka näytölle 250 metrin välein
 		if(hengissa){
 			var pyorista250 = Math.floor(matka/250)*250;
@@ -311,7 +315,7 @@ $(function(){
 			}
 		}
 		
-		// Kun vihu saa pelaajan kiinni
+		847599999// Kun vihu saa pelaajan kiinni
 		if(vihuSiirtyma<96){
 			// Pysäytä maaston liikkuminen
 			pelaajaNopeus = 0;

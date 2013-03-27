@@ -1,5 +1,5 @@
 // 20.fi/9621
-
+// http://openetherpad.org/SJkLmQ7z63
 
 $(function(){
 	// Etunollat
@@ -20,49 +20,53 @@ $(function(){
 		}
 	}
 
-	
+	function lataaKuvat(nimi, nmax){
+		var taulu = [];
+		for(var i=0;i<=nmax;i++){
+			var img = new Image();
+			img.src="img/"+nimi+i+".png";
+			taulu.push(img);
+		}
+		return taulu;
+	}
 
-
-	
-	// TODO: Siirrä oliomuotoon.
-	
-
-
-
-    function lataaKuvat(nimi, nmax){
-        var taulu = [];
-        for(var i=0;i<=nmax;i++){
-            var img = new Image();
-            img.src="img/"+nimi+i+".png";
-            taulu.push(img);
-        }
-        return taulu;
-    }
-
-	var tieSuoraan = lataaKuvat('tiesuoraan', 5 );
-	var tieVasemmalle = lataaKuvat('kaannosv',1 );
-	var tieOikealle = lataaKuvat('kaannoso',1 );
-	var taustaKuva = lataaKuvat('tausta', 4);
-    var tieVaakaan = lataaKuvat('tievaaka', 1);
-    var tieOikeaYlos = lataaKuvat('kaannosoy', 0);
-    var tieVasenYlos = lataaKuvat('kaannosvy', 0);
+	var tieSuoraan = lataaKuvat('tiesuoraan',5);
+	var tieVasemmalle = lataaKuvat('kaannosv',1);
+	var tieOikealle = lataaKuvat('kaannoso',1);
+	var taustaKuva = lataaKuvat('tausta',8);
+    var tieVaakaan = lataaKuvat('tievaaka',1);
+    var tieOikeaYlos = lataaKuvat('kaannosoy',0);
+    var tieVasenYlos = lataaKuvat('kaannosvy',0);
 
 	var hengissa = true;
 	
 	var biomi = 0; // Biomi on maaston tyyppi (0 = peltotie, 1 = asfaltti, ...)
 	
-	var lintu = lataaKuvat('lintu', 8);
+
+	// TODO: Siirrä oliomuotoon.
+	var  otus = {
+		x : 0,
+		y : 0,
+		i : 0,
+		kuvat : [],
+		lataaKuvat : function(nimi, lkm ){ 
+			this.kuvat = lataaKuvat(nimi, lkm)
+		}
+		
+	}
+	
+	var lintu = lataaKuvat('lintu', 8); // Lataa linnun kuvat
 	var iLintu=0; // Linnun animaatio - framen n:o
 	var lintuX = 0; // Linnun sijainti X
 	var lintuY = 128; // Linnun sijainti Y
 	var lintuK = 1.25; // Linnun kallistuskulma (px)
-	//var iLintuMax=8;
 	
 	var ukko = lataaKuvat('ukko', 2);
 	var iUkko=0;
 	var ukkoX = 384;
 	var ukkoY = 192;
 	var pelaajaNopeus = 6;
+	var ukkoHyppy = false;
 
 	var vihu = lataaKuvat('vihu', 4);
 	var iVihu=1;
@@ -74,7 +78,7 @@ $(function(){
 	// 2D-taulukko [5x4], jossa on referenssit kuviin
 	var maasto = new Array(5);
     var maastomuoto = new Array( maasto.length ); //Tarvitaan lopetusehtoon
-    var tie = 2; //Missä on ylimmänrivin tie matkalla ylöspäin.
+    var tie = 2; // Missä on ylimmänrivin tie matkalla ylöspäin.
 	for (var i=0; i<maasto.length; i++){ // X-suuntaan
 		maasto[i] = new Array(4);
 		maastomuoto[i] = new Array( maasto[i].length );
@@ -163,7 +167,7 @@ $(function(){
         return ind;
     }
 
-
+	
 	var ukkoLiikkuuX = 0;
 	var siirtoY = 0;	
 	setInterval(paivita,25);
@@ -197,6 +201,18 @@ $(function(){
 		vihuX = ukkoX; 
 		piirraLintu(iLintu,lintuX,lintuY);
 		
+		// Piirtää varjon, mikäli pelaaja on ilmassa = hyppää
+		if(ukkoHyppy){
+			game().fillStyle = "rgba(0,0,0,.25)";
+			game().arc(472,384,48,0,2*Math.PI);
+			game().fill();
+			game().fillStyle = "#000";
+			game().font = "bold italic 64px sans-serif";
+			game().fillText("UNGH!",64,192);
+			game().fillStyle = "#FF8000";
+			game().fillText("UNGH!",65,193);
+		}
+		
 		// Pelaajan ohjauskomennot
 		$("*").keydown(function(e) {
 			switch(e.keyCode){
@@ -210,6 +226,14 @@ $(function(){
 				case 68:
 					ukkoLiikkuuX = 7.5;
 				break;
+				case 38:
+					if(!ukkoHyppy){
+						ukkoHyppy=true;
+						setTimeout(function(){
+							ukkoHyppy=false;
+						},500);
+					}
+				break;
 			}
 		}).keyup(function(e){
 			ukkoLiikkuuX = 0;
@@ -219,7 +243,6 @@ $(function(){
 		if(ukkoX<352 || ukkoX > 432){
 			ukkoX=384;
 			vihuSiirtyma -= 96;
-			matka += 25; // Uhkarohkeusmatka
 		}
 		ukkoX += ukkoLiikkuuX;
 		
@@ -247,7 +270,7 @@ $(function(){
 
 
 
-			// Päivitys funtsittu, eli ok. 
+			// Päivitys 
 			// 1. Suoraan / käännös oikealle / käännös vasemmalle
 			// 	i=0 => Ei vasemmalle
 			// 	i=4 => Ei oikealle

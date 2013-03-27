@@ -33,7 +33,7 @@ $(function(){
 	var tieSuoraan = lataaKuvat('tiesuoraan',5);
 	var tieVasemmalle = lataaKuvat('kaannosv',1);
 	var tieOikealle = lataaKuvat('kaannoso',1);
-	var taustaKuva = lataaKuvat('tausta',8);
+	var taustaKuva = lataaKuvat('tausta',9);
     var tieVaakaan = lataaKuvat('tievaaka',1);
     var tieOikeaYlos = lataaKuvat('kaannosoy',0);
     var tieVasenYlos = lataaKuvat('kaannosvy',0);

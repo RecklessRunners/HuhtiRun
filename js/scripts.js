@@ -37,6 +37,7 @@ $(function(){
     var tieVaakaan = lataaKuvat('tievaaka',1);
     var tieOikeaYlos = lataaKuvat('kaannosoy',0);
     var tieVasenYlos = lataaKuvat('kaannosvy',0);
+	var varjo = lataaKuvat('varjo',0);
 
 	var hengissa = true;
 	
@@ -203,14 +204,15 @@ $(function(){
 		
 		// Piirtää varjon, mikäli pelaaja on ilmassa = hyppää
 		if(ukkoHyppy){
-			game().fillStyle = "rgba(0,0,0,.25)";
-			game().arc(472,384,48,0,2*Math.PI);
-			game().fill();
+			ukkoY=192-16;
+			game().drawImage(varjo[0],420,357);
 			game().fillStyle = "#000";
-			game().font = "bold italic 64px sans-serif";
-			game().fillText("UNGH!",64,192);
+			game().font = "bold italic 32px sans-serif";
+			game().fillText("UNGH!",256,192);
 			game().fillStyle = "#FF8000";
-			game().fillText("UNGH!",65,193);
+			game().fillText("UNGH!",257,193);
+		}else{
+			ukkoY=192;
 		}
 		
 		// Pelaajan ohjauskomennot
@@ -227,7 +229,7 @@ $(function(){
 					ukkoLiikkuuX = 7.5;
 				break;
 				case 38:
-					if(!ukkoHyppy){
+					if(!ukkoHyppy && hengissa){
 						ukkoHyppy=true;
 						setTimeout(function(){
 							ukkoHyppy=false;

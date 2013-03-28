@@ -20,7 +20,7 @@ $(function(){
 		}
 	}
 
-	function lataaKuvat(nimi, nmax){
+	function lataaKuvat(nimi,nmax){
 		var taulu = [];
 		for(var i=0;i<=nmax;i++){
 			var img = new Image();
@@ -29,7 +29,19 @@ $(function(){
 		}
 		return taulu;
 	}
+	
+	function lataaAanet(nimi,nmax){
+		var taulu = [];
+		for(var i=0;i<=nmax;i++){
+			var snd = new Audio();
+			snd.src="snd/"+nimi+i+".wav";
+			snd.load();
+			taulu.push(snd);
+		}
+		return taulu;
+	}
 
+	// Kuvat
 	var tieSuoraan = lataaKuvat('tiesuoraan',5);
 	var tieVasemmalle = lataaKuvat('kaannosv',1);
 	var tieOikealle = lataaKuvat('kaannoso',1);
@@ -38,11 +50,11 @@ $(function(){
     var tieOikeaYlos = lataaKuvat('kaannosoy',0);
     var tieVasenYlos = lataaKuvat('kaannosvy',0);
 	var varjo = lataaKuvat('varjo',0);
+	
+	// Äänet
+	var hyppyAani = lataaAanet("jump",0);
 
 	var hengissa = true;
-	
-	var biomi = 0; // Biomi on maaston tyyppi (0 = peltotie, 1 = asfaltti, ...)
-	
 
 	// TODO: Siirrä oliomuotoon.
 	var  otus = {
@@ -53,8 +65,9 @@ $(function(){
 		lataaKuvat : function(nimi, lkm ){ 
 			this.kuvat = lataaKuvat(nimi, lkm)
 		}
-		
 	}
+	
+	var debugMode = false; // Mikäli päällä, näyttää pelin tietoja oikeassa ylälaidassa
 	
 	var lintu = lataaKuvat('lintu', 8); // Lataa linnun kuvat
 	var iLintu=0; // Linnun animaatio - framen n:o
@@ -163,8 +176,6 @@ $(function(){
         for ( var i in iTausta ){
           maasto[iTausta[i]][0] = taustaKuva[Math.floor(Math.random()*taustaKuva.length)]; 
         }
-
-
         return ind;
     }
 
@@ -221,20 +232,29 @@ $(function(){
 				// Vasemmalle
 				case 37:
 				case 65:
-					ukkoLiikkuuX = -7.5;
+					ukkoLiikkuuX = -8;
 				break;
 				// Oikealle
 				case 39:	
 				case 68:
-					ukkoLiikkuuX = 7.5;
+					ukkoLiikkuuX = 8;
 				break;
 				case 38:
 					if(!ukkoHyppy && hengissa){
+						hyppyAani[0].play();
 						ukkoHyppy=true;
 						setTimeout(function(){
 							ukkoHyppy=false;
 						},500);
 					}
+				break;
+				case 114: // F3
+					if(debugMode){
+						debugMode=false;
+					}else{
+						debugMode=true;
+					}
+					e.preventDefault();
 				break;
 			}
 		}).keyup(function(e){
@@ -247,14 +267,13 @@ $(function(){
 			vihuSiirtyma -= 96;
 		}
 		ukkoX += ukkoLiikkuuX;
-		
-		
-		// Maaston liikuttaminen
+			
+		// Maaston liikuttaminen pelaajan nopeuden mukaan
 		siirtoY+=pelaajaNopeus;
+		
+		// Maaston päivitys
 		if (siirtoY>192){
 			siirtoY=0;
-
-			// Maaston päivitys
 			
 			// Kopioidaan ylemmät rivit alempaan
 			for (var j=maasto[0].length-1; j>0; j--){
@@ -267,10 +286,8 @@ $(function(){
 
             // Päivitetään ylin rivi.
 			for (var i=0; i < maasto.length; i++){
-				//maasto[i][0] = tieSuoraan[Math.floor(Math.random()*tieSuoraan.length)];
+				// maasto[i][0] = tieSuoraan[Math.floor(Math.random()*tieSuoraan.length)];
 			}
-
-
 
 			// Päivitys 
 			// 1. Suoraan / käännös oikealle / käännös vasemmalle
@@ -312,7 +329,6 @@ $(function(){
                     tie = jatkaTieYlos(tie);
                 }
             }
-
 		}
 		
 		// Linnun liikerata
@@ -382,6 +398,12 @@ $(function(){
 			game().fillText("Yritä keskittyä seuraavalla pelikerralla hieman paremmin",65,193);
 			game().fillStyle = "#FFF";
 			game().fillText("Yritä keskittyä seuraavalla pelikerralla hieman paremmin",64,192);
+		}
+		// Bebug-tietojen kirjoittaminen, mikäli debugMode=true
+		if(debugMode){
+			game().fillStyle = "#000";
+			game().font = "bold 16px sans-serif";
+			game().fillText("DebugMode",16,16);
 		}
 	}
 	

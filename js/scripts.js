@@ -3,6 +3,9 @@
 
 $(function(){
 
+
+
+
 	// Poistumisvarmistus
 	window.onbeforeunload = function (e) {
 		e = e || window.event;
@@ -42,7 +45,18 @@ $(function(){
         }
         return taulu;
     }
+    function lataaAanet(nimi, nmax){
+        var taulu = [];
+        for(var i=0;i<=nmax;i++){
+            var snd = new Audio();
+            snd.src="snd/"+nimi+i+".wav";
+			snd.load();
+            taulu.push(snd);
+        }
+        return taulu;
+    }
 
+	// Kuvat
 	var tieSuoraan = lataaKuvat('tiesuoraan', 5 );
 	var tieVasemmalle = lataaKuvat('kaannosv',1 );
 	var tieOikealle = lataaKuvat('kaannoso',1 );
@@ -51,9 +65,16 @@ $(function(){
     var tieOikeaYlos = lataaKuvat('kaannosoy', 0);
     var tieVasenYlos = lataaKuvat('kaannosvy', 0);
     var varjo = lataaKuvat('varjo',0);
+	
+	// Äänet
+	var hyppyAani = lataaAanet("jump",0);
+	var jyta = lataaAanet("jyta",0);
+	
+	jyta[0].loop=true;
+	jyta[0].play();
 
 	var hengissa = true;
-    var ukkoToleranssi = 80; 
+    var ukkoToleranssi = 40; 
     
 	var lintu = lataaKuvat('lintu', 8);
 	var iLintu=0; // Linnun animaatio - framen n:o
@@ -61,6 +82,8 @@ $(function(){
 	var lintuY = 128; // Linnun sijainti Y
 	var lintuK = 1.25; // Linnun kallistuskulma (px)
 	//var iLintuMax=8;
+	
+	var hyppy = false;
 	
 	if(localStorage.length != 0){
 		parhaatPisteet = localStorage.parhaatPisteet;
@@ -273,7 +296,7 @@ $(function(){
 		if(ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi){
 			ukkoX=0.5*( tieMinMax[0] + tieMinMax[1] );
 			vihuSiirtyma -= 96;
-            //ÄÄNIEFEKTI
+            hyppyAani[0].play();
 		}
 		ukkoX += ukkoLiikkuuX;
 		
@@ -356,7 +379,7 @@ $(function(){
 			lintuY=(Math.random()*($("canvas").height()/2))+$("canvas").height()/4;
 			lintuK=(Math.random()-.5)*6;
 		}
-74
+
 		// Kirjoita matka näytölle 250 metrin välein
 		if(hengissa){
 			var pyorista250 = Math.floor(matka/250)*250;
@@ -378,7 +401,7 @@ $(function(){
 		// Varjo
 		game().fillStyle="rgba(0,0,0,.2)";
 		
-		847599999// Kun vihu saa pelaajan kiinni
+		// Kun vihu saa pelaajan kiinni
 		if(vihuSiirtyma<96){
 			// Pysäytä maaston liikkuminen
 			pelaajaNopeus = 0;

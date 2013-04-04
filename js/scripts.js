@@ -2,7 +2,17 @@
 
 
 $(function(){
-	// Etunollat
+
+	// Poistumisvarmistus
+	window.onbeforeunload = function (e) {
+		e = e || window.event;
+		if (e) {
+			e.returnValue = 'Sure?';
+		}
+		return 'Sure?';
+	};
+
+	// Etunollat -- onko enää tarpeen?
 	function pad(number,length) {
 		var str = ''+number;
 		while (str.length < length) {
@@ -10,6 +20,7 @@ $(function(){
 		}
 		return str;
 	}
+	
 	function game(){
 		var canvas = $("canvas")[0];
 		if(canvas.getContext){
@@ -20,14 +31,7 @@ $(function(){
 		}
 	}
 
-	
-
-
-	
 	// TODO: Siirrä oliomuotoon.
-	
-
-
 
     function lataaKuvat(nimi, nmax){
         var taulu = [];
@@ -42,16 +46,15 @@ $(function(){
 	var tieSuoraan = lataaKuvat('tiesuoraan', 5 );
 	var tieVasemmalle = lataaKuvat('kaannosv',1 );
 	var tieOikealle = lataaKuvat('kaannoso',1 );
-	var taustaKuva = lataaKuvat('tausta', 4);
+	var taustaKuva = lataaKuvat('tausta', 8);
     var tieVaakaan = lataaKuvat('tievaaka', 1);
     var tieOikeaYlos = lataaKuvat('kaannosoy', 0);
     var tieVasenYlos = lataaKuvat('kaannosvy', 0);
+    var varjo = lataaKuvat('varjo',0);
 
 	var hengissa = true;
     var ukkoToleranssi = 80; 
-	
-	var biomi = 0; // Biomi on maaston tyyppi (0 = peltotie, 1 = asfaltti, ...)
-	
+    
 	var lintu = lataaKuvat('lintu', 8);
 	var iLintu=0; // Linnun animaatio - framen n:o
 	var lintuX = 0; // Linnun sijainti X
@@ -59,22 +62,30 @@ $(function(){
 	var lintuK = 1.25; // Linnun kallistuskulma (px)
 	//var iLintuMax=8;
 	
+	if(localStorage.length != 0){
+		parhaatPisteet = localStorage.parhaatPisteet;
+	}else{
+		parhaatPisteet = 0;
+	}
+	
 	var ukko = lataaKuvat('ukko', 2);
 	var iUkko=0;
 	var ukkoX = 384;
 	var ukkoY = 192;
-	var pelaajaNopeus = 6;
+	var pelaajaNopeus = 9;
 
 	var vihu = lataaKuvat('vihu', 4);
 	var iVihu=1;
 	var vihuX = []; 
-    for (var i=1; i < 20; i++){
+    for (var i=1; i < 5; i++){
             vihuX.push( ukkoX );
     }
 	var vihuSiirtyma = 256;
 	
 	var matka = 0;
     var tieMinMax = [0, 960];
+    
+    var paussilla = false;
 
 	// 2D-taulukko [5x4], jossa on referenssit kuviin
 	var maasto = new Array(5);
@@ -207,6 +218,7 @@ $(function(){
 		piirraVihu(iVihu,vihuX.shift(), ukkoY+vihuSiirtyma);
 		piirraUkko(iUkko,ukkoX,ukkoY);
 		piirraLintu(iLintu,lintuX,lintuY);
+		//piirraVarjo();
 		
 		// Pelaajan ohjauskomennot
 		$("*").keydown(function(e) {
@@ -214,12 +226,20 @@ $(function(){
 				// Vasemmalle
 				case 37:
 				case 65:
-					ukkoLiikkuuX = -17.5;
+					ukkoLiikkuuX = -20;
 				break;
 				// Oikealle
 				case 39:	
 				case 68:
-					ukkoLiikkuuX = 17.5;
+					ukkoLiikkuuX = 20;
+				break;
+				// Aseta peli tauolle kun painaa Esc
+				case 27:
+					if(paussilla){
+						paussilla=false;
+					}else{
+						paussilla=true;
+					}
 				break;
 			}
 		}).keyup(function(e){
@@ -253,14 +273,19 @@ $(function(){
 		if(ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi){
 			ukkoX=0.5*( tieMinMax[0] + tieMinMax[1] );
 			vihuSiirtyma -= 96;
-			matka += 25; // Uhkarohkeusmatka
             //ÄÄNIEFEKTI
 		}
 		ukkoX += ukkoLiikkuuX;
 		
 		
 		// Maaston liikuttaminen
-		siirtoY+=pelaajaNopeus;
+		if(paussilla){
+			game().fillStyle = "#FFF";
+			game().font = "32px sans-serif";
+			game().fillText("Paussilla",64,64);	
+		}else{
+			siirtoY+=pelaajaNopeus;
+		}
 		if (siirtoY>192){
 			siirtoY=0;
 
@@ -335,14 +360,23 @@ $(function(){
 		// Kirjoita matka näytölle 250 metrin välein
 		if(hengissa){
 			var pyorista250 = Math.floor(matka/250)*250;
-			if(matka >= 250 && matka >= pyorista250 && matka <= pyorista250+50){
+			var pyorista25 = Math.floor(matka/25)*25;
+			if(matka >= 250 && matka >= pyorista250 && matka <= pyorista250+25){
 				game().fillStyle = "#000";
 				game().font = "64px sans-serif";
 				game().fillText(pyorista250+" m",385,129);
 				game().fillStyle = "#FFF";
 				game().fillText(pyorista250+" m",384,128);
 			}
+			game().fillStyle = "#000";
+			game().font = "16px sans-serif";
+			game().fillText(pyorista25+" m",16,16);
+			game().fillStyle = "#FFF";
+			game().fillText(pyorista25+" m",16,16);
 		}
+		
+		// Varjo
+		game().fillStyle="rgba(0,0,0,.2)";
 		
 		847599999// Kun vihu saa pelaajan kiinni
 		if(vihuSiirtyma<96){
@@ -356,6 +390,7 @@ $(function(){
 					vihuSiirtyma=256;
 					hengissa=true;
 					pelaajaNopeus=6;
+					matka=0;
 				},5000);
 			}
 		
@@ -377,15 +412,19 @@ $(function(){
 			// Kirjoita tekstit
 			game().fillStyle = "#000";
 			game().font = "bold 64px sans-serif";
-			game().fillText("Henki pois :-(",65,129);
+			game().fillText("Uuh, ihanaa!",65,129);
 			game().fillStyle = "#FFF";
-			game().fillText("Henki pois :-(",64,128);
+			game().fillText("Uuh, ihanaa!",64,128);
+			parhaatPisteet = Math.max(parhaatPisteet,matka);
+			localStorage.parhaatPisteet=parhaatPisteet;
 			
 			game().fillStyle = "#000";
 			game().font = "16px sans-serif";
-			game().fillText("Yritä keskittyä seuraavalla pelikerralla hieman paremmin",65,193);
+			var alateksti = "Juoksit " + Math.round(matka) + " metriä. Paras tulos on " + Math.round(parhaatPisteet) + " m.";
+			
+			game().fillText(alateksti,65,193);
 			game().fillStyle = "#FFF";
-			game().fillText("Yritä keskittyä seuraavalla pelikerralla hieman paremmin",64,192);
+			game().fillText(alateksti,64,192);
 		}
 	}
 	
@@ -401,6 +440,10 @@ $(function(){
 	
 	function piirraLintu(i,x,y){
 		game().drawImage(lintu[i],x,y);
+	}
+	
+	function piirraVarjo(){
+		//game().drawImage(varjoKuva[0],ukkoX,ukkoY+128);
 	}
 	
 	function piirraVihu(i,x,y){

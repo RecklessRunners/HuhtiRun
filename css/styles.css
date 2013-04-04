@@ -1,12 +1,15 @@
 @import url(http://fonts.googleapis.com/css?family=Oxygen:400,700);
 
+body,html{
+	margin:0;
+	padding:0;
+}
 body{
 	font:Verdana,sans-serif,serif;
-	background-color:#303030;
+	background-color:#000;
 	text-align:center;
 	color:#FFF;
 	font-family: 'Oxygen', sans-serif;
-	background-image:url(../img/bg.png);
 }
 a{
 	color:#0080FF;
@@ -14,12 +17,26 @@ a{
 }
 canvas{
 	background-color:#FFF;
-	box-shadow:0 0 16px rgba(0,0,0,.25);
-	border-radius:4px;
-	margin-top:16px;
+	height:100%;
+	margin:0;
+	padding:0;
 }
 #fork-button{
-	position:absolute;
+	position:fixed;
 	right:16px;
 	top:16px;
+}
+#bottomBar{
+	position:fixed;
+	bottom:8px;
+	left:0;
+	width:100%;
+	text-align:center;
+	text-shadow:1px 1px 0 rgba(0,0,0,.5),0 0 2px #000;
+	background-color:rgba(0,0,0,.5);
+	padding:4px;
+	opacity:.5;
+}
+#bottomBar:hover{
+	opacity:1;
 }

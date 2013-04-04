@@ -60,21 +60,23 @@ $(function(){
 	var tieSuoraan = lataaKuvat('tiesuoraan', 5 );
 	var tieVasemmalle = lataaKuvat('kaannosv',1 );
 	var tieOikealle = lataaKuvat('kaannoso',1 );
-	var taustaKuva = lataaKuvat('tausta', 8);
-    var tieVaakaan = lataaKuvat('tievaaka', 1);
-    var tieOikeaYlos = lataaKuvat('kaannosoy', 0);
-    var tieVasenYlos = lataaKuvat('kaannosvy', 0);
-    var varjo = lataaKuvat('varjo',0);
+	var taustaKuva = lataaKuvat('tausta', 9);
+	var tieVaakaan = lataaKuvat('tievaaka', 1);
+	var tieOikeaYlos = lataaKuvat('kaannosoy', 0);
+	var tieVasenYlos = lataaKuvat('kaannosvy', 0);
+	var varjo = lataaKuvat('varjo',0);
 	
 	// Äänet
 	var hyppyAani = lataaAanet("jump",0);
-	var jyta = lataaAanet("jyta",0);
+	var dramaattinen = lataaAanet("dead",0);
+	var tausta = lataaAanet("back",0);
+	var auts = lataaAanet("ouch",0);
 	
-	jyta[0].loop=true;
-	jyta[0].play();
+	tausta[0].loop=true;
+	tausta[0].play();
 
 	var hengissa = true;
-    var ukkoToleranssi = 40; 
+	var ukkoToleranssi = 40; 
     
 	var lintu = lataaKuvat('lintu', 8);
 	var iLintu=0; // Linnun animaatio - framen n:o
@@ -215,7 +217,9 @@ $(function(){
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
-		matka += .375;
+		if(hengissa){
+			matka += .375;
+		}
 		if(Math.ceil(Math.random()*16)==16){
 			vihuSiirtyma -= Math.floor(4/256*vihuSiirtyma);
 		}
@@ -296,7 +300,7 @@ $(function(){
 		if(ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi){
 			ukkoX=0.5*( tieMinMax[0] + tieMinMax[1] );
 			vihuSiirtyma -= 96;
-            hyppyAani[0].play();
+            auts[0].play();
 		}
 		ukkoX += ukkoLiikkuuX;
 		
@@ -392,10 +396,10 @@ $(function(){
 				game().fillText(pyorista250+" m",384,128);
 			}
 			game().fillStyle = "#000";
-			game().font = "16px sans-serif";
-			game().fillText(pyorista25+" m",16,16);
+			game().font = "bold 24px sans-serif";
+			game().fillText(pyorista25+" m",48,48);
 			game().fillStyle = "#FFF";
-			game().fillText(pyorista25+" m",16,16);
+			game().fillText(pyorista25+" m",49,49);
 		}
 		
 		// Varjo
@@ -405,15 +409,18 @@ $(function(){
 		if(vihuSiirtyma<96){
 			// Pysäytä maaston liikkuminen
 			pelaajaNopeus = 0;
+			tausta[0].volume=.5;
 		
 			// Ajasta uuden pelin alkaminen
 			if(hengissa){
 				hengissa=false;
+				dramaattinen[0].play();
 				setTimeout(function(){
 					vihuSiirtyma=256;
 					hengissa=true;
-					pelaajaNopeus=6;
+					pelaajaNopeus=9;
 					matka=0;
+					tausta[0].volume=1;
 				},5000);
 			}
 		
@@ -438,12 +445,13 @@ $(function(){
 			game().fillText("Uuh, ihanaa!",65,129);
 			game().fillStyle = "#FFF";
 			game().fillText("Uuh, ihanaa!",64,128);
+
 			parhaatPisteet = Math.max(parhaatPisteet,matka);
 			localStorage.parhaatPisteet=parhaatPisteet;
 			
 			game().fillStyle = "#000";
-			game().font = "16px sans-serif";
-			var alateksti = "Juoksit " + Math.round(matka) + " metriä. Paras tulos on " + Math.round(parhaatPisteet) + " m.";
+			game().font = "bold 16px sans-serif";
+			var alateksti = "Juoksit " + Math.round(matka) + " metriä! Paras tulos tällä koneella on " + Math.round(parhaatPisteet) + " m.";
 			
 			game().fillText(alateksti,65,193);
 			game().fillStyle = "#FFF";

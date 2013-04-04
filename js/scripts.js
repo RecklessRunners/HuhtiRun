@@ -218,7 +218,7 @@ $(function(){
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
 		if(hengissa){
-			matka += .375;
+			matka += .075;
 		}
 		if(Math.ceil(Math.random()*16)==16){
 			vihuSiirtyma -= Math.floor(4/256*vihuSiirtyma);
@@ -384,22 +384,22 @@ $(function(){
 			lintuK=(Math.random()-.5)*6;
 		}
 
-		// Kirjoita matka näytölle 250 metrin välein
+		// Kirjoita matka näytölle 50 metrin välein
 		if(hengissa){
-			var pyorista250 = Math.floor(matka/250)*250;
-			var pyorista25 = Math.floor(matka/25)*25;
-			if(matka >= 250 && matka >= pyorista250 && matka <= pyorista250+25){
+			var pyorista50 = Math.floor(matka/50)*50;
+			var pyorista5 = Math.floor(matka/5)*5;
+			if(matka >= 50 && matka >= pyorista50 && matka <= pyorista50+10){
 				game().fillStyle = "#000";
 				game().font = "64px sans-serif";
-				game().fillText(pyorista250+" m",385,129);
+				game().fillText(pyorista50+" m",385,129);
 				game().fillStyle = "#FFF";
-				game().fillText(pyorista250+" m",384,128);
+				game().fillText(pyorista50+" m",384,128);
 			}
 			game().fillStyle = "#000";
 			game().font = "bold 24px sans-serif";
-			game().fillText(pyorista25+" m",48,48);
+			game().fillText(pyorista5+" m",48,48);
 			game().fillStyle = "#FFF";
-			game().fillText(pyorista25+" m",49,49);
+			game().fillText(pyorista5+" m",49,49);
 		}
 		
 		// Varjo
@@ -409,7 +409,7 @@ $(function(){
 		if(vihuSiirtyma<96){
 			// Pysäytä maaston liikkuminen
 			pelaajaNopeus = 0;
-			tausta[0].volume=.5;
+			tausta[0].volume=.375;
 		
 			// Ajasta uuden pelin alkaminen
 			if(hengissa){

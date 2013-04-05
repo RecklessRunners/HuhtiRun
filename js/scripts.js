@@ -3,16 +3,13 @@
 
 $(function(){
 
-
-
-
-	// Poistumisvarmistus
+	// Poistumisvahvistus
 	window.onbeforeunload = function (e) {
 		e = e || window.event;
 		if (e) {
-			e.returnValue = 'Sure?';
+			e.returnValue = "Haluatko varmasti poistua?";
 		}
-		return 'Sure?';
+		return "Haluatko varmasti poistua?";
 	};
 
 	// Etunollat -- onko enää tarpeen?
@@ -26,10 +23,10 @@ $(function(){
 	
 	function game(){
 		var canvas = $("canvas")[0];
-		if(canvas.getContext){
+		if(canvas.getContext && navigator.userAgent.indexOf("Firefox") != -1){
 			return canvas.getContext('2d');
 		}else{
-			document.location="unsupported.html";
+			document.location="pages/unsupported.html";
 			return false;
 		}
 	}
@@ -68,13 +65,19 @@ $(function(){
 	
 	// Äänet
 	var hyppyAani = lataaAanet("jump",0);
-	var dramaattinen = lataaAanet("dead",0);
-	var tausta = lataaAanet("back",0);
+	var dramaattinen = lataaAanet("over",0);
+	var tausta = lataaAanet("bg",0);
 	var auts = lataaAanet("ouch",0);
+	var korkeaAani = lataaAanet("angels",0);
 	
 	tausta[0].loop=true;
 	tausta[0].play();
 
+	korkeaAani[0].loop=true;
+	korkeaAani[0].volume=0;
+	korkeaAani[0].play();
+
+	var suojakilpi = 4000;
 	var hengissa = true;
 	var ukkoToleranssi = 40; 
     
@@ -126,11 +129,10 @@ $(function(){
 			if(i == 2){
 				// Keskelle tie.
 				maasto[i][j] = tieSuoraan[0]; //Satunnainen tie.
-                maastomuoto[i][j] = 1; //TIE
+            	maastomuoto[i][j] = 1; //TIE
 			}else{
 				maasto[i][j] = taustaKuva[0]; //Satunnainen ei-tie.
                 maastomuoto[i][j] = 0; //Kuolema 
-
 			}
 		}
 	}
@@ -217,11 +219,23 @@ $(function(){
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
+		aanenVoimakkuus=Math.max(0,Math.min(1,1/176*(vihuSiirtyma-80)));
+		if(hengissa){
+			korkeaAani[0].volume=Math.max(0,.6-aanenVoimakkuus);
+			tausta[0].volume=aanenVoimakkuus;
+		}else{
+			korkeaAani[0].volume=0;
+			tausta[0].volume=.2;
+		}
+
+		if(suojakilpi>0){
+			suojakilpi-=50;
+		}
 		if(hengissa){
 			matka += .075;
 		}
 		if(Math.ceil(Math.random()*16)==16){
-			vihuSiirtyma -= Math.floor(4/256*vihuSiirtyma);
+			vihuSiirtyma -= Math.floor(2/256*vihuSiirtyma);
 		}
 		// Pelin lopetustestaus
 
@@ -249,16 +263,17 @@ $(function(){
 		
 		// Pelaajan ohjauskomennot
 		$("*").keydown(function(e) {
+			var randomiNopeus = 20 + Math.round(Math.random()*20);
 			switch(e.keyCode){
 				// Vasemmalle
 				case 37:
 				case 65:
-					ukkoLiikkuuX = -20;
+					ukkoLiikkuuX = randomiNopeus*-1;
 				break;
 				// Oikealle
 				case 39:	
 				case 68:
-					ukkoLiikkuuX = 20;
+					ukkoLiikkuuX = randomiNopeus;
 				break;
 				// Aseta peli tauolle kun painaa Esc
 				case 27:
@@ -297,12 +312,17 @@ $(function(){
         }
         
         //Ukko ja tie. 
-		if(ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi){
-			ukkoX=0.5*( tieMinMax[0] + tieMinMax[1] );
-			vihuSiirtyma -= 96;
-            auts[0].play();
+		if(ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi-120){
+			if(suojakilpi==0){
+				vihuSiirtyma -= 64 + Math.round(Math.random()*48);
+				ukkoX=0.5*( tieMinMax[0] + tieMinMax[1] );
+				suojakilpi+=2000;
+				auts[0].play();
+			}
 		}
-		ukkoX += ukkoLiikkuuX;
+		if(ukkoX + ukkoLiikkuuX >= 0 && ukkoX + ukkoLiikkuuX <= $("canvas").width()-192){
+			ukkoX += ukkoLiikkuuX;
+		}
 		
 		
 		// Maaston liikuttaminen
@@ -387,7 +407,6 @@ $(function(){
 		// Kirjoita matka näytölle 50 metrin välein
 		if(hengissa){
 			var pyorista50 = Math.floor(matka/50)*50;
-			var pyorista5 = Math.floor(matka/5)*5;
 			if(matka >= 50 && matka >= pyorista50 && matka <= pyorista50+10){
 				game().fillStyle = "#000";
 				game().font = "64px sans-serif";
@@ -397,22 +416,33 @@ $(function(){
 			}
 			game().fillStyle = "#000";
 			game().font = "bold 24px sans-serif";
-			game().fillText(pyorista5+" m",48,48);
+			game().fillText(Math.round(matka)+" m",48,48);
 			game().fillStyle = "#FFF";
-			game().fillText(pyorista5+" m",49,49);
+			game().fillText(Math.round(matka)+" m",49,49);
 		}
 		
 		// Varjo
-		game().fillStyle="rgba(0,0,0,.2)";
+		//game().fillStyle="rgba(0,0,0,.2)";
+
+		if(vihuSiirtyma<192 && hengissa){
+			game().textAlign="center";
+			game().font = "bold 32px sans-serif";
+			game().fillStyle="#000";
+			var keskiosa = {"x":$("canvas").width()/2,"y":$("canvas").height()/2};
+			game().fillText("Olet hengenvaarassa!",keskiosa.x,keskiosa.y);
+			game().fillStyle="#FF0000";
+			game().fillText("Olet hengenvaarassa!",keskiosa.x+1,keskiosa.y+1);
+			game().textAlign="start";
+		}
 		
 		// Kun vihu saa pelaajan kiinni
 		if(vihuSiirtyma<96){
 			// Pysäytä maaston liikkuminen
 			pelaajaNopeus = 0;
-			tausta[0].volume=.375;
 		
 			// Ajasta uuden pelin alkaminen
 			if(hengissa){
+				suojakilpi=0;
 				hengissa=false;
 				dramaattinen[0].play();
 				setTimeout(function(){
@@ -421,6 +451,7 @@ $(function(){
 					pelaajaNopeus=9;
 					matka=0;
 					tausta[0].volume=1;
+					suojakilpi=4000;
 				},5000);
 			}
 		
@@ -429,8 +460,8 @@ $(function(){
 			var pix = imgd.data;
 			for (var i = 0, n = pix.length; i < n; i += 4) {
 				var grayscale = pix[i] * .3 + pix[i+1] * .59 + pix[i+2] * .11;
-				var sat = Math.random()*64-32;
-				pix[i] = grayscale - sat;
+				var sat = 32+(Math.random()*96);
+				pix[i] = grayscale - 32;
 				pix[i+1] = grayscale - sat;
 				pix[i+2] = grayscale - sat;
 			}
@@ -482,6 +513,16 @@ $(function(){
 	}
 	
 	function piirraUkko(i,x,y){
+		if(suojakilpi>0){
+			if(suojakilpi<=2000){
+				if(suojakilpi%100){
+					game().globalAlpha=.5;
+				}
+			}else{
+				game().globalAlpha=.5;
+			}
+		}
 		game().drawImage(ukko[i],x,y);
+		game().globalAlpha=1;
 	}
 });

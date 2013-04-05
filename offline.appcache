@@ -55,10 +55,11 @@ img/vihu4.png
 snd/bg0.wav
 snd/jump0.wav
 snd/dead0.wav
+snd/high0.wav
 authors.html
 fallback.html
 help.html
 unsupported.html
 
 FALLBACK:
-fallback.html
+pages/fallback.html

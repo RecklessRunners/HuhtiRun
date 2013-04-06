@@ -54,13 +54,13 @@ $(function(){
     }
 
 	// Kuvat
-	var tieSuoraan = lataaKuvat('tiesuoraan', 5 );
-	var tieVasemmalle = lataaKuvat('kaannosv',1 );
-	var tieOikealle = lataaKuvat('kaannoso',1 );
-	var taustaKuva = lataaKuvat('tausta', 9);
-	var tieVaakaan = lataaKuvat('tievaaka', 1);
-	var tieOikeaYlos = lataaKuvat('kaannosoy', 0);
-	var tieVasenYlos = lataaKuvat('kaannosvy', 0);
+	var tieSuoraan = lataaKuvat('tiesuoraan',5);
+	var tieVasemmalle = lataaKuvat('kaannosv',1);
+	var tieOikealle = lataaKuvat('kaannoso',2);
+	var taustaKuva = lataaKuvat('tausta',6);
+	var tieVaakaan = lataaKuvat('tievaaka',1);
+	var tieOikeaYlos = lataaKuvat('kaannosoy',1);
+	var tieVasenYlos = lataaKuvat('kaannosvy',1);
 	var varjo = lataaKuvat('varjo',0);
 	
 	// Äänet
@@ -79,7 +79,46 @@ $(function(){
 
 	var suojakilpi = 4000;
 	var hengissa = true;
-	var ukkoToleranssi = 40; 
+	var ukkoToleranssi = 40;
+	
+	// Biomit
+	// Arvotaan tietyn tyyppistä tietä ja maastoa, kun ollaan aavikolla, ruohikossa, merellä jne.
+	var biomi = 0;
+	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille
+		[0,0,0,3,3,4,5,5], // Aavikko
+		[1,2], // Ruoho
+		[6] // Meri
+	];
+	var biomiTieSuoraanKuvat = [
+		[0,1,4],
+		[2,3,5],
+		[2,3,5]
+	];
+	var biomiTieVaakaanKuvat = [
+		[0],
+		[1],
+		[1]
+	];
+	var biomiTieVYKuvat = [
+		[1],
+		[0],
+		[0]
+	];
+	var biomiTieOYKuvat = [
+		[0],
+		[1],
+		[1]
+	];
+	var biomiTieVasKuvat = [
+		[0],
+		[1],
+		[1]
+	];
+	var biomiTieOikKuvat = [
+		[2],
+		[0,1],
+		[0,1]
+	];
     
 	var lintu = lataaKuvat('lintu', 8);
 	var iLintu=0; // Linnun animaatio - framen n:o
@@ -143,14 +182,14 @@ $(function(){
         //Arvotaan, kuinka kauas mennään oikeaan, eli arvotaan indeksi, jossa käännytään ylös
         ylos = Math.floor( Math.random()*(5-1-ind) ) + ind +1 ;
 
-        maasto[ind][0] = tieOikealle[Math.floor(Math.random()*tieOikealle.length)];
+        maasto[ind][0] = tieOikealle[biomiTieOikKuvat[biomi][Math.floor(Math.random()*biomiTieOikKuvat[biomi].length)]];
         maastomuoto[ind][0] = 1;
         //Täytetään välit suorilla
         for (var i=ind+1; i<ylos; i++){
-            maasto[i][0] = tieVaakaan[Math.floor(Math.random()*tieVaakaan.length)];
+            maasto[i][0] = tieVaakaan[biomiTieVaakaanKuvat[biomi][Math.floor(Math.random()*biomiTieVaakaanKuvat[biomi].length)]];
             maastomuoto[i][0] = 1; //Tie
         }
-        maasto[ylos][0] = tieOikeaYlos[Math.floor(Math.random()*tieOikeaYlos.length)]; 
+        maasto[ylos][0] = tieOikeaYlos[biomiTieOYKuvat[biomi][Math.floor(Math.random()*biomiTieOYKuvat[biomi].length)]]; 
         maastomuoto[ylos][0]=1; 
 
 
@@ -158,7 +197,8 @@ $(function(){
         var iTausta = [0, 1, 2, 3, 4];
         iTausta.splice(ind, ylos-ind+1);
         for ( var i in iTausta ){
-          maasto[iTausta[i]][0] = taustaKuva[Math.floor(Math.random()*taustaKuva.length)]; 
+          maasto[iTausta[i]][0] = taustaKuva[biomiKuvat[biomi][Math.floor(Math.random()*biomiKuvat[biomi].length)]];
+          console.log("Biomi: "+biomi+", Kuva: "+biomiKuvat[biomi][Math.floor(Math.random()*biomiKuvat[biomi].length)]);
           maastomuoto[iTausta[i]][0] = 0; //Kuolema
         }
 
@@ -172,14 +212,14 @@ $(function(){
         //Arvotaan, kuinka kauas mennään vasempaan, eli arvotaan indeksi, jossa käännytään ylös
         ylos = Math.floor( Math.random()*(ind-1) );
 
-        maasto[ind][0] = tieVasemmalle[Math.floor(Math.random()*tieVasemmalle.length)];
+        maasto[ind][0] = tieVasemmalle[biomiTieVasKuvat[biomi][Math.floor(Math.random()*biomiTieVasKuvat[biomi].length)]];
         maastomuoto[ind][0]=1; //Tie
         //Täytetään välit suorilla
         for (var i=ylos+1; i<ind; i++){
-            maasto[i][0] = tieVaakaan[Math.floor(Math.random()*tieVaakaan.length)];
+            maasto[i][0] = tieVaakaan[biomiTieVaakaanKuvat[biomi][Math.floor(Math.random()*biomiTieVaakaanKuvat[biomi].length)]];
             maastomuoto[i][0]=1;
         }
-        maasto[ylos][0] = tieVasenYlos[Math.floor(Math.random()*tieVasenYlos.length)]; 
+        maasto[ylos][0] = tieVasenYlos[biomiTieVYKuvat[biomi][Math.floor(Math.random()*biomiTieVYKuvat[biomi].length)]]; 
         maastomuoto[ylos][0]=1; 
 
 
@@ -187,7 +227,7 @@ $(function(){
         var iTausta = [0, 1, 2, 3, 4];
         iTausta.splice(ylos, ind-ylos+1);
         for ( var i in iTausta ){
-          maasto[iTausta[i]][0] = taustaKuva[Math.floor(Math.random()*taustaKuva.length)]; 
+          maasto[iTausta[i]][0] = taustaKuva[biomiKuvat[biomi][Math.floor(Math.random()*biomiKuvat[biomi].length)]];
           maastomuoto[iTausta[i]][0]=0;  //Kuolema
         }
 
@@ -196,7 +236,7 @@ $(function(){
 
     function jatkaTieYlos(ind){
 
-        maasto[ind][0] = tieSuoraan[Math.floor(Math.random()*tieSuoraan.length)];
+        maasto[ind][0] = tieSuoraan[biomiTieSuoraanKuvat[biomi][Math.floor(Math.random()*biomiTieSuoraanKuvat[biomi].length)]];
         maastomuoto[ind][0]=1;
 
         
@@ -204,7 +244,7 @@ $(function(){
         var iTausta = [0, 1, 2, 3, 4];
         iTausta.splice(ind, 1);
         for ( var i in iTausta ){
-          maasto[iTausta[i]][0] = taustaKuva[Math.floor(Math.random()*taustaKuva.length)]; 
+          maasto[iTausta[i]][0] = taustaKuva[biomiKuvat[biomi][Math.floor(Math.random()*biomiKuvat[biomi].length)]];
           maastomuoto[iTausta[i]][0]=0;
         }
 
@@ -219,6 +259,12 @@ $(function(){
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
+		// Muuta biomia
+		if(Math.random()<1/100){
+			console.log("Biomi muuttunut!");
+			biomi=Math.floor(Math.random()*3);
+		}
+		// Pienennä musiikin äänenvoimakkuutta, kun vihollinen on lähempänä
 		aanenVoimakkuus=Math.max(0,Math.min(1,1/176*(vihuSiirtyma-80)));
 		if(hengissa){
 			korkeaAani[0].volume=Math.max(0,.6-aanenVoimakkuus);
@@ -305,16 +351,14 @@ $(function(){
             max = tieKoordinaatit.lastIndexOf(1);
 
             tieMinMax = [192*min, 192*(max+1)];
-            console.log("Koord " + tieMinMax );
-
-            console.log("Paikkaa " +  tieKoordinaatit );
-
+            // console.log("Koord " + tieMinMax );
+            // console.log("Paikkaa " +  tieKoordinaatit );
         }
         
         //Ukko ja tie. 
 		if(ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi-120){
 			if(suojakilpi==0){
-				vihuSiirtyma -= 64 + Math.round(Math.random()*48);
+				//vihuSiirtyma -= 64 + Math.round(Math.random()*48);
 				ukkoX=0.5*( tieMinMax[0] + tieMinMax[1] );
 				suojakilpi+=2000;
 				auts[0].play();

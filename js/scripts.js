@@ -336,11 +336,13 @@ $(function(){
 				case 37:
 				case 65:
 					ukkoLiikkuuX = randomiNopeus*-1;
+					pelaajaNopeus=8;
 				break;
 				// Oikealle
 				case 39:	
 				case 68:
 					ukkoLiikkuuX = randomiNopeus;
+					pelaajaNopeus=8;
 				break;
 				// Aseta peli tauolle kun painaa Esc
 				case 27:
@@ -559,22 +561,32 @@ $(function(){
 			kirjoita("Rahaa "+Math.round(kolikot)+" €",$("canvas").width()-64,128);
 
 			game().textAlign="start";
+		}else{
+			if(matka<10){
+				kirjoita("Vasemmalle",64,256);
+				game().textAlign="center";
+				kirjoita("Pysähdy sivusuunnassa",$("canvas").width()/2,256);
+				game().textAlign="end";
+				kirjoita("Oikealle",$("canvas").width()-64,256);
+				game().textAlign="start";
+			}
 		}
 	}
 
 	$("canvas").mousedown(function(e){
 		var x = Math.floor(e.pageX-$("canvas").offset().left);
 		var y = Math.floor(e.pageY-$("canvas").offset().top);
-		var randomiNopeus = 20 + Math.round(Math.random()*20);
+		var randomiNopeus = 10 + Math.round(Math.random()*10);
+		pelaajaNopeus=4;
 		if(hengissa){
 			if(x>=0 && x<=$("canvas").width()/3){
-				ukkoLiikkuuX-=randomiNopeus;
+				ukkoLiikkuuX=-randomiNopeus;
 			}
 			if(x>=$("canvas").width()/3 && x<=$("canvas").width()/3*2){
 				ukkoLiikkuuX=0;
 			}
 			if(x>=$("canvas").width()/3*2 && x<=$("canvas").width()){
-				ukkoLiikkuuX+=randomiNopeus;
+				ukkoLiikkuuX=randomiNopeus;
 			}
 		}else{
 			if(x>=0 && x<=$("canvas").width()/2){

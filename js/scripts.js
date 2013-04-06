@@ -71,7 +71,6 @@ $(function(){
 	var tausta = lataaAanet("bg",0);
 	var auts = lataaAanet("ouch",0);
 	var korkeaAani = lataaAanet("angels",0);
-	var menuAani = lataaAanet("menu",0);
 	var maksuAani = lataaAanet("coin",0);
 	var klikkiAani = lataaAanet("click",0);
 	
@@ -138,9 +137,11 @@ $(function(){
 	var hyppy = false;
 	
 	if(localStorage.length != 0){
-		parhaatPisteet = localStorage.parhaatPisteet;
+		var parhaatPisteet = localStorage.parhaatPisteet;
+		var kolikot = localStorage.kolikot;
 	}else{
-		parhaatPisteet = 0;
+		var parhaatPisteet = 0;
+		var kolikot = 500;
 	}
 	
 	var ukko = lataaKuvat('ukko', 2);
@@ -352,54 +353,6 @@ $(function(){
 			}
 		}).keyup(function(e){
 			ukkoLiikkuuX = 0;
-			switch(e.keyCode){
-				// Aloita uusi peli, mikäli kuollut
-				case 49:
-				case 97:
-					if(hengissa==false && ! inaktiivinenMenu){
-						inaktiivinenMenu=true;
-						klikkiAani[0].play();
-						setTimeout(function(){
-							vihuSiirtyma=256;
-							hengissa=true;
-							pelaajaNopeus=9;
-							matka=0;
-							tausta[0].volume=1;
-							suojakilpi=4000;
-							inaktiivinenMenu=false;
-							pelikerrat=0;
-						},1000);
-					}
-				break;
-				// Aloita uusi peli, mutta älä nollaa pisteitä
-				case 50:
-				case 98:
-					if(hengissa==false && ! inaktiivinenMenu && 100*Math.pow(2,pelikerrat)<=matka){
-						inaktiivinenMenu=true;
-						matka=matka-(100*Math.pow(2,pelikerrat));
-						maksuAani[0].play();
-						setTimeout(function(){
-							vihuSiirtyma=256;
-							hengissa=true;
-							pelaajaNopeus=9;
-							tausta[0].volume=1;
-							suojakilpi=4000;
-							inaktiivinenMenu=false;
-							pelikerrat+=1;
-						},1000);
-					}
-				break;
-				case 51:
-				case 99:
-					klikkiAani[0].play();
-					window.location="pages/help.html";
-				break;
-				case 52:
-				case 100:
-					klikkiAani[0].play();
-					window.location="pages/authors.html";
-				break;
-			}
 		});
 		
 
@@ -562,6 +515,11 @@ $(function(){
 				hengissa=false;
 				suojakilpi=0;
 				dramaattinen[0].play();
+				inaktiivinenMenu=true;
+				setTimeout(function(){
+					inaktiivinenMenu=false;
+					kolikot+=matka;
+				},1000);
 			}
 		
 			// Muuta Canvas harmaasävyiseksi ja tummenna sitä hieman
@@ -569,14 +527,19 @@ $(function(){
 			var pix = imgd.data;
 			for (var i = 0, n = pix.length; i < n; i += 4) {
 				var grayscale = pix[i] * .3 + pix[i+1] * .59 + pix[i+2] * .11;
-				pix[i] = grayscale+32;
-				pix[i+1] = grayscale-32;
-				pix[i+2] = grayscale-32;
+				pix[i] = grayscale+48;
+				pix[i+1] = grayscale-48;
+				pix[i+2] = grayscale-48;
 			}
 			game().putImageData(imgd, 0, 0);
 			
 			// Aseta vihu pelaajan alle
 			vihuSiirtyma=95;
+
+			// Pelitietojen tallennus
+			parhaatPisteet = Math.max(parhaatPisteet,matka);
+			localStorage.parhaatPisteet=parhaatPisteet;
+			localStorage.kolikot=kolikot;
 			
 			// Kirjoita tekstit
 			game().fillStyle = "#000";
@@ -584,20 +547,72 @@ $(function(){
 			game().fillText(pad(Math.round(matka),6),65,129);
 			game().fillStyle = "#FFF";
 			game().fillText(pad(Math.round(matka),6),64,128);
-
-			parhaatPisteet = Math.max(parhaatPisteet,matka);
-			localStorage.parhaatPisteet=parhaatPisteet;
 			
-			kirjoita("[ 1 ] Aloita uusi peli",64,192);
-			if(matka>=100*Math.pow(2,pelikerrat)){
-				kirjoita("[ 2 ] Elvytä itsesi (hinta " + (100*Math.pow(2,pelikerrat)) + ")",64,224);
+			kirjoita("Aloita uusi peli",64,256);
+			game().textAlign="end";
+			if(kolikot>=100*Math.pow(2,pelikerrat)){
+				kirjoita("Elvytä itsesi (hinta " + (100*Math.pow(2,pelikerrat)) + " €)",$("canvas").width()-64,256);
 			}else{
-				kirjoita("[ 2 ] Ei riittävästi rahaa!",64,224);
+				kirjoita("Elvytä itsesi (ei riittävästi rahaa)",$("canvas").width()-64,256);
 			}
-			kirjoita("[ 3 ] Peliohjeet",64,288);
-			kirjoita("[ 4 ] Tekijät",64,320);
+
+			kirjoita("Rahaa "+Math.round(kolikot)+" €",$("canvas").width()-64,128);
+
+			game().textAlign="start";
 		}
 	}
+
+	$("canvas").mousedown(function(e){
+		var x = Math.floor(e.pageX-$("canvas").offset().left);
+		var y = Math.floor(e.pageY-$("canvas").offset().top);
+		var randomiNopeus = 20 + Math.round(Math.random()*20);
+		if(hengissa){
+			if(x>=0 && x<=$("canvas").width()/3){
+				ukkoLiikkuuX-=randomiNopeus;
+			}
+			if(x>=$("canvas").width()/3 && x<=$("canvas").width()/3*2){
+				// Hyppy
+			}
+			if(x>=$("canvas").width()/3*2 && x<=$("canvas").width()){
+				ukkoLiikkuuX+=randomiNopeus;
+			}
+		}else{
+			if(x>=0 && x<=$("canvas").width()/2){
+				if(! inaktiivinenMenu){
+					inaktiivinenMenu=true;
+					klikkiAani[0].play();
+					setTimeout(function(){
+						vihuSiirtyma=256;
+						hengissa=true;
+						pelaajaNopeus=9;
+						matka=0;
+						tausta[0].volume=1;
+						suojakilpi=4000;
+						inaktiivinenMenu=false;
+						pelikerrat=0;
+					},1000);
+				}
+			}
+			if(x>=$("canvas").width()/2 && x<=$("canvas").width()){
+				if(! inaktiivinenMenu && 100*Math.pow(2,pelikerrat)<=kolikot){
+					inaktiivinenMenu=true;
+					kolikot -= 100*Math.pow(2,pelikerrat);
+					maksuAani[0].play();
+					setTimeout(function(){
+						vihuSiirtyma=256;
+						hengissa=true;
+						pelaajaNopeus=9;
+						tausta[0].volume=1;
+						suojakilpi=4000;
+						inaktiivinenMenu=false;
+						pelikerrat+=1;
+					},1000);
+				}
+			}
+		}
+	}).mouseup(function(e){
+		ukkoLiikkuuX=0;
+	});
 	
 	function piirraMaasto(siirtoY){
 		for (var i=0; i<maasto.length; i++){

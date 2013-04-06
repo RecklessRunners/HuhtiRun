@@ -571,7 +571,7 @@ $(function(){
 				ukkoLiikkuuX-=randomiNopeus;
 			}
 			if(x>=$("canvas").width()/3 && x<=$("canvas").width()/3*2){
-				// Hyppy
+				ukkoLiikkuuX=0;
 			}
 			if(x>=$("canvas").width()/3*2 && x<=$("canvas").width()){
 				ukkoLiikkuuX+=randomiNopeus;
@@ -611,7 +611,7 @@ $(function(){
 			}
 		}
 	}).mouseup(function(e){
-		ukkoLiikkuuX=0;
+		//ukkoLiikkuuX=0;
 	});
 	
 	function piirraMaasto(siirtoY){

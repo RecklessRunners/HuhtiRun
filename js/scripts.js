@@ -7,9 +7,9 @@ $(function(){
 	window.onbeforeunload = function (e) {
 		e = e || window.event;
 		if (e) {
-			e.returnValue = "Haluatko varmasti poistua?";
+			e.returnValue = "Pelisi jää kesken";
 		}
-		return "Haluatko varmasti poistua?";
+		return "Pelisi jää kesken";
 	};
 
 	// Etunollat -- onko enää tarpeen?
@@ -33,34 +33,34 @@ $(function(){
 
 	// TODO: Siirrä oliomuotoon.
 
-    function lataaKuvat(nimi, nmax){
-        var taulu = [];
-        for(var i=0;i<=nmax;i++){
-            var img = new Image();
-            img.src="img/"+nimi+i+".png";
-            taulu.push(img);
-        }
-        return taulu;
-    }
-    function lataaAanet(nimi, nmax){
-        var taulu = [];
-        for(var i=0;i<=nmax;i++){
-            var snd = new Audio();
-            snd.src="snd/"+nimi+i+".wav";
+	function lataaKuvat(nimi, nmax){
+		var taulu = [];
+		for(var i=0;i<=nmax;i++){
+			var img = new Image();
+			img.src="img/"+nimi+i+".png";
+			taulu.push(img);
+		}
+		return taulu;
+	}
+	function lataaAanet(nimi, nmax){
+		var taulu = [];
+		for(var i=0;i<=nmax;i++){
+			var snd = new Audio();
+			snd.src="snd/"+nimi+i+".wav";
 			snd.load();
-            taulu.push(snd);
-        }
-        return taulu;
-    }
+			taulu.push(snd);
+		}
+		return taulu;
+	}
 
 	// Kuvat
-	var tieSuoraan = lataaKuvat('tiesuoraan',5);
-	var tieVasemmalle = lataaKuvat('kaannosv',1);
-	var tieOikealle = lataaKuvat('kaannoso',2);
+	var tieSuoraan = lataaKuvat('tiesuoraan',6);
+	var tieVasemmalle = lataaKuvat('kaannosv',2);
+	var tieOikealle = lataaKuvat('kaannoso',3);
 	var taustaKuva = lataaKuvat('tausta',6);
-	var tieVaakaan = lataaKuvat('tievaaka',1);
-	var tieOikeaYlos = lataaKuvat('kaannosoy',1);
-	var tieVasenYlos = lataaKuvat('kaannosvy',1);
+	var tieVaakaan = lataaKuvat('tievaaka',2);
+	var tieOikeaYlos = lataaKuvat('kaannosoy',2);
+	var tieVasenYlos = lataaKuvat('kaannosvy',2);
 	var varjo = lataaKuvat('varjo',0);
 	
 	// Äänet
@@ -83,7 +83,7 @@ $(function(){
 	
 	// Biomit
 	// Arvotaan tietyn tyyppistä tietä ja maastoa, kun ollaan aavikolla, ruohikossa, merellä jne.
-	var biomi = 0;
+	var biomi = 2;
 	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille
 		[0,0,0,3,3,4,5,5], // Aavikko
 		[1,2], // Ruoho
@@ -92,7 +92,7 @@ $(function(){
 	var biomiTieSuoraanKuvat = [
 		[0,1,4],
 		[2,3,5],
-		[2,3,5]
+		[6]
 	];
 	var biomiTieVaakaanKuvat = [
 		[0],
@@ -102,22 +102,22 @@ $(function(){
 	var biomiTieVYKuvat = [
 		[1],
 		[0],
-		[0]
+		[2]
 	];
 	var biomiTieOYKuvat = [
 		[0],
 		[1],
-		[1]
+		[2]
 	];
 	var biomiTieVasKuvat = [
 		[0],
 		[1],
-		[1]
+		[2]
 	];
 	var biomiTieOikKuvat = [
 		[2],
 		[0,1],
-		[0,1]
+		[3]
 	];
     
 	var lintu = lataaKuvat('lintu', 8);
@@ -198,7 +198,6 @@ $(function(){
         iTausta.splice(ind, ylos-ind+1);
         for ( var i in iTausta ){
           maasto[iTausta[i]][0] = taustaKuva[biomiKuvat[biomi][Math.floor(Math.random()*biomiKuvat[biomi].length)]];
-          console.log("Biomi: "+biomi+", Kuva: "+biomiKuvat[biomi][Math.floor(Math.random()*biomiKuvat[biomi].length)]);
           maastomuoto[iTausta[i]][0] = 0; //Kuolema
         }
 
@@ -261,8 +260,9 @@ $(function(){
 	function paivita(){
 		// Muuta biomia
 		if(Math.random()<1/100){
-			console.log("Biomi muuttunut!");
-			biomi=Math.floor(Math.random()*3);
+			var uusiBiomi = Math.floor(Math.random()*3);
+			console.log("Biomi muuttuu "+biomi+" --> "+uusiBiomi);
+			biomi=uusiBiomi;
 		}
 		// Pienennä musiikin äänenvoimakkuutta, kun vihollinen on lähempänä
 		aanenVoimakkuus=Math.max(0,Math.min(1,1/176*(vihuSiirtyma-80)));
@@ -358,15 +358,14 @@ $(function(){
         //Ukko ja tie. 
 		if(ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi-120){
 			if(suojakilpi==0){
-				//vihuSiirtyma -= 64 + Math.round(Math.random()*48);
+				vihuSiirtyma -= 64 + Math.round(Math.random()*48);
 				ukkoX=0.5*( tieMinMax[0] + tieMinMax[1] );
 				suojakilpi+=2000;
 				auts[0].play();
 			}
 		}
-		if(ukkoX + ukkoLiikkuuX >= 0 && ukkoX + ukkoLiikkuuX <= $("canvas").width()-192){
-			ukkoX += ukkoLiikkuuX;
-		}
+
+		ukkoX += ukkoLiikkuuX;
 		
 		
 		// Maaston liikuttaminen

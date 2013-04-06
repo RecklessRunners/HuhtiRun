@@ -5,14 +5,16 @@ $(function(){
 
 	// Poistumisvahvistus
 	window.onbeforeunload = function (e) {
-		e = e || window.event;
-		if (e) {
-			e.returnValue = "Pelisi jää kesken";
+		if(hengissa){
+			e = e || window.event;
+			if (e) {
+				e.returnValue = "Pelisi jää kesken";
+			}
+			return "Pelisi jää kesken";
 		}
-		return "Pelisi jää kesken";
 	};
 
-	// Etunollat -- onko enää tarpeen?
+	// Etunollat
 	function pad(number,length) {
 		var str = ''+number;
 		while (str.length < length) {
@@ -69,6 +71,9 @@ $(function(){
 	var tausta = lataaAanet("bg",0);
 	var auts = lataaAanet("ouch",0);
 	var korkeaAani = lataaAanet("angels",0);
+	var menuAani = lataaAanet("menu",0);
+	var maksuAani = lataaAanet("coin",0);
+	var klikkiAani = lataaAanet("click",0);
 	
 	tausta[0].loop=true;
 	tausta[0].play();
@@ -80,6 +85,7 @@ $(function(){
 	var suojakilpi = 4000;
 	var hengissa = true;
 	var ukkoToleranssi = 40;
+	var pelikerrat=0;
 	
 	// Biomit
 	// Arvotaan tietyn tyyppistä tietä ja maastoa, kun ollaan aavikolla, ruohikossa, merellä jne.
@@ -126,6 +132,8 @@ $(function(){
 	var lintuY = 128; // Linnun sijainti Y
 	var lintuK = 1.25; // Linnun kallistuskulma (px)
 	//var iLintuMax=8;
+
+	var inaktiivinenMenu = false;
 	
 	var hyppy = false;
 	
@@ -255,6 +263,18 @@ $(function(){
 	var ukkoLiikkuuX = 0;
 	var siirtoY = 0;	
 	setInterval(paivita,50);
+
+	function kirjoita(teksti,x,y){
+		game().fillStyle = "#000";
+		game().font = "bold 16px sans-serif";
+		game().fillText(teksti,x+1,y+1);
+		if(inaktiivinenMenu){
+			game().fillStyle = "#C0C0C0";
+		}else{
+			game().fillStyle = "#FFF";
+		}
+		game().fillText(teksti,x,y);
+	}
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
@@ -332,6 +352,54 @@ $(function(){
 			}
 		}).keyup(function(e){
 			ukkoLiikkuuX = 0;
+			switch(e.keyCode){
+				// Aloita uusi peli, mikäli kuollut
+				case 49:
+				case 97:
+					if(hengissa==false && ! inaktiivinenMenu){
+						inaktiivinenMenu=true;
+						klikkiAani[0].play();
+						setTimeout(function(){
+							vihuSiirtyma=256;
+							hengissa=true;
+							pelaajaNopeus=9;
+							matka=0;
+							tausta[0].volume=1;
+							suojakilpi=4000;
+							inaktiivinenMenu=false;
+							pelikerrat=0;
+						},1000);
+					}
+				break;
+				// Aloita uusi peli, mutta älä nollaa pisteitä
+				case 50:
+				case 98:
+					if(hengissa==false && ! inaktiivinenMenu && 100*Math.pow(2,pelikerrat)<=matka){
+						inaktiivinenMenu=true;
+						matka=matka-(100*Math.pow(2,pelikerrat));
+						maksuAani[0].play();
+						setTimeout(function(){
+							vihuSiirtyma=256;
+							hengissa=true;
+							pelaajaNopeus=9;
+							tausta[0].volume=1;
+							suojakilpi=4000;
+							inaktiivinenMenu=false;
+							pelikerrat+=1;
+						},1000);
+					}
+				break;
+				case 51:
+				case 99:
+					klikkiAani[0].play();
+					window.location="pages/help.html";
+				break;
+				case 52:
+				case 100:
+					klikkiAani[0].play();
+					window.location="pages/authors.html";
+				break;
+			}
 		});
 		
 
@@ -365,8 +433,10 @@ $(function(){
 			}
 		}
 
-		ukkoX += ukkoLiikkuuX;
-		
+		if(hengissa){
+			ukkoX += ukkoLiikkuuX;
+			matka += Math.abs(ukkoLiikkuuX)/250;
+		}
 		
 		// Maaston liikuttaminen
 		if(paussilla){
@@ -450,7 +520,7 @@ $(function(){
 		// Kirjoita matka näytölle 50 metrin välein
 		if(hengissa){
 			var pyorista50 = Math.floor(matka/50)*50;
-			if(matka >= 50 && matka >= pyorista50 && matka <= pyorista50+10){
+			if(matka >= 50 && matka >= pyorista50 && matka <= pyorista50+5){
 				game().fillStyle = "#000";
 				game().font = "64px sans-serif";
 				game().fillText(pyorista50+" m",385,129);
@@ -459,9 +529,14 @@ $(function(){
 			}
 			game().fillStyle = "#000";
 			game().font = "bold 24px sans-serif";
-			game().fillText(Math.round(matka)+" m",48,48);
+			game().fillText(pad(Math.round(matka),6),48,48);
 			game().fillStyle = "#FFF";
-			game().fillText(Math.round(matka)+" m",49,49);
+			game().fillText(pad(Math.round(matka),6),49,49);
+			game().fillStyle = "#000";
+			game().font = "bold 12px sans-serif";
+			game().fillText("Paras: "+pad(Math.round(parhaatPisteet),6),48,64);
+			game().fillStyle = "#FFF";
+			game().fillText("Paras: "+pad(Math.round(parhaatPisteet),6),49,65);
 		}
 		
 		// Varjo
@@ -483,19 +558,10 @@ $(function(){
 			// Pysäytä maaston liikkuminen
 			pelaajaNopeus = 0;
 		
-			// Ajasta uuden pelin alkaminen
 			if(hengissa){
-				suojakilpi=0;
 				hengissa=false;
+				suojakilpi=0;
 				dramaattinen[0].play();
-				setTimeout(function(){
-					vihuSiirtyma=256;
-					hengissa=true;
-					pelaajaNopeus=9;
-					matka=0;
-					tausta[0].volume=1;
-					suojakilpi=4000;
-				},5000);
 			}
 		
 			// Muuta Canvas harmaasävyiseksi ja tummenna sitä hieman
@@ -503,10 +569,9 @@ $(function(){
 			var pix = imgd.data;
 			for (var i = 0, n = pix.length; i < n; i += 4) {
 				var grayscale = pix[i] * .3 + pix[i+1] * .59 + pix[i+2] * .11;
-				var sat = 32+(Math.random()*96);
-				pix[i] = grayscale - 32;
-				pix[i+1] = grayscale - sat;
-				pix[i+2] = grayscale - sat;
+				pix[i] = grayscale+32;
+				pix[i+1] = grayscale-32;
+				pix[i+2] = grayscale-32;
 			}
 			game().putImageData(imgd, 0, 0);
 			
@@ -516,20 +581,21 @@ $(function(){
 			// Kirjoita tekstit
 			game().fillStyle = "#000";
 			game().font = "bold 64px sans-serif";
-			game().fillText("Uuh, ihanaa!",65,129);
+			game().fillText(pad(Math.round(matka),6),65,129);
 			game().fillStyle = "#FFF";
-			game().fillText("Uuh, ihanaa!",64,128);
+			game().fillText(pad(Math.round(matka),6),64,128);
 
 			parhaatPisteet = Math.max(parhaatPisteet,matka);
 			localStorage.parhaatPisteet=parhaatPisteet;
 			
-			game().fillStyle = "#000";
-			game().font = "bold 16px sans-serif";
-			var alateksti = "Juoksit " + Math.round(matka) + " metriä! Paras tulos tällä koneella on " + Math.round(parhaatPisteet) + " m.";
-			
-			game().fillText(alateksti,65,193);
-			game().fillStyle = "#FFF";
-			game().fillText(alateksti,64,192);
+			kirjoita("[ 1 ] Aloita uusi peli",64,192);
+			if(matka>=100*Math.pow(2,pelikerrat)){
+				kirjoita("[ 2 ] Elvytä itsesi (hinta " + (100*Math.pow(2,pelikerrat)) + ")",64,224);
+			}else{
+				kirjoita("[ 2 ] Ei riittävästi rahaa!",64,224);
+			}
+			kirjoita("[ 3 ] Peliohjeet",64,288);
+			kirjoita("[ 4 ] Tekijät",64,320);
 		}
 	}
 	

@@ -522,7 +522,7 @@ $(function(){
 				inaktiivinenMenu=true;
 				setTimeout(function(){
 					inaktiivinenMenu=false;
-					kolikot+=matka;
+					kolikot=parseInt(kolikot)+parseInt(matka);
 				},1000);
 			}
 		

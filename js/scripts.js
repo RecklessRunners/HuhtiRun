@@ -143,6 +143,8 @@ $(function(){
 		var parhaatPisteet = 0;
 		var kolikot = 500;
 	}
+
+	var klikkiPos = [0,0];
 	
 	var ukko = lataaKuvat('ukko', 2);
 	var iUkko=0;
@@ -336,13 +338,13 @@ $(function(){
 				case 37:
 				case 65:
 					ukkoLiikkuuX = randomiNopeus*-1;
-					pelaajaNopeus=8;
+					pelaajaNopeus=9;
 				break;
 				// Oikealle
 				case 39:	
 				case 68:
 					ukkoLiikkuuX = randomiNopeus;
-					pelaajaNopeus=8;
+					pelaajaNopeus=9;
 				break;
 				// Aseta peli tauolle kun painaa Esc
 				case 27:
@@ -553,23 +555,16 @@ $(function(){
 			kirjoita("Aloita uusi peli",64,256);
 			game().textAlign="end";
 			if(kolikot>=100*Math.pow(2,pelikerrat)){
-				kirjoita("Elvytä itsesi (hinta " + (100*Math.pow(2,pelikerrat)) + " €)",$("canvas").width()-64,256);
+				kirjoita("Elvytä itsesi",$("canvas").width()-64,256);
+				kirjoita("Hinta "+(100*Math.pow(2,pelikerrat))+" €",$("canvas").width()-64,288);
 			}else{
-				kirjoita("Elvytä itsesi (ei riittävästi rahaa)",$("canvas").width()-64,256);
+				kirjoita("Elvytä itsesi",$("canvas").width()-64,256);
+				kirjoita("Tarvitset "+Math.round((100*Math.pow(2,pelikerrat))-kolikot)+" € lisää rahaa",$("canvas").width()-64,288);
 			}
 
 			kirjoita("Rahaa "+Math.round(kolikot)+" €",$("canvas").width()-64,128);
 
 			game().textAlign="start";
-		}else{
-			if(matka<10){
-				kirjoita("Vasemmalle",64,256);
-				game().textAlign="center";
-				kirjoita("Pysähdy sivusuunnassa",$("canvas").width()/2,256);
-				game().textAlign="end";
-				kirjoita("Oikealle",$("canvas").width()-64,256);
-				game().textAlign="start";
-			}
 		}
 	}
 
@@ -577,17 +572,8 @@ $(function(){
 		var x = Math.floor(e.pageX-$("canvas").offset().left);
 		var y = Math.floor(e.pageY-$("canvas").offset().top);
 		var randomiNopeus = 10 + Math.round(Math.random()*10);
-		pelaajaNopeus=4;
 		if(hengissa){
-			if(x>=0 && x<=$("canvas").width()/3){
-				ukkoLiikkuuX=-randomiNopeus;
-			}
-			if(x>=$("canvas").width()/3 && x<=$("canvas").width()/3*2){
-				ukkoLiikkuuX=0;
-			}
-			if(x>=$("canvas").width()/3*2 && x<=$("canvas").width()){
-				ukkoLiikkuuX=randomiNopeus;
-			}
+			klikkiPos=[x,y];
 		}else{
 			if(x>=0 && x<=$("canvas").width()/2){
 				if(! inaktiivinenMenu){
@@ -622,8 +608,10 @@ $(function(){
 				}
 			}
 		}
-	}).mouseup(function(e){
-		//ukkoLiikkuuX=0;
+	}).mousemove(function(e){
+		var x = Math.floor(e.pageX-$("canvas").offset().left);
+		var y = Math.floor(e.pageY-$("canvas").offset().top);
+		ukkoX = x;
 	});
 	
 	function piirraMaasto(siirtoY){

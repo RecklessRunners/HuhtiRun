@@ -565,6 +565,7 @@ $(function(){
 			kirjoita("Rahaa "+Math.round(kolikot)+" €",$("canvas").width()-64,128);
 
 			game().textAlign="start";
+			kirjoita("Nollaa statsit (jos elvytys bugii)",64,512);
 		}
 	}
 
@@ -575,36 +576,48 @@ $(function(){
 		if(hengissa){
 			klikkiPos=[x,y];
 		}else{
-			if(x>=0 && x<=$("canvas").width()/2){
-				if(! inaktiivinenMenu){
-					inaktiivinenMenu=true;
-					klikkiAani[0].play();
-					setTimeout(function(){
-						vihuSiirtyma=256;
-						hengissa=true;
-						pelaajaNopeus=9;
-						matka=0;
-						tausta[0].volume=1;
-						suojakilpi=4000;
-						inaktiivinenMenu=false;
-						pelikerrat=0;
-					},1000);
+			if(y<448){
+				if(x>=0 && x<=$("canvas").width()/2){
+					if(! inaktiivinenMenu){
+						inaktiivinenMenu=true;
+						klikkiAani[0].play();
+						setTimeout(function(){
+							vihuSiirtyma=256;
+							hengissa=true;
+							pelaajaNopeus=9;
+							matka=0;
+							tausta[0].volume=1;
+							suojakilpi=4000;
+							inaktiivinenMenu=false;
+							pelikerrat=0;
+						},1000);
+					}
 				}
-			}
-			if(x>=$("canvas").width()/2 && x<=$("canvas").width()){
-				if(! inaktiivinenMenu && 100*Math.pow(2,pelikerrat)<=kolikot){
-					inaktiivinenMenu=true;
-					kolikot -= 100*Math.pow(2,pelikerrat);
-					maksuAani[0].play();
-					setTimeout(function(){
-						vihuSiirtyma=256;
-						hengissa=true;
-						pelaajaNopeus=9;
-						tausta[0].volume=1;
-						suojakilpi=4000;
-						inaktiivinenMenu=false;
-						pelikerrat+=1;
-					},1000);
+				if(x>=$("canvas").width()/2 && x<=$("canvas").width()){
+					if(! inaktiivinenMenu && 100*Math.pow(2,pelikerrat)<=kolikot){
+						inaktiivinenMenu=true;
+						kolikot -= 100*Math.pow(2,pelikerrat);
+						maksuAani[0].play();
+						setTimeout(function(){
+							vihuSiirtyma=256;
+							hengissa=true;
+							pelaajaNopeus=9;
+							tausta[0].volume=1;
+							suojakilpi=4000;
+							inaktiivinenMenu=false;
+							pelikerrat+=1;
+						},1000);
+					}
+				}
+			}else{
+				if(x>=0 && x<=$("canvas").width()/2){
+					if(confirm("Nollataanko statsit?\n\nTämä toiminto pääasiassa sitä varten, että voit korjata bugin, joka väittää kolikoita olevan NaN.\n\nToiminto nollaa parhaat pisteesi sekä kaikki rahasi.")){
+						parhaatPisteet=0;
+						localStorage.parhaatPisteet=0;
+						kolikot=500;
+						localStorage.kolikot=500;
+						location.reload(true);
+					}
 				}
 			}
 		}

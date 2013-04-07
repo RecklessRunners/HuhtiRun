@@ -267,9 +267,13 @@ $(function(){
 	var siirtoY = 0;	
 	setInterval(paivita,50);
 
-	function kirjoita(teksti,x,y){
+	function kirjoita(teksti,x,y,lihavoitu){
 		game().fillStyle = "#000";
-		game().font = "bold 16px sans-serif";
+		if(lihavoitu){
+			game().font = "bold 16px sans-serif";
+		}else{
+			game().font = "16px sans-serif";
+		}
 		game().fillText(teksti,x+1,y+1);
 		if(inaktiivinenMenu){
 			game().fillStyle = "#C0C0C0";
@@ -386,6 +390,7 @@ $(function(){
 				vihuSiirtyma -= 64 + Math.round(Math.random()*48);
 				ukkoX=0.5*( tieMinMax[0] + tieMinMax[1] );
 				suojakilpi+=2000;
+				navigator.vibrate(500);
 				auts[0].play();
 			}
 		}
@@ -516,6 +521,7 @@ $(function(){
 			pelaajaNopeus = 0;
 		
 			if(hengissa){
+				navigator.vibrate(1000);
 				hengissa=false;
 				suojakilpi=0;
 				dramaattinen[0].play();
@@ -552,20 +558,21 @@ $(function(){
 			game().fillStyle = "#FFF";
 			game().fillText(pad(Math.round(matka),6),64,128);
 			
-			kirjoita("Aloita uusi peli",64,256);
+			kirjoita("Aloita uusi peli",64,256,true);
+			kirjoita("...ja näytä taitosi!",64,280,false);
 			game().textAlign="end";
 			if(kolikot>=100*Math.pow(2,pelikerrat)){
-				kirjoita("Elvytä itsesi",$("canvas").width()-64,256);
-				kirjoita("Hinta "+(100*Math.pow(2,pelikerrat))+" €",$("canvas").width()-64,288);
+				kirjoita("Elvytä itsesi",$("canvas").width()-64,256,true);
+				kirjoita("Hinta "+(100*Math.pow(2,pelikerrat))+" €",$("canvas").width()-64,280,false);
 			}else{
-				kirjoita("Elvytä itsesi",$("canvas").width()-64,256);
-				kirjoita("Tarvitset "+Math.round((100*Math.pow(2,pelikerrat))-kolikot)+" € lisää rahaa",$("canvas").width()-64,288);
+				kirjoita("Elvytä itsesi",$("canvas").width()-64,256,true);
+				kirjoita("Tarvitset "+Math.round((100*Math.pow(2,pelikerrat))-kolikot)+" € lisää",$("canvas").width()-64,280,false);
 			}
 
-			kirjoita("Rahaa "+Math.round(kolikot)+" €",$("canvas").width()-64,128);
+			kirjoita("Rahaa "+Math.round(kolikot)+" €",$("canvas").width()-64,128,true);
 
 			game().textAlign="start";
-			kirjoita("Nollaa statsit (jos elvytys bugii)",64,512);
+			kirjoita("Nollaa statsit",64,512,false);
 		}
 	}
 
@@ -575,7 +582,9 @@ $(function(){
 		var randomiNopeus = 10 + Math.round(Math.random()*10);
 		if(hengissa){
 			klikkiPos=[x,y];
+			navigator.vibrate(100);
 		}else{
+			navigator.vibrate(100);
 			if(y<448){
 				if(x>=0 && x<=$("canvas").width()/2){
 					if(! inaktiivinenMenu){
@@ -590,6 +599,7 @@ $(function(){
 							suojakilpi=4000;
 							inaktiivinenMenu=false;
 							pelikerrat=0;
+							navigator.vibrate(1000);
 						},1000);
 					}
 				}
@@ -606,12 +616,13 @@ $(function(){
 							suojakilpi=4000;
 							inaktiivinenMenu=false;
 							pelikerrat+=1;
+							navigator.vibrate(1000);
 						},1000);
 					}
 				}
 			}else{
-				if(x>=0 && x<=$("canvas").width()/2){
-					if(confirm("Nollataanko statsit?\n\nTämä toiminto pääasiassa sitä varten, että voit korjata bugin, joka väittää kolikoita olevan NaN.\n\nToiminto nollaa parhaat pisteesi sekä kaikki rahasi.")){
+				if(x>=0 && x<=$("canvas").width()/3){
+					if(confirm("Nollataanko statsit?\n\nTämä toiminto pääasiassa sitä varten, että voit korjata bugin, joka väittää kolikoita tai parhaiden pisteiden olevan NaN.\n\nToiminto nollaa parhaat pisteesi sekä rahasi.")){
 						parhaatPisteet=0;
 						localStorage.parhaatPisteet=0;
 						kolikot=500;

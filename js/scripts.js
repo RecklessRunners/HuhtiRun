@@ -157,7 +157,7 @@ $(function(){
 	var iUkko=0;
 	var ukkoX = 384;
 	var ukkoY = 192;
-	var pelaajaNopeus = 10;
+	var pelaajaNopeus = 9;
 
 	var vihu = lataaKuvat('vihu', 4);
 	var iVihu = 1;
@@ -364,13 +364,11 @@ $(function(){
 				case 37:
 				case 65:
 					ukkoLiikkuuX = randomiNopeus*-1;
-					pelaajaNopeus=10;
 				break;
 				// Oikealle
 				case 39:	
 				case 68:
 					ukkoLiikkuuX = randomiNopeus;
-					pelaajaNopeus=10;
 				break;
 				// Aseta peli tauolle kun painaa Esc
 				case 27:
@@ -540,6 +538,8 @@ $(function(){
 			game().fillText("Olet hengenvaarassa!",keskiosa.x+1,keskiosa.y+1);
 			game().textAlign="start";
 		}
+
+		pelaajaNopeus=8+(16/375*matka); // Peli vaikenee, mitä pitemmälle pääsee
 		
 		// Kun vihu saa pelaajan kiinni
 		if(vihuSiirtyma<96){
@@ -724,8 +724,8 @@ $(function(){
 						if(x>448 && x<448+256){
 							if(y>192-16 && y<192+16){
 								if(osta(150)){
-									buusti+=20*1000;
-									suojakilpi+=10*500;
+									buusti+=20*500;
+									suojakilpi+=20*500;
 								}
 							}
 							if(y>224-16 && y<224+16){

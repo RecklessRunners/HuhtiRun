@@ -57,13 +57,13 @@ $(function(){
 	}
 
 	// Kuvat
-	var tieSuoraan = lataaKuvat('tiesuoraan',6);
-	var tieVasemmalle = lataaKuvat('kaannosv',2);
-	var tieOikealle = lataaKuvat('kaannoso',3);
-	var taustaKuva = lataaKuvat('tausta',6);
-	var tieVaakaan = lataaKuvat('tievaaka',2);
-	var tieOikeaYlos = lataaKuvat('kaannosoy',2);
-	var tieVasenYlos = lataaKuvat('kaannosvy',2);
+	var tieSuoraan = lataaKuvat('tiesuoraan',7);
+	var tieVasemmalle = lataaKuvat('kaannosv',3);
+	var tieOikealle = lataaKuvat('kaannoso',4);
+	var taustaKuva = lataaKuvat('tausta',8);
+	var tieVaakaan = lataaKuvat('tievaaka',3);
+	var tieOikeaYlos = lataaKuvat('kaannosoy',3);
+	var tieVasenYlos = lataaKuvat('kaannosvy',3);
 	var varjo = lataaKuvat('varjo',0);
 	
 	// Äänet
@@ -89,43 +89,52 @@ $(function(){
 	var ukkoToleranssi = 40;
 	var pelikerrat=0;
 	
+	var tummuus = 0;
+	
 	// Biomit
 	// Arvotaan tietyn tyyppistä tietä ja maastoa, kun ollaan aavikolla, ruohikossa, merellä jne.
-	var biomi = 2;
+	var biomi = 3;
 	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille
 		[0,0,0,3,3,4,5,5], // Aavikko
 		[1,2], // Ruoho
-		[6] // Meri
+		[6], // Meri,
+		[7,8] // Luola
 	];
 	var biomiTieSuoraanKuvat = [
 		[0,1,4],
 		[2,3,5],
-		[6]
+		[6],
+		[7]
 	];
 	var biomiTieVaakaanKuvat = [
 		[0],
 		[1],
-		[1]
+		[2],
+		[3]
 	];
 	var biomiTieVYKuvat = [
 		[1],
 		[0],
-		[2]
+		[2],
+		[3]
 	];
 	var biomiTieOYKuvat = [
 		[0],
 		[1],
-		[2]
+		[2],
+		[3]
 	];
 	var biomiTieVasKuvat = [
 		[0],
 		[1],
-		[2]
+		[2],
+		[3]
 	];
 	var biomiTieOikKuvat = [
 		[2],
 		[0,1],
-		[3]
+		[3],
+		[4]
 	];
     
 	var lintu = lataaKuvat('lintu', 8);
@@ -304,7 +313,7 @@ $(function(){
 
 		// Muuta biomia
 		if(Math.random()<1/100){
-			var uusiBiomi = Math.floor(Math.random()*3);
+			var uusiBiomi = Math.floor(Math.random()*4);
 			console.log("Biomi muuttuu "+biomi+" --> "+uusiBiomi);
 			biomi=uusiBiomi;
 		}
@@ -429,7 +438,11 @@ $(function(){
 			if(buusti>0){
 				siirtoY+=pelaajaNopeus*4;
 			}else{
-				siirtoY+=pelaajaNopeus;
+				if(biomi==3){
+					siirtoY+=pelaajaNopeus/2;
+				}else{
+					siirtoY+=pelaajaNopeus;
+				}
 			}
 		}
 		if (siirtoY>192){
@@ -539,7 +552,22 @@ $(function(){
 			game().textAlign="start";
 		}
 
-		pelaajaNopeus=8+(16/375*matka); // Peli vaikenee, mitä pitemmälle pääsee
+		if(biomi==3){
+			tummuus += .005;
+			tummuus = Math.min(tummuus,.8);
+			game().fillStyle="rgba(0,0,0,"+Math.min(tummuus,.8)+")";
+			game().fillRect(0,0,960,576);
+		}else{
+			tummuus -= .02;
+			if(tummuus>0){
+				game().fillStyle="rgba(0,0,0,"+Math.min(tummuus,.8)+")";
+				game().fillRect(0,0,960,576);
+			}
+			tummuus = Math.max(tummuus,0);
+		}
+
+		pelaajaNopeus=8+(28/1000*matka); // Peli vaikenee, mitä pitemmälle pääsee
+		console.log(pelaajaNopeus);
 		
 		// Kun vihu saa pelaajan kiinni
 		if(vihuSiirtyma<96){
@@ -611,11 +639,11 @@ $(function(){
 					kirjoita("Tililläsi on "+Math.round(kolikot)+" €",$("canvas").width()-64,128,true);
 					game().textAlign="start";
 					kirjoita("Pikajuoksu (+ suojakilpi)",64,192,false);
-					kirjoita(Math.floor(buusti/1000*2)+" m",384,192,false);
+					kirjoita(Math.floor(buusti/1000*2/25*20)+" m",384,192,false);
 					kirjoita("Osta 20 m (150 €)",512,192,false);
 
 					kirjoita("Suojakilpi",64,224,false);
-					kirjoita(Math.floor(suojakilpi/1000*2)+" m",384,224,false);
+					kirjoita(Math.floor(suojakilpi/1000*2/25*20)+" m",384,224,false);
 					kirjoita("Osta 20 m (75 €)",512,224,false);
 
 					kirjoita("← Takaisin",64,512,true);
@@ -724,13 +752,13 @@ $(function(){
 						if(x>448 && x<448+256){
 							if(y>192-16 && y<192+16){
 								if(osta(150)){
-									buusti+=20*500;
-									suojakilpi+=20*500;
+									buusti+=25*500;
+									suojakilpi+=25*500;
 								}
 							}
 							if(y>224-16 && y<224+16){
 								if(osta(75)){
-									suojakilpi+=20*500;
+									suojakilpi+=25*500;
 								}
 							}
 						}

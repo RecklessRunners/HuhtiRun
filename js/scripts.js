@@ -332,10 +332,10 @@ $(function(){
 			suojakilpi=Math.max(suojakilpi,0);
 		}
 		if(buusti>0 && hengissa){
-			buusti-=50;
-			buusti=Math.max(buusti,0);
+			matka=buusti;
+			buusti=0;
 		}
-		if(hengissa){
+		if(hengissa && !paussilla){
 			matka += .075;
 		}
 		if(Math.ceil(Math.random()*16)==16){
@@ -414,7 +414,7 @@ $(function(){
         }
         
         //Ukko ja tie. 
-		if(ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi-120){
+		if((ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi-120) && !paussilla){
 			if(suojakilpi<=0){
 				vihuSiirtyma -= 64 + Math.round(Math.random()*48);
 				ukkoX=0.5*( tieMinMax[0] + tieMinMax[1] );
@@ -431,25 +431,19 @@ $(function(){
 		
 		// Maaston liikuttaminen
 		if(paussilla){
-			game().fillStyle = "#FFF";
-			game().font = "32px sans-serif";
-			game().fillText("Paussilla",64,64);	
+			var keskiosa = {"x":$("canvas").width()/2,"y":$("canvas").height()/2};
+			kirjoita("Tauolla",keskiosa.x,keskiosa.y,true,32);
 		}else{
-			if(buusti>0){
-				siirtoY+=pelaajaNopeus*4;
+			if(biomi==3){
+				siirtoY+=pelaajaNopeus*.8;
 			}else{
-				if(biomi==3){
-					siirtoY+=pelaajaNopeus/2;
-				}else{
-					siirtoY+=pelaajaNopeus;
-				}
+				siirtoY+=pelaajaNopeus;
 			}
 		}
+
 		if (siirtoY>192){
 			siirtoY=0;
 
-			// Maaston päivitys
-			
 			// Kopioidaan ylemmät rivit alempaan
 			for (var j=maasto[0].length-1; j>0; j--){
 				for (var i=0; i < maasto.length; i++){
@@ -554,19 +548,19 @@ $(function(){
 
 		if(biomi==3){
 			tummuus += .005;
-			tummuus = Math.min(tummuus,.8);
-			game().fillStyle="rgba(0,0,0,"+Math.min(tummuus,.8)+")";
+			tummuus = Math.min(tummuus,.6);
+			game().fillStyle="rgba(0,0,0,"+Math.min(tummuus,.6)+")";
 			game().fillRect(0,0,960,576);
 		}else{
 			tummuus -= .02;
 			if(tummuus>0){
-				game().fillStyle="rgba(0,0,0,"+Math.min(tummuus,.8)+")";
+				game().fillStyle="rgba(0,0,0,"+Math.min(tummuus,.6)+")";
 				game().fillRect(0,0,960,576);
 			}
 			tummuus = Math.max(tummuus,0);
 		}
 
-		pelaajaNopeus=8+(28/1000*matka); // Peli vaikenee, mitä pitemmälle pääsee
+		pelaajaNopeus=10+(28/1500*matka); // Peli vaikenee, mitä pitemmälle pääsee
 		console.log(pelaajaNopeus);
 		
 		// Kun vihu saa pelaajan kiinni
@@ -638,7 +632,7 @@ $(function(){
 					game().textAlign="end";
 					kirjoita("Tililläsi on "+Math.round(kolikot)+" €",$("canvas").width()-64,128,true);
 					game().textAlign="start";
-					kirjoita("Pikajuoksu (+ suojakilpi)",64,192,false);
+					kirjoita("Kelaa eteenpäin",64,192,false);
 					kirjoita(Math.floor(buusti/1000*2/25*20)+" m",384,192,false);
 					kirjoita("Osta 20 m (150 €)",512,192,false);
 
@@ -650,6 +644,15 @@ $(function(){
 				break;
 			}
 		}
+		if(hengissa){
+			var oikeaReuna = $("canvas").width()-12;
+			game().fillStyle="#000";
+			game().fillRect(oikeaReuna-12,12,12,24);
+			game().fillRect(oikeaReuna-30,12,12,24);
+			game().fillStyle="#FFF";
+			game().fillRect(oikeaReuna-13,13,12,24);
+			game().fillRect(oikeaReuna-31,13,12,24);
+		}
 	}
 
 	$("canvas").mousedown(function(e){
@@ -659,6 +662,13 @@ $(function(){
 		if(hengissa){
 			klikkiPos=[x,y];
 			navigator.vibrate(100);
+			if(x>$("canvas").width()-48 && y<64){
+				if(paussilla){
+					paussilla=false;
+				}else{
+					paussilla=true;
+				}
+			}
 		}else{
 			if(tila==0){
 				navigator.vibrate(100);

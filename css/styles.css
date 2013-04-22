@@ -21,11 +21,6 @@ canvas{
 	margin:0;
 	padding:0;
 }
-#fork-button{
-	position:fixed;
-	right:16px;
-	top:16px;
-}
 #bottomBar{
 	position:fixed;
 	bottom:8px;

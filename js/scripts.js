@@ -57,13 +57,13 @@ $(function(){
 	}
 
 	// Kuvat
-	var tieSuoraan = lataaKuvat('tiesuoraan',7);
-	var tieVasemmalle = lataaKuvat('kaannosv',3);
-	var tieOikealle = lataaKuvat('kaannoso',4);
-	var taustaKuva = lataaKuvat('tausta',8);
-	var tieVaakaan = lataaKuvat('tievaaka',3);
-	var tieOikeaYlos = lataaKuvat('kaannosoy',3);
-	var tieVasenYlos = lataaKuvat('kaannosvy',3);
+	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',7);
+	var tieVasemmalle = lataaKuvat('upcoming/kaannosv',3);
+	var tieOikealle = lataaKuvat('upcoming/kaannoso',4);
+	var taustaKuva = lataaKuvat('upcoming/tausta',8);
+	var tieVaakaan = lataaKuvat('upcoming/tievaaka',3);
+	var tieOikeaYlos = lataaKuvat('upcoming/kaannosoy',3);
+	var tieVasenYlos = lataaKuvat('upcoming/kaannosvy',3);
 	var varjo = lataaKuvat('varjo',0);
 	
 	// Äänet
@@ -74,6 +74,8 @@ $(function(){
 	var korkeaAani = lataaAanet("angels",0);
 	var maksuAani = lataaAanet("coin",0);
 	var klikkiAani = lataaAanet("click",0);
+	var skratsaus = lataaAanet("scratch",0);
+	var huuto = lataaAanet("scream",0);
 	
 	tausta[0].loop=true;
 	tausta[0].play();
@@ -91,6 +93,7 @@ $(function(){
 	var pelikerrat=0;
 	
 	var tummuus = 0;
+	var biomiLaskuri=0;
 	
 	// Biomit
 	// Arvotaan tietyn tyyppistä tietä ja maastoa, kun ollaan aavikolla, ruohikossa, merellä jne.
@@ -188,26 +191,31 @@ $(function(){
     var paussilla = true;
 
 	// 2D-taulukko [5x4], jossa on referenssit kuviin
-	var maasto = new Array(5);
-    var maastomuoto = new Array( maasto.length ); //Tarvitaan lopetusehtoon
-    var tie = 2; //Missä on ylimmänrivin tie matkalla ylöspäin.
-	for (var i=0; i<maasto.length; i++){ // X-suuntaan
-		maasto[i] = new Array(4);
-		maastomuoto[i] = new Array( maasto[i].length );
-		// Generoi maasto eli lataa kuvat:
-		// Tehdään suora tie:
+	function alustaMaasto(){
+		biomi=Math.floor(Math.random()*biomiKuvat.length);
+		maasto = new Array(5);
+		maastomuoto = new Array(maasto.length); //Tarvitaan lopetusehtoon
+		tie = 2; //Missä on ylimmänrivin tie matkalla ylöspäin.
+		for (var i=0; i<maasto.length; i++){ // X-suuntaan
+			maasto[i] = new Array(4);
+			maastomuoto[i] = new Array( maasto[i].length );
+			// Generoi maasto eli lataa kuvat:
+			// Tehdään suora tie:
 
-		for(var j=0; j<maasto[i].length; j++){ // Y-suuntaan
-			if(i == 2){
-				// Keskelle tie.
-				maasto[i][j] = tieSuoraan[0]; //Satunnainen tie.
-            	maastomuoto[i][j] = 1; //TIE
-			}else{
-				maasto[i][j] = taustaKuva[0]; //Satunnainen ei-tie.
-                maastomuoto[i][j] = 0; //Kuolema 
+			for(var j=0; j<maasto[i].length; j++){ // Y-suuntaan
+				if(i == 2){
+					// Keskelle tie.
+					maasto[i][j] = tieSuoraan[0]; //Satunnainen tie.
+		        	maastomuoto[i][j] = 1; //TIE
+				}else{
+					maasto[i][j] = taustaKuva[0]; //Satunnainen ei-tie.
+		            maastomuoto[i][j] = 0; //Kuolema 
+				}
 			}
 		}
 	}
+
+	alustaMaasto();
 
     function jatkaTieOikeaan(ind){
         //Arvotaan, kuinka kauas mennään oikeaan, eli arvotaan indeksi, jossa käännytään ylös
@@ -301,24 +309,24 @@ $(function(){
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
 		// Siirrä ukkoa
-		/*if(tavoiteX != ukkoX){
-			var posErotus = Math.max(ukkoX,tavoiteX-96)-Math.min(ukkoX,tavoiteX-96);
-			if(posErotus<48){
-				ukkoX=tavoiteX-96;
+		if(tavoiteX != ukkoX){
+			var posErotus = ((Math.max(ukkoX,tavoiteX)-Math.min(ukkoX,tavoiteX)))/4;
+			if(tavoiteX < ukkoX){
+				ukkoX-=posErotus;
 			}else{
-				if(tavoiteX < ukkoX){
-					ukkoX-=Math.min(posErotus/3,64);
-				}else{
-					ukkoX+=Math.min(posErotus/3,64);
-				}
+				ukkoX+=posErotus;
 			}
-		}*/
+		}
 
 		// Muuta biomia
-		if(Math.random()<1/100){
-			var uusiBiomi = Math.floor(Math.random()*4);
+		if(biomiLaskuri >= 10){
+			var uusiBiomi = Math.floor(Math.random()*biomiKuvat.length);
+			while(uusiBiomi==biomi){
+				uusiBiomi = Math.floor(Math.random()*biomiKuvat.length);
+			}
 			console.log("Biomi muuttuu "+biomi+" --> "+uusiBiomi);
 			biomi=uusiBiomi;
+			biomiLaskuri=0;
 		}
 		// Pienennä musiikin äänenvoimakkuutta, kun vihollinen on lähempänä, menuissa, ym.
 		if(paussilla){
@@ -338,16 +346,15 @@ $(function(){
 			suojakilpi-=50;
 			suojakilpi=Math.max(suojakilpi,0);
 		}
-		if(hengissa && !paussilla){
-			matka += .075;
-		}
 		if(Math.ceil(Math.random()*16)==16){
-			vihuSiirtyma -= Math.floor(2/256*vihuSiirtyma);
+			vihuSiirtyma -= Math.floor(3/512*vihuSiirtyma);
 		}
-		// Pelin lopetustestaus
 
 		// Siirtää vihollista hitaasti taaksepäin
-		vihuSiirtyma = Math.min(256,vihuSiirtyma+.375);
+		vihuSiirtyma = Math.min(384,vihuSiirtyma+.375);
+		if(vihuSiirtyma>256){
+			vihuSiirtyma-=1.5;
+		}
 		
 		iUkko+=1;
 		if(iUkko>=ukko.length){
@@ -415,14 +422,32 @@ $(function(){
             // console.log("Koord " + tieMinMax );
             // console.log("Paikkaa " +  tieKoordinaatit );
         }
+		if(suojakilpi>2000){
+			var puolivali = Math.floor((0.5*(tieMinMax[0] + tieMinMax[1]))/192)*192;
+			if(ukkoX != puolivali){
+				if(ukkoX<puolivali){
+					ukkoX+=(Math.max(ukkoX,puolivali)-Math.min(ukkoX,puolivali))/4;
+				}else{
+					ukkoX-=(Math.max(ukkoX,puolivali)-Math.min(ukkoX,puolivali))/4;
+				}
+			}
+		}
+		if((suojakilpi>0 && suojakilpi<=2000) || (matka<=5)){
+			var puolivali = Math.floor((0.5*(tieMinMax[0] + tieMinMax[1]))/192)*192;
+			game().strokeStyle="red";
+			game().lineWidth=2;
+			game().beginPath();
+			game().moveTo(puolivali+96,96);
+			game().lineTo(puolivali+96,192);
+			game().stroke();
+		}
         
         //Ukko ja tie. 
 		if((ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi-120) && !paussilla){
 			suojakilpiTeho -= Math.random()/10;
 			suojakilpiTeho  = Math.max(0.1,suojakilpiTeho);
-			if(Math.random() > suojakilpiTeho){
+			if(suojakilpi <= 0){
 				vihuSiirtyma -= 64 + Math.round(Math.random()*48);
-				ukkoX=0.5*( tieMinMax[0] + tieMinMax[1] );
 				suojakilpi+=2000;
 				navigator.vibrate(500);
 				auts[0].play();
@@ -450,6 +475,11 @@ $(function(){
 
 		if (siirtoY>192){
 			siirtoY=0;
+			biomiLaskuri+=1;
+			console.log("Biomia on ollut "+biomiLaskuri+" blokkia");
+		if(hengissa && !paussilla){
+			matka += 1;
+		}
 
 			// Kopioidaan ylemmät rivit alempaan
 			for (var j=maasto[0].length-1; j>0; j--){
@@ -567,13 +597,12 @@ $(function(){
 			tummuus = Math.max(tummuus,0);
 		}
 
-		pelaajaNopeus=10+(28/1500*matka); // Peli vaikenee, mitä pitemmälle pääsee
-		console.log(pelaajaNopeus);
+		pelaajaNopeus=10+Math.round(5/250*matka); // Peli vaikenee, mitä pitemmälle pääsee
 		
 		// Kun vihu saa pelaajan kiinni
 		if(vihuSiirtyma<96){
 			// Pysäytä maaston liikkuminen
-			pelaajaNopeus = 0;
+			pelaajaNopeus=0;
 		
 			if(hengissa){
 				// Kuolemismenu
@@ -584,7 +613,7 @@ $(function(){
 				inaktiivinenMenu=true;
 				setTimeout(function(){
 					inaktiivinenMenu=false;
-					if(matka>25){
+					if(matka >= 10){
 						kolikot=parseInt(kolikot)+parseInt(matka);
 					}
 					// Pelitietojen tallennus
@@ -673,7 +702,7 @@ $(function(){
 		}else{
 			// Versionumeron ja copyrightin printtaus
 			game().textAlign="end";
-			kirjoita("HuhtiRun 1.0.9",$("canvas").width()-8,$("canvas").height()-8,false,8);
+			kirjoita("HuhtiRun 1.1",$("canvas").width()-8,$("canvas").height()-8,false,8);
 			game().textAlign="start";
 			kirjoita("© 2013 Huhdin koulu",8,$("canvas").height()-8,false,8);
 		}
@@ -701,10 +730,13 @@ $(function(){
 							if(! inaktiivinenMenu){
 								inaktiivinenMenu=true;
 								klikkiAani[0].play();
+								pelaajaNopeus=0;
 								setTimeout(function(){
-									vihuSiirtyma=256;
-									hengissa=true;
+									alustaMaasto();
+									vihuSiirtyma=512;
 									pelaajaNopeus=10;
+									huuto[0].play();
+									hengissa=true;
 									matka=0;
 									tausta[0].volume=1;
 									suojakilpi+=2000;
@@ -721,6 +753,7 @@ $(function(){
 						if(x>=256 && x<512){ // Elvytä itsesi
 							if(! inaktiivinenMenu && osta(100*Math.pow(2,pelikerrat)+50)){
 								inaktiivinenMenu=true;
+								pelaajaNopeus=0;
 								setTimeout(function(){
 									vihuSiirtyma=256;
 									hengissa=true;
@@ -787,7 +820,6 @@ $(function(){
 						}
 					}
 				}else if(tila==1){ // Kaupassa
-					console.log(x + ", " + y);
 					if(y<448){
 						if(x>448 && x<448+256){
 							if(y>192-16 && y<192+16){
@@ -823,7 +855,7 @@ $(function(){
 		var x = Math.floor(e.pageX-$("canvas").offset().left);
 		var y = Math.floor(e.pageY-$("canvas").offset().top);
 		if(hengissa){
-			ukkoX=x-96;
+			tavoiteX=x-96;
 		}
 	});
 	

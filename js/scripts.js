@@ -94,6 +94,7 @@ $(function(){
 	
 	var tummuus = 1;
 	var biomiLaskuri=0;
+	var elvytettavissa = false;
 	
 	// Biomit
 	// Arvotaan tietyn tyyppistä tietä ja maastoa, kun ollaan aavikolla, ruohikossa, merellä jne.
@@ -290,7 +291,7 @@ $(function(){
 	var siirtoY = 0;	
 	setInterval(paivita,50);
 
-	function kirjoita(teksti,x,y,lihavoitu,fonttikoko=16){
+	function kirjoita(teksti,x,y,lihavoitu,fonttikoko=16,vari="#FFF"){
 		game().fillStyle = "#000";
 		if(lihavoitu){
 			game().font = "bold "+fonttikoko+"px sans-serif";
@@ -301,7 +302,7 @@ $(function(){
 		if(inaktiivinenMenu){
 			game().fillStyle = "#C0C0C0";
 		}else{
-			game().fillStyle = "#FFF";
+			game().fillStyle = vari;
 		}
 		game().fillText(teksti,x,y);
 	}
@@ -612,6 +613,8 @@ $(function(){
 				hengissa=false;
 				suojakilpi=0;
 				dramaattinen[0].play();
+				tummuus=1;
+				elvytettavissa=true;
 				inaktiivinenMenu=true;
 				setTimeout(function(){
 					inaktiivinenMenu=false;
@@ -625,10 +628,14 @@ $(function(){
 					localStorage.buusti=buusti;
 					localStorage.kilpi=suojakilpi/1000;
 					localStorage.kilpiTeho=suojakilpiTeho;
+					setTimeout(function(){
+						elvytettavissa=false;
+					},3000);
 				},1000);
 			}
 
 			kolikot=localStorage.kolikot;
+			tummuus=1;
 		
 			// Muuta Canvas harmaasävyiseksi ja tummenna sitä hieman
 			var imgd = game().getImageData(0, 0, $("canvas").width(), $("canvas").height());
@@ -647,20 +654,24 @@ $(function(){
 			// Kirjoita ruudun tekstit
 			switch(tila){
 				case 0:
+					kirjoita("Elvytä",320,256,true,24);
 					if(matka>=10){
 						kirjoita(pad(Math.round(matka),6),64,128,true,64);
-						kirjoita("Elvytä",320,256,true,24);
-						if(kolikot>=100*Math.pow(2,pelikerrat)+50){
-							kirjoita("Jatka peliä, hinta "+(100*Math.pow(2,pelikerrat)+50)+" €",320,280,false);
+						if(elvytettavissa){
+							if(kolikot>=100*Math.pow(2,pelikerrat)+50){
+								kirjoita("Hinta "+(100*Math.pow(2,pelikerrat)+50)+" €",320,280,false);
+							}else{
+								kirjoita("Rahaa ei ole riittävästi",320,280,false);
+							}
 						}else{
-							kirjoita("Tarvitset vielä "+Math.round((100*Math.pow(2,pelikerrat))+50-kolikot)+" €",320,280,false);
+							kirjoita("Et ehtinyt elvyttää!",320,280,false);
 						}
 					}else{
 						kirjoita("HuhtiRun",64,128,true,64);
+						kirjoita("Elvytys ei mahdollista!",320,280,false);
 					}
 			
-					kirjoita("Uusi peli",64+(Math.random()*4),256+(Math.random()*4),true,24);
-					kirjoita("Oletko valmis seikkailuun?",64+(Math.random()*4),280+(Math.random()*4),false);
+					kirjoita("Pelaa ➤",64,280,true,48,"lime");
 					kirjoita("Kauppa",576,256,true,24);
 					kirjoita("Osta buustia, suojakilpi ym.",576,280,false);
 
@@ -721,7 +732,7 @@ $(function(){
 		}else{
 			// Versionumeron ja copyrightin printtaus
 			game().textAlign="end";
-			kirjoita("rev. 1.1.1 (a)",$("canvas").width()-8,$("canvas").height()-8,false,8);
+			kirjoita("rev. 1.1.1 (b)",$("canvas").width()-8,$("canvas").height()-8,false,8);
 			game().textAlign="start";
 			kirjoita("© 2013 Huhdin koulu",8,$("canvas").height()-8,false,8);
 		}
@@ -784,7 +795,7 @@ $(function(){
 									},1000);
 								}
 							}
-							if(x>=256 && x<512){ // Elvytä itsesi
+							if(x>=256 && x<512 && elvytettavissa){ // Elvytä itsesi
 								if(matka>=10){
 									if(! inaktiivinenMenu && osta(100*Math.pow(2,pelikerrat)+50)){
 										inaktiivinenMenu=true;

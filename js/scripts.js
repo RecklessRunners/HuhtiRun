@@ -95,6 +95,12 @@ $(function(){
 	var tummuus = 1;
 	var biomiLaskuri=0;
 	var elvytettavissa = false;
+
+	var pelaaNo = 0; // Ei deskriptiivinen nimi
+	
+	var tavoitteet = [0,0,0,0,0,0,0,0,0,0,0,0];
+
+	//alert(localStorage.length);
 	
 	// Biomit
 	// Arvotaan tietyn tyyppistä tietä ja maastoa, kun ollaan aavikolla, ruohikossa, merellä jne.
@@ -153,18 +159,19 @@ $(function(){
 	var hyppy = false;
 	
 	// Lataa pelitiedot selaimesta
-	if(localStorage.length != 0){
+	if(localStorage.length > 0){
 		var parhaatPisteet = parseInt(localStorage.parhaatPisteet);
 		var kolikot = parseInt(localStorage.kolikot);
 		var buusti = parseInt(localStorage.buusti);
 		var suojakilpi = parseInt(localStorage.kilpi)*1000;
-		var suojakilpiTeho = parseInt(localStorage.suojakilpiTeho);
+		var tavoitteet = JSON.parse(localStorage.tavoitteet);
+		
 	}else{
 		var parhaatPisteet = 0;
 		var kolikot = 0;
 		var buusti = 0;
 		var suojakilpi = 4000;
-		var suojakilpiTeho = 0.1;
+		var tavoitteet = [0,0,0,0,0,0,0,0,0,0,0];
 	}
 
 	var klikkiPos = [0,0];
@@ -621,6 +628,10 @@ $(function(){
 					if(matka >= 10){
 						kolikot=parseInt(kolikot)+parseInt(matka);
 					}
+					tavoitteet[0]=Math.max(tavoitteet[0],kolikot);
+					tavoitteet[1] = Math.max(tavoitteet[1],Math.min(1/100*matka,1));
+					tavoitteet[2] = Math.max(tavoitteet[2],Math.min(1/250*matka,1));
+					tavoitteet[3] = Math.max(tavoitteet[3],Math.min(1/500*matka,1));
 					// Pelitietojen tallennus
 					parhaatPisteet = Math.max(parhaatPisteet,matka);
 					localStorage.parhaatPisteet=parhaatPisteet;
@@ -628,6 +639,8 @@ $(function(){
 					localStorage.buusti=buusti;
 					localStorage.kilpi=suojakilpi/1000;
 					localStorage.kilpiTeho=suojakilpiTeho;
+					localStorage.tavoitteet=JSON.stringify(tavoitteet);
+					console.log(tavoitteet);
 					setTimeout(function(){
 						elvytettavissa=false;
 					},3000);
@@ -670,19 +683,22 @@ $(function(){
 						kirjoita("HuhtiRun",64,128,true,64);
 						kirjoita("Elvytys ei mahdollista!",320,280,false);
 					}
-			
-					kirjoita("Pelaa ➤",64,280,true,48,"lime");
+					pelaaNo+=.5;
+					if(pelaaNo>9){
+						pelaaNo=0;
+					}
+					kirjoita("Pelaa ➤",64,278+(Math.sin(pelaaNo)*4),true,48,"lime");
 					kirjoita("Kauppa",576,256,true,24);
 					kirjoita("Osta buustia, suojakilpi ym.",576,280,false);
 
 					kirjoita("Tavoitteet",64,384,true,24);
 					kirjoita("Tarkastele tavoitteitasi",64,408,false);
 
-					kirjoita("Asetukset",320,384,true,24);
-					kirjoita("Säädä pelin asetuksia",320,408,false);
+					kirjoita("Tilastot",320,384,true,24);
+					kirjoita("Seuraa pelitilastojasi",320,408,false);
 
-					kirjoita("Ekstrat",576,384,true,24);
-					kirjoita("Ohjeet, tekijät ym.",576,408,false);
+					kirjoita("Lisää...",576,384,true,24);
+					kirjoita("Asetukset, ohjeet, tekijät ym.",576,408,false);
 
 					kirjoita("Tililläsi on nyt "+Math.round(kolikot)+" €",64,160,true);
 
@@ -715,7 +731,69 @@ $(function(){
 
 					kirjoita("← Takaisin",64,512,true);
 				break;
-				case 2:case 3:case 4:
+				case 2:
+					kirjoita("Tavoitteet",64,128,true,64);
+
+					kirjoita("Noviisi",64,192,false);
+					kirjoita("Juokse 100 m",256,192,false);
+					if(parhaatPisteet<100){
+						kirjoita(Math.min(100,Math.round(100/100*parhaatPisteet))+" %",512,192,false);
+					}else{
+						kirjoita("Tehty!",512,192,true,16,"lime");
+					}
+
+					kirjoita("Lenkkeilijä",64,224,false);
+					kirjoita("Juokse 250 m",256,224,false);
+					if(parhaatPisteet<250){
+						kirjoita(Math.min(100,Math.round(100/250*parhaatPisteet))+" %",512,224,false);
+					}else{
+						kirjoita("Tehty!",512,192,true,16,"lime");
+					}
+
+					kirjoita("Ammattilainen",64,256,false);
+					kirjoita("Juokse 500 m",256,256,false);
+					if(parhaatPisteet<500){
+						kirjoita(Math.min(100,Math.round(100/500*parhaatPisteet))+" %",512,256,false);
+					}else{
+						kirjoita("Tehty!",512,192,true,16,"lime");
+					}
+
+					kirjoita("Kuntotesti",64,288,false);
+					kirjoita("Tulossa myöhemmin!",256,288,false);
+
+					kirjoita("Tulikoe",64,320,false);
+					kirjoita("Tulossa myöhemmin!",256,320,false);
+
+					kirjoita("Huhtirun-addikti",64,352,false);
+					kirjoita("Tulossa myöhemmin!",256,352,false);
+
+					kirjoita("Luuseri",64,384,false);
+					kirjoita("Elvytä itsesi",256,384,false);
+					if(tavoitteet[1]==false){
+						kirjoita("0 %",512,384,false);
+					}else{
+						kirjoita("Tehty!",512,384,true,16,"lime");
+					}
+
+					kirjoita("Kuolematon",64,416,false);
+					kirjoita("Elvytä viidesti pelin aikana",256,416,false);
+					if(tavoitteet[2]==false){
+						kirjoita("0 %",512,416,false);
+					}else{
+						kirjoita("Tehty!",512,416,true,16,"lime");
+					}
+
+					kirjoita("Rikas",64,448,false);
+					kirjoita("Kerää 25 000 € tilillesi -- bugii!",256,448,false);
+					if(tavoitteet[0]<25000){
+						kirjoita(Math.min(100,Math.round(100/25000*tavoitteet[0]))+" %",512,448,false);
+					}else{
+						kirjoita("Tehty!",512,448,true,16,"lime");
+					}
+
+					kirjoita("← Takaisin",64,512,true);
+				break;
+				case 3:case 4:
 					kirjoita("Tulossa pian!",64,128,true,64);
 					kirjoita("← Takaisin",64,512,true);
 				break;
@@ -795,26 +873,34 @@ $(function(){
 									},1000);
 								}
 							}
-							if(x>=256 && x<512 && elvytettavissa){ // Elvytä itsesi
+							if(x>=256 && x<512){ // Elvytä itsesi
+								tavoitteet[1]=true;
 								if(matka>=10){
-									if(! inaktiivinenMenu && osta(100*Math.pow(2,pelikerrat)+50)){
-										inaktiivinenMenu=true;
-										pelaajaNopeus=0;
-										setTimeout(function(){
-											tummuus=1;
-											vihuSiirtyma=256;
-											hengissa=true;
-											pelaajaNopeus=10;
-											tausta[0].volume=1;
-											suojakilpi+=2000;
-											inaktiivinenMenu=false;
-											pelikerrat+=1;
-											navigator.vibrate(1000);
-											if(buusti>0 && hengissa){
-												matka+=parseInt(buusti);
-												buusti=0;
-											}
-										},1000);
+									if(elvytettavissa){
+										if(! inaktiivinenMenu && osta(100*Math.pow(2,pelikerrat)+50)){
+											inaktiivinenMenu=true;
+											pelaajaNopeus=0;
+											setTimeout(function(){
+												tummuus=1;
+												vihuSiirtyma=256;
+												hengissa=true;
+												pelaajaNopeus=10;
+												tausta[0].volume=1;
+												suojakilpi+=2000;
+												inaktiivinenMenu=false;
+												pelikerrat+=1;
+												if(pelikerrat==5){
+													tavoitteet[2]=true;
+												}
+												navigator.vibrate(1000);
+												if(buusti>0 && hengissa){
+													matka+=parseInt(buusti);
+													buusti=0;
+												}
+											},1000);
+										}
+									}else{
+										alert("Jotta voit elvyttää itsesi, sinun tulee olla tarpeeksi nopea. Muutoin pelihahmosi menehtyy, etkä enää voi elvyttää sitä.");
 									}
 								}
 							}
@@ -859,9 +945,8 @@ $(function(){
 									localStorage.buusti=0;
 									suojakilpi=0;
 									localStorage.kilpi=0;
-									suojakilpiTeho=0;
-									localStorage.suojakilpiTeho=0;
-									location.reload(true);
+									//tavoitteet=JSON.stringify([0,0,0,0,0,0,0,0,0,0,0,0,0]);
+									//localStorage.tavoitteet=tavoitteet;
 								}else{
 									alert("Väärin. Tietoja ei ole poistettu.");
 								}

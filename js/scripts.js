@@ -206,6 +206,8 @@ $(function(){
     
     var tauko = false;
 
+	var tehty = "✔ Tehty";
+
 	// 2D-taulukko [5x4], jossa on referenssit kuviin
 	function alustaMaasto(){
 		biomi=Math.floor(Math.random()*biomiKuvat.length);
@@ -638,7 +640,7 @@ $(function(){
 						kolikot=parseInt(kolikot)+parseInt(matka);
 					}
 					tavoitteet[0]=Math.max(tavoitteet[0],kolikot);
-					tavoitteet[2]=Math.max(tavoitteet[2],pelikerta);
+					tavoitteet[2]=Math.max(tavoitteet[2],pelikerrat);
 					// Pelitietojen tallennus
 					parhaatPisteet = Math.max(parhaatPisteet,matka);
 					localStorage.parhaatPisteet=parhaatPisteet;
@@ -670,8 +672,8 @@ $(function(){
 			// Kirjoita ruudun tekstit
 			switch(tila){
 				case 0:
-					kirjoita("Elvytä",320,256,true,24);
 					if(matka>=10){
+						kirjoita("Elvytä",320,256,true,24);
 						kirjoita(pad(Math.round(matka),6),64,128,true,64);
 						if(elvytettavissa){
 							if(kolikot>=100*Math.pow(2,pelikerrat)+50){
@@ -700,13 +702,12 @@ $(function(){
 						game().textAlign="start";
 					}else{
 						kirjoita("HuhtiRun",64,128,true,64);
-						kirjoita("Elvytys ei mahdollista!",320,280,false);
 					}
 					pelaaNo+=.5;
-					if(pelaaNo>9){
+					if(pelaaNo>100){
 						pelaaNo=0;
 					}
-					kirjoita("Pelaa ➤",64,278+(Math.sin(pelaaNo)*4),true,48,"lime");
+					kirjoita("Pelaa ➧",64,278+(Math.sin(pelaaNo)*4),true,48,"lime");
 					kirjoita("Kauppa",576,256,true,24);
 					kirjoita("Osta buustia, suojakilpi ym.",576,280,false);
 
@@ -753,61 +754,61 @@ $(function(){
 				case 2:
 					kirjoita("Tavoitteet",64,128,true,64);
 
-					kirjoita("Noviisi",64,192,false);
+					kirjoita("Noviisi",64,192,true);
 					kirjoita("Juokse 100 m",256,192,false);
 					if(parhaatPisteet<100){
-						kirjoita(Math.min(100,Math.round(100/100*parhaatPisteet))+" %",512,192,false);
+						kirjoita(Math.min(100,Math.round(100/100*parhaatPisteet))+" %",640,192,false);
 					}else{
-						kirjoita("Tehty!",512,192,true,16,"lime");
+						kirjoita(tehty,640,192,true,16,"lime");
 					}
 
-					kirjoita("Lenkkeilijä",64,224,false);
+					kirjoita("Lenkkeilijä",64,224,true);
 					kirjoita("Juokse 250 m",256,224,false);
 					if(parhaatPisteet<250){
-						kirjoita(Math.min(100,Math.round(100/250*parhaatPisteet))+" %",512,224,false);
+						kirjoita(Math.min(100,Math.round(100/250*parhaatPisteet))+" %",640,224,false);
 					}else{
-						kirjoita("Tehty!",512,192,true,16,"lime");
+						kirjoita(tehty,640,192,true,16,"lime");
 					}
 
-					kirjoita("Ammattilainen",64,256,false);
+					kirjoita("Ammattilainen",64,256,true);
 					kirjoita("Juokse 500 m",256,256,false);
 					if(parhaatPisteet<500){
-						kirjoita(Math.min(100,Math.round(100/500*parhaatPisteet))+" %",512,256,false);
+						kirjoita(Math.min(100,Math.round(100/500*parhaatPisteet))+" %",640,256,false);
 					}else{
-						kirjoita("Tehty!",512,192,true,16,"lime");
+						kirjoita(tehty,640,192,true,16,"lime");
 					}
 
-					kirjoita("Kuntotesti",64,288,false);
-					kirjoita("Tulossa myöhemmin!",256,288,false);
+					kirjoita("Kuntotesti",64,288,true);
+					kirjoita("Juokse ensimmäiset 50 m haavoittumatta",256,288,false);
 
-					kirjoita("Tulikoe",64,320,false);
-					kirjoita("Tulossa myöhemmin!",256,320,false);
+					kirjoita("Tulikoe",64,320,true);
+					kirjoita("Juokse ensimmäiset 100 m haavoittumatta",256,320,false);
 
-					kirjoita("Huhtirun-addikti",64,352,false);
-					kirjoita("Tulossa myöhemmin!",256,352,false);
+					kirjoita("Huhtirun-addikti",64,352,true);
+					kirjoita("Juokse 20 000 m koko aikana",256,352,false);
 
-					kirjoita("Luuseri",64,384,false);
+					kirjoita("Luuseri",64,384,true);
 					kirjoita("Elvytä itsesi",256,384,false);
 					if(tavoitteet[1]==false){
-						kirjoita("0 %",512,384,false);
+						kirjoita("0 %",640,384,false);
 					}else{
-						kirjoita("Tehty!",512,384,true,16,"lime");
+						kirjoita(tehty,640,384,true,16,"lime");
 					}
 
-					kirjoita("Kuolematon",64,416,false);
+					kirjoita("Kuolematon",64,416,true);
 					kirjoita("Elvytä viidesti pelin aikana",256,416,false);
 					if(tavoitteet[2]<5){
-						kirjoita(Math.max(Math.round(20*tavoitteet[2]),100)+" %",512,416,false);
+						kirjoita(Math.min(Math.round(20*tavoitteet[2]),100)+" %",640,416,false);
 					}else{
-						kirjoita("Tehty!",512,416,true,16,"lime");
+						kirjoita(tehty,640,416,true,16,"lime");
 					}
 
-					kirjoita("Rikas",64,448,false);
-					kirjoita("Kerää 25 000 € tilillesi -- bugii!",256,448,false);
-					if(tavoitteet[0]<25000){
-						kirjoita(Math.min(100,Math.round(100/25000*tavoitteet[0]))+" %",512,448,false);
+					kirjoita("Rikas",64,448,true);
+					kirjoita("Kerää 20 000 € tilillesi",256,448,false);
+					if(tavoitteet[0]<20000){
+						kirjoita(Math.min(100,Math.round(100/20000*tavoitteet[0]))+" %",640,448,false);
 					}else{
-						kirjoita("Tehty!",512,448,true,16,"lime");
+						kirjoita(tehty,640,448,true,16,"lime");
 					}
 
 					kirjoita("← Takaisin",64,512,true);
@@ -829,7 +830,7 @@ $(function(){
 		}else{
 			// Versionumeron ja copyrightin printtaus
 			game().textAlign="end";
-			kirjoita("rev. 1.1.2 (c)",$("canvas").width()-8,$("canvas").height()-8,false,8);
+			kirjoita("rev. 1.1.3 (a)",$("canvas").width()-8,$("canvas").height()-8,false,8);
 			game().textAlign="start";
 			kirjoita("© 2013 Huhdin koulu",8,$("canvas").height()-8,false,8);
 		}
@@ -906,7 +907,7 @@ $(function(){
 												suojakilpi+=2000;
 												inaktiivinenMenu=false;
 												pelikerrat+=1;
-												tavoitteet[2]=Math.max(tavoitteet[0],pelikerrat);;
+												tavoitteet[2]=Math.max(tavoitteet[2],pelikerrat);
 												navigator.vibrate(1000);
 												if(buusti>0 && hengissa){
 													matka+=parseInt(buusti);

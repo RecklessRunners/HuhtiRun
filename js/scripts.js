@@ -66,6 +66,7 @@ $(function(){
 	var tieVasenYlos = lataaKuvat('upcoming/kaannosvy',3);
 	var varjo = lataaKuvat('varjo',0);
 	var veri = lataaKuvat('veri',0);
+	var futisKentta = lataaKuvat('futis/bg',0);
 	
 	// Äänet
 	var hyppyAani = lataaAanet("jump",0);
@@ -99,7 +100,7 @@ $(function(){
 
 	var pelaaNo = 0; // Ei deskriptiivinen nimi
 	
-	var tavoitteet = [0,0,0,0,0,0,0,0,0,0,0,0];
+	var tavoitteet = [0,false,0,0,0,0,0,0,0,0,0,0];
 
 	//alert(localStorage.length);
 	
@@ -160,19 +161,19 @@ $(function(){
 	var hyppy = false;
 	
 	// Lataa pelitiedot selaimesta
-	if(localStorage.length < 1 || localStorage == null || localStorage == undefined){
-		alert("Tervetuloa pelaamaan HuhtiRunia!\nAnnamme sinulle 200 € aloitusrahaa peliin.");
+	if(localStorage.parhaatPisteet == null || localStorage.parhaatPisteet == undefined){
+		alert("Tervetuloa pelaamaan HuhtiRunia!\nAnnamme sinulle 500 € aloitusrahaa peliin.");
 		var parhaatPisteet = 0;
-		var kolikot = 200;
+		var kolikot = 500;
 		var buusti = 0;
 		var suojakilpi = 4000;
-		var tavoitteet = [0,false,false,0,0,0,0,0,0,0,0];
+		var tavoitteet = [0,false,0,0,0,0,0,0,0,0,0];
 
 		localStorage.parhaatPisteet = 0;
-		localStorage.kolikot = 200;
+		localStorage.kolikot = 500;
 		localStorage.buusti = 0;
 		localStorage.suojakilpi = 4000;
-		localStorage.tavoitteet = [0,false,false,0,0,0,0,0,0,0,0];
+		localStorage.tavoitteet = [0,false,0,0,0,0,0,0,0,0,0];
 	}else{
 		var parhaatPisteet = parseInt(localStorage.parhaatPisteet);
 		var kolikot = parseInt(localStorage.kolikot);
@@ -637,9 +638,7 @@ $(function(){
 						kolikot=parseInt(kolikot)+parseInt(matka);
 					}
 					tavoitteet[0]=Math.max(tavoitteet[0],kolikot);
-					tavoitteet[1] = Math.max(tavoitteet[1],Math.min(1/100*matka,1));
-					tavoitteet[2] = Math.max(tavoitteet[2],Math.min(1/250*matka,1));
-					tavoitteet[3] = Math.max(tavoitteet[3],Math.min(1/500*matka,1));
+					tavoitteet[2]=Math.max(tavoitteet[2],pelikerta);
 					// Pelitietojen tallennus
 					parhaatPisteet = Math.max(parhaatPisteet,matka);
 					localStorage.parhaatPisteet=parhaatPisteet;
@@ -797,8 +796,8 @@ $(function(){
 
 					kirjoita("Kuolematon",64,416,false);
 					kirjoita("Elvytä viidesti pelin aikana",256,416,false);
-					if(tavoitteet[2]==false){
-						kirjoita("0 %",512,416,false);
+					if(tavoitteet[2]<5){
+						kirjoita(Math.max(Math.round(20*tavoitteet[2]),100)+" %",512,416,false);
 					}else{
 						kirjoita("Tehty!",512,416,true,16,"lime");
 					}
@@ -830,7 +829,7 @@ $(function(){
 		}else{
 			// Versionumeron ja copyrightin printtaus
 			game().textAlign="end";
-			kirjoita("rev. 1.1.2 (a)",$("canvas").width()-8,$("canvas").height()-8,false,8);
+			kirjoita("rev. 1.1.2 (c)",$("canvas").width()-8,$("canvas").height()-8,false,8);
 			game().textAlign="start";
 			kirjoita("© 2013 Huhdin koulu",8,$("canvas").height()-8,false,8);
 		}
@@ -907,9 +906,7 @@ $(function(){
 												suojakilpi+=2000;
 												inaktiivinenMenu=false;
 												pelikerrat+=1;
-												if(pelikerrat==5){
-													tavoitteet[2]=true;
-												}
+												tavoitteet[2]=Math.max(tavoitteet[0],pelikerrat);;
 												navigator.vibrate(1000);
 												if(buusti>0 && hengissa){
 													matka+=parseInt(buusti);
@@ -954,17 +951,8 @@ $(function(){
 							}
 							if(confirm("Haluatko varmasti palauttaa pelin alkutilaansa?\n\nTämä poistaa kaikki ostamasi tavarat, palauttaa tilin saldon ja parhaat pisteesi.\n\nToiminto on peruuttamaton.")){
 								if(prompt("Vahvista toimenpide kirjoittamalla kokonaan pienin kirjaimin, mikä viikonpäivä on tänään.")==viikonpaiva){
-									alert("Tiedot poistetaan!");
-									parhaatPisteet=0;
-									localStorage.parhaatPisteet=0;
-									kolikot=0;
-									localStorage.kolikot=0;
-									buusti=0;
-									localStorage.buusti=0;
-									suojakilpi=0;
-									localStorage.kilpi=0;
-									//tavoitteet=JSON.stringify([0,0,0,0,0,0,0,0,0,0,0,0,0]);
-									//localStorage.tavoitteet=tavoitteet;
+									localStorage.clear();
+									location.reload();
 								}else{
 									alert("Väärin. Tietoja ei ole poistettu.");
 								}
@@ -1044,10 +1032,10 @@ $(function(){
 		if(suojakilpi>0 && hengissa){
 			if(suojakilpi<=2000){
 				if(suojakilpi%100){
-					game().globalAlpha=.5;
+					game().globalAlpha=0;
 				}
 			}else{
-				game().globalAlpha=.5;
+				game().globalAlpha=0.5;
 			}
 		}
 		game().drawImage(ukko[i],x,y);

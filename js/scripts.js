@@ -1,6 +1,5 @@
 // 20.fi/9621
 
-
 $(function(){
 
 	// Poistumisvahvistus
@@ -71,6 +70,7 @@ $(function(){
 	var mitalit = lataaKuvat('mitalit/',4);
 	var mitalinauha = lataaKuvat('mitalit/mitalinauha',0);
 	var hyppyKuva = lataaKuvat('hyppy',0);
+	var kolikkoKuva = lataaKuvat('kolikko',0);
 	
 	// Äänet
 	var hyppyAani = lataaAanet("jump",0);
@@ -82,6 +82,8 @@ $(function(){
 	var klikkiAani = lataaAanet("click",0);
 	var skratsaus = lataaAanet("scratch",0);
 	var huuto = lataaAanet("scream",0);
+	var kilina = lataaAanet("gain",0);
+
 	
 	tausta[0].loop=true;
 	tausta[0].play();
@@ -101,6 +103,7 @@ $(function(){
 	var tummuus = 1;
 	var biomiLaskuri=0;
 	var elvytettavissa = false;
+	var kokonaisSuoritus = 0;
 
 	var pelaaNo = 0; // Ei deskriptiivinen nimi
 	
@@ -197,18 +200,20 @@ $(function(){
 	var tavoiteX = 0;	
 	var hyppy = false;
 	var kokoMatka = 0;
+
+	var kolikot = [];
 	
 	// Lataa pelitiedot selaimesta
 	if(localStorage.parhaatPisteet == null || localStorage.parhaatPisteet == undefined){
 		var parhaatPisteet = 0;
-		var kolikot = 500;
+		var rahat = 500;
 		var buusti = 0;
 		var suojakilpi = 4000;
 		var kokoMatka = 0;
 		var tavoiteData = [0,false,0,0,0,0,0,0,0,0,0];
 
 		localStorage.parhaatPisteet=parhaatPisteet;
-		localStorage.kolikot=kolikot;
+		localStorage.rahat=rahat;
 		localStorage.buusti=buusti;
 		localStorage.suojakilpi=suojakilpi;
 		localStorage.kokoMatka=kokoMatka;
@@ -217,7 +222,7 @@ $(function(){
 		alert("Tervetuloa pelaamaan HuhtiRunia!");
 	}else{
 		var parhaatPisteet = parseInt(localStorage.parhaatPisteet);
-		var kolikot = parseInt(localStorage.kolikot);
+		var rahat = parseInt(localStorage.rahat);
 		var buusti = parseInt(localStorage.buusti);
 		var suojakilpi = parseInt(localStorage.kilpi)*1000;
 		var kokoMatka = parseInt(localStorage.kokoMatka);
@@ -244,6 +249,7 @@ $(function(){
 	var vihuSiirtyma = 95;
 	
 	var matka = 0;
+	var pisteet = 0;
     var tieMinMax = [0, 960];
     
     var tauko = false;
@@ -368,10 +374,18 @@ $(function(){
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
+
+		// Laske tavoitteiden suoritusprosentti
+		kokonaisSuoritus=0;
+		$.each(tavoitteet,function(i,v){
+			kokonaisSuoritus+=v.vaatimus();
+		});
+		kokonaisSuoritus = kokonaisSuoritus/tavoitteet.length;
 		pelaaNo+=.5;
 		if(pelaaNo>1000){
 			pelaaNo=0;
 		}
+
 		// Siirrä ukkoa
 		if(tavoiteX != ukkoX){
 			var posErotus = ((Math.max(ukkoX,tavoiteX)-Math.min(ukkoX,tavoiteX)))/4;
@@ -384,10 +398,10 @@ $(function(){
 
 		// Muuta biomia
 		if(biomiLaskuri >= 12){
-			var uusiBiomi = Math.floor(Math.random()*biomiKuvat.length);
+			var uusiBiomi = 0;/*Math.floor(Math.random()*biomiKuvat.length);
 			while(uusiBiomi==biomi){
 				uusiBiomi = Math.floor(Math.random()*biomiKuvat.length);
-			}
+			}*/
 			console.log("Biomi muuttuu "+biomi+" --> "+uusiBiomi);
 			biomi=uusiBiomi;
 			biomiLaskuri=0;
@@ -435,9 +449,9 @@ $(function(){
 		//Piirrä oliota ja asioita. 
 		piirraMaasto(siirtoY);
 		piirraVihu(iVihu,vihuX.shift(), ukkoY+vihuSiirtyma);
+		piirraVarjo();
 		piirraUkko(iUkko,ukkoX,ukkoY);
 		piirraLintu(iLintu,lintuX,lintuY);
-		piirraVarjo();
 		piirraHyppyNappi();
 
 		if(!hengissa){
@@ -496,15 +510,9 @@ $(function(){
 			var puolivali = Math.floor((0.5*(tieMinMax[0] + tieMinMax[1]))/192)*192;
 			tavoiteX=puolivali;
 		}
-		if(((suojakilpi>0 && suojakilpi<=2000) || (matka<=5))&& hengissa){
+		/*if(((suojakilpi>0 && suojakilpi<=2000) || (matka<=5))&& hengissa){
 			var puolivali = Math.floor((0.5*(tieMinMax[0] + tieMinMax[1]))/192)*192;
-			game().strokeStyle="red";
-			game().lineWidth=2;
-			game().beginPath();
-			game().moveTo(puolivali+96,96);
-			game().lineTo(ukkoX+96,192);
-			game().stroke();
-		}
+		}*/
         
         //Ukko ja tie. 
 		if((ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi-120) && !tauko){
@@ -517,12 +525,20 @@ $(function(){
 				suojakilpi+=2000;
 				navigator.vibrate(500);
 				auts[0].play();
+				console.log(maasto);
 			}
 		}
 
 		if(hengissa){
 			ukkoX += ukkoLiikkuuX;
 			matka += Math.abs(ukkoLiikkuuX)/250;
+		}
+
+		// Tunnista tietyyppi (kuolee mikäli kompastuu puuhun ym.)
+		if(!hyppy && suojakilpi<=0 && siirtoY>144){
+			if(maasto[Math.round(ukkoX/192)][1]==tieSuoraan[1] || maasto[Math.round(ukkoX/192)][1]==tieSuoraan[4]){
+				vihuSiirtyma=95;
+			}
 		}
 		
 		// Maaston liikuttaminen
@@ -532,20 +548,36 @@ $(function(){
 			kirjoita("Tauolla",keskiosa.x,keskiosa.y,true,48);
 			game().textAlign="start";
 		}else{
-			if(biomi==3){
-				siirtoY+=pelaajaNopeus*.8;
-			}else{
-				siirtoY+=pelaajaNopeus;
-			}
+			siirtoY+=pelaajaNopeus;
 		}
 
-		if (siirtoY>192){
+		$.each(kolikot,function(i,v){
+			var kolikkoY = (matka-v[1])*192+siirtoY-48;
+			game().drawImage(kolikkoKuva[0],v[0],kolikkoY);
+			if(kolikkoY > ukkoY && kolikkoY < ukkoY+96 && ukkoX > v[0]-24-96 && ukkoX < v[0]+72){
+				//kolikot.splice(i,1);
+				kolikot[i][1]=$("canvas").height();
+				pisteet+=1;
+				kilina[0].play();
+			}
+			if(kolikkoY > $("canvas").height()){
+				//kolikot.splice(i,1);
+			}
+		});
+
+		if (siirtoY >= 192){
 			siirtoY=0;
 			biomiLaskuri+=1;
 			console.log("Biomia on ollut "+biomiLaskuri+" blokkia");
-		if(hengissa && !tauko){
-			matka += 1;
-		}
+			
+			if(hengissa && !tauko){
+				matka += 1;
+				/*kolikot.push([tie*192+96-24,matka]);
+				kolikot.push([tie*192+96-24,matka+0.2]);
+				kolikot.push([tie*192+96-24,matka+0.4]);
+				kolikot.push([tie*192+96-24,matka+0.6]);
+				kolikot.push([tie*192+96-24,matka+0.8]);*/
+			}
 
 			// Kopioidaan ylemmät rivit alempaan
 			for (var j=maasto[0].length-1; j>0; j--){
@@ -563,10 +595,6 @@ $(function(){
 			// 	i=4 => Ei oikealle
 			// 2. Tee välisuorat
 			// 3. Päivitä maasto / maastomuoto
-
-            // If on nopein:
-            // http://stackoverflow.com/questions/6665997/switch-statement-for-greater-than-less-than/12259830#12259830
-            //
             var Suunta = Math.random();
 
             if (tie == 0){
@@ -663,7 +691,7 @@ $(function(){
 			tummuus = Math.max(tummuus,0);
 		}
 
-		pelaajaNopeus=10+Math.round(5/250*matka); // Peli vaikenee, mitä pitemmälle pääsee
+		pelaajaNopeus=10+Math.round(5/300*matka); // Peli vaikenee, mitä pitemmälle pääsee
 		
 		// Kun vihu saa pelaajan kiinni
 		if(vihuSiirtyma<96){
@@ -679,18 +707,19 @@ $(function(){
 				tummuus=0;
 				elvytettavissa=true;
 				inaktiivinenMenu=true;
+				kolikot=[];
 				setTimeout(function(){
 					inaktiivinenMenu=false;
 					if(matka >= 10){
-						kolikot=parseInt(kolikot)+parseInt(matka);
+						rahat=parseInt(rahat)+parseInt(matka);
 						kokoMatka+=parseInt(matka);
 					}
-					tavoiteData[0]=Math.max(tavoiteData[0],kolikot);
+					tavoiteData[0]=Math.max(tavoiteData[0],rahat);
 					tavoiteData[2]=Math.max(tavoiteData[2],pelikerrat);
 					// Pelitietojen tallennus
 					parhaatPisteet = Math.max(parhaatPisteet,matka);
 					localStorage.parhaatPisteet=parhaatPisteet;
-					localStorage.kolikot=kolikot;
+					localStorage.rahat=rahat;
 					localStorage.buusti=buusti;
 					localStorage.kilpi=suojakilpi/1000;
 					localStorage.kilpiTeho=suojakilpiTeho;
@@ -703,7 +732,7 @@ $(function(){
 				},1000);
 			}
 
-			kolikot=localStorage.kolikot;
+			rahat=localStorage.rahat;
 			tummuus=.4;
 		
 
@@ -723,7 +752,7 @@ $(function(){
 						kirjoita("Elvytä",320,256,true,24);
 						kirjoita(pad(Math.round(matka),6),64,128,true,64);
 						if(elvytettavissa){
-							if(kolikot>=100*Math.pow(2,pelikerrat)+50){
+							if(rahat>=100*Math.pow(2,pelikerrat)+50){
 								kirjoita("Hinta "+(100*Math.pow(2,pelikerrat)+50)+" €",320,280,false);
 							}else{
 								kirjoita("Rahaa ei ole riittävästi",320,280,false);
@@ -755,7 +784,7 @@ $(function(){
 					kirjoita("Osta buustia, suojakilpi ym.",576,280,false);
 
 					kirjoita("Tavoitteet",64,384,true,24);
-					kirjoita("Tarkastele tavoitteitasi",64,408,false);
+					kirjoita(Math.round(kokonaisSuoritus*100)+" % suoritettu",64,408,false);
 
 					kirjoita("Tilastot",320,384,true,24);
 					kirjoita("Seuraa pelitilastojasi",320,408,false);
@@ -763,7 +792,7 @@ $(function(){
 					kirjoita("Lisää · · ·",576,384,true,24);
 					kirjoita("Asetukset, ohjeet, tekijät ym.",576,408,false);
 
-					kirjoita("Tililläsi on nyt "+Math.round(kolikot)+" €",64,160,true);
+					kirjoita("Tililläsi on nyt "+Math.round(rahat)+" €",64,160,true);
 
 					game().textAlign="end";
 					kirjoita("Pelin resetointi",$("canvas").width()-64,512,false);
@@ -772,7 +801,7 @@ $(function(){
 				case 1:
 					kirjoita("Kauppa",64,128,true,64);
 					game().textAlign="end";
-					kirjoita("Tililläsi on "+Math.round(kolikot)+" €",$("canvas").width()-64,128,true);
+					kirjoita("Tililläsi on "+Math.round(rahat)+" €",$("canvas").width()-64,128,true);
 					game().textAlign="start";
 
 					game().save(); // Tallentaa canvasin asetukset
@@ -811,11 +840,6 @@ $(function(){
 					
 					game().textAlign="end";
 					kirjoita("Seuraava 〉",$("canvas").width()-64,512,true);
-					var kokonaisSuoritus = 0;
-					$.each(tavoitteet,function(i,v){
-						kokonaisSuoritus+=v.vaatimus();
-					});
-					kokonaisSuoritus = kokonaisSuoritus/tavoitteet.length;
 					kirjoita("Tavoitteista on suoritettu "+Math.round(kokonaisSuoritus*100)+" %",$("canvas").width()-64,128,true);
 					game().textAlign="center";
 					kirjoita("Takaisin valikkoon",$("canvas").width()/2,512,true);
@@ -1038,7 +1062,7 @@ $(function(){
 		var x = Math.floor(e.pageX-$("canvas").offset().left);
 		var y = Math.floor(e.pageY-$("canvas").offset().top);
 		if(y<$("canvas").height()*.8){
-			if(hengissa){
+			if(hengissa && !tauko && !hyppy){
 				tavoiteX=x-96;
 			}
 		}else{
@@ -1105,14 +1129,14 @@ $(function(){
 	}
 	// Ostotoiminto kauppaa varten
 	function osta(hinta){
-		if(hinta <= kolikot){
-			kolikot-=hinta;
-			localStorage.kolikot=kolikot;
+		if(hinta <= rahat){
+			rahat-=hinta;
+			localStorage.rahat=rahat;
 			maksuAani[0].play();
 			return true;
 		}else{
 			dramaattinen[0].play();
-			alert("Rahasi eivät riitä :-(\nTarvitset "+Math.floor(hinta-kolikot)+" € lisää rahaa ostaaksesi tämän");
+			alert("Rahasi eivät riitä :-(\nTarvitset "+Math.floor(hinta-rahat)+" € lisää rahaa ostaaksesi tämän");
 			return false;
 		}
 	}

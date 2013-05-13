@@ -87,9 +87,13 @@ $(function(){
 	var skratsaus = lataaAanet("scratch",0);
 	var huuto = lataaAanet("scream",0);
 	var kilina = lataaAanet("gain",0);
+	var menuMusiikki = lataaAanet("menu",0);
 
 	tausta[0].loop=true;
 	tausta[0].play();
+
+	menuMusiikki[0].loop=true;
+	menuMusiikki[0].play();
 
 	korkeaAani[0].loop=true;
 	korkeaAani[0].volume=0;
@@ -377,12 +381,12 @@ $(function(){
 	var siirtoY = 0;	
 	setInterval(paivita,50);
 
-	function kirjoita(teksti,x,y,lihavoitu,fonttikoko=16,vari="#FFF"){
+	function kirjoita(teksti,x,y,lihavoitu,fonttikoko=16,vari="#FFF",fontti="sans-serif"){
 		game().fillStyle = "#000";
 		if(lihavoitu){
-			game().font = "bold "+fonttikoko+"px sans-serif";
+			game().font = "bold "+fonttikoko+"px "+fontti+",sans-serif";
 		}else{
-			game().font = fonttikoko+"px sans-serif";
+			game().font = fonttikoko+"px "+fontti+",sans-serif";
 		}
 		game().fillText(teksti,x+1,y+1);
 		if(inaktiivinenMenu){
@@ -431,9 +435,11 @@ $(function(){
 		if(hengissa){
 			korkeaAani[0].volume=Math.max(0,.6-aanenVoimakkuus);
 			tausta[0].volume=aanenVoimakkuus;
+			menuMusiikki[0].volume=Math.max(0,menuMusiikki[0].volume-0.01);
 		}else{
 			korkeaAani[0].volume=0;
-			tausta[0].volume=.2;
+			tausta[0].volume=0;
+			menuMusiikki[0].volume=1;
 		}
 		if(Math.ceil(Math.random()*16)==16){
 			vihuSiirtyma -= Math.floor(3/512*vihuSiirtyma);
@@ -525,8 +531,10 @@ $(function(){
 				tavoiteX=puolivali;
 				vihuSiirtyma -= 64 + Math.round(Math.random()*48);
 				suojakilpi+=2;
-				navigator.vibrate(500);
-				auts[0].play();
+				if(hengissa){
+					navigator.vibrate(500);
+					auts[0].play();
+				}
 				console.log(maasto);
 			}
 		}
@@ -636,7 +644,9 @@ $(function(){
 		lintuX += 8;
 		lintuY += lintuK+16*Math.sin(lintuX*.1);
 		if(lintuX>$("canvas").width()+512){
-			lintuX=-512;
+			if(hengissa){
+				lintuX=-512;
+			}
 			lintuY=(Math.random()*($("canvas").height()/2))+$("canvas").height()/4;
 			lintuK=(Math.random()-.5)*6;
 		}
@@ -693,7 +703,7 @@ $(function(){
 		// Kun vihu saa pelaajan kiinni, mene päävalikkoon
 		if(vihuSiirtyma<96){
 			// Pysäytä maaston liikkuminen
-			pelaajaNopeus=0;
+			pelaajaNopeus=5;
 			suojakilpi=0;
 		
 			if(hengissa){
@@ -729,11 +739,11 @@ $(function(){
 						if(!inaktiivinenMenu){
 							elvytettavissa=false;
 						}
-					},3000);
+					},2000);
 				},1000);
 			}
 
-			tummuus=0.5;
+			tummuus=0.25;
 		
 			game().fillStyle="rgba(128,0,0,.9)";
 			game().fillRect(0,320+veriSiirtyma,960,576);
@@ -748,8 +758,8 @@ $(function(){
 				case 0:
 					// Kirjoita otsikko
 					game().textAlign="center";
-					kirjoita("HuhtiRun",$("canvas").width()/2,112,true,64);
-					kirjoita("™",$("canvas").width()*0.7,96,true,32);
+					kirjoita("HuhtiRun",$("canvas").width()/2,112,true,64,"#FFF","'Fondamento'");
+					kirjoita("TM",$("canvas").width()*0.675,80,true,16);
 					game().textAlign="start";
 
 					// Näytä rahatilanne vasemmassa yläkulmassa
@@ -776,9 +786,9 @@ $(function(){
 						// Piirrä kentänvalitsimet
 						//game().drawImage(taustaKuva[biomiTieSuoraanKuvat[biomi][0]],112,224,96,96);
 						game().textAlign="center";
-						kirjoita(biomiTyypit[biomi],$("canvas").width()/2,256,true);
-						kirjoita("〈",192,192,true,48);
-						kirjoita("〉",$("canvas").width()-192,192,true,48);
+						//kirjoita(biomiTyypit[biomi],$("canvas").width()/2,256,true);
+						kirjoita("〈",64,256,true,48);
+						kirjoita("〉",$("canvas").width()-64,256,true,48);
 						game().textAlign="start";
 					}
 				break;
@@ -864,7 +874,7 @@ $(function(){
 		}else{
 			// Versionumeron ja copyrightin printtaus
 			game().textAlign="end";
-			kirjoita("rev. 1.1.6 (b)",$("canvas").width()-8,$("canvas").height()-8,false,8);
+			kirjoita("rev. 1.1.6 (c)",$("canvas").width()-8,$("canvas").height()-8,false,8);
 			game().textAlign="start";
 			kirjoita("© 2013 Huhdin koulu",8,$("canvas").height()-8,false,8);
 		}
@@ -887,14 +897,14 @@ $(function(){
 		}else{
 			if(tila==0){
 				navigator.vibrate(100);
-					if(y>128 && y<224){
-						if(x>=160 && x<224){
+					if(y>192 && y<288){
+						if(x<128){
 							biomi=Math.max(0,biomi-1);
 							klikkiAani[0].play();
 							alustaMaasto();
 							ukkoX=384;
 						}
-						if(x>=$("canvas").width()-192-32 && x<$("canvas").width()-192+32){
+						if(x>$("canvas").width()-128){
 							biomi=Math.min(biomiTyypit.length-1,biomi+1);
 							klikkiAani[0].play();
 							alustaMaasto();

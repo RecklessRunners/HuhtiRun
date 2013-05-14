@@ -106,6 +106,8 @@ $(function(){
 	var hengissa = true;
 	var ukkoToleranssi = 40;
 	var pelikerrat=0;
+
+	var maxBonusMatka = 50;
 	
 	var tummuus = 1;
 	var biomiLaskuri=0;
@@ -275,6 +277,7 @@ $(function(){
 	var vihuSiirtyma = 95;
 	
 	var matka = 0;
+	var bonusMatka = 0;
 	var pisteet = 0;
     var tieMinMax = [0, 960];
     
@@ -533,6 +536,7 @@ $(function(){
 				suojakilpi+=2;
 				if(hengissa){
 					navigator.vibrate(500);
+					bonusMatka = Math.round(bonusMatka/2);
 					auts[0].play();
 				}
 				console.log(maasto);
@@ -582,6 +586,7 @@ $(function(){
 			
 			if(hengissa && !tauko){
 				matka += 1;
+				bonusMatka += 1;
 				if(suojakilpi>0){
 					suojakilpi-=1;
 				}
@@ -655,22 +660,43 @@ $(function(){
 		if(hengissa){
 			var pyorista50 = Math.floor(matka/50)*50;
 			if(matka >= 50 && matka >= pyorista50 && matka <= pyorista50+5){
-				game().fillStyle = "#000";
-				game().font = "64px sans-serif";
-				game().fillText(pyorista50+" m",385,129);
-				game().fillStyle = "#FFF";
-				game().fillText(pyorista50+" m",384,128);
+				kirjoita(pyorista50,384,128);
 			}
-			game().fillStyle = "#000";
-			game().font = "bold 24px sans-serif";
-			game().fillText(pad(Math.round(matka),6),48,48);
-			game().fillStyle = "#FFF";
-			game().fillText(pad(Math.round(matka),6),49,49);
-			game().fillStyle = "#000";
-			game().font = "bold 12px sans-serif";
-			game().fillText("Paras: "+pad(Math.round(parhaatPisteet),6),48,64);
-			game().fillStyle = "#FFF";
-			game().fillText("Paras: "+pad(Math.round(parhaatPisteet),6),49,65);
+			kirjoita(pad(Math.round(matka),6),32,48,true,24); // Kirjoita nykyiset pisteet
+
+			if(bonusMatka<maxBonusMatka){
+				//kirjoita(Math.min(100,Math.round(100/maxBonusMatka*bonusMatka))+"% bonus",32,64,true,12);
+
+				// Piirrä bonuspalkki vasempaan reunaan
+				game().beginPath();
+				game().rect(32,128,24,256);
+				game().fillStyle = "rgba(0,0,0,.5)";
+				game().fill();
+				game().strokeStyle="rgba(0,0,0,.25)";
+				game().stroke();
+
+				game().beginPath();
+				var pylvasK = Math.min(256,Math.round(256/maxBonusMatka*bonusMatka));
+				game().rect(32,256-pylvasK+128,24,pylvasK);
+				game().fillStyle = "gold";
+				game().fill();
+			}else{
+				bonusMatka=maxBonusMatka;
+				if(matka%2){
+					kirjoita("Kaksoisnapsauta saadaksesi bonuksen!",96,192,true,12,"gold");
+				}
+
+				// Piirrä bonuspalkki vasempaan reunaan
+				game().beginPath();
+				game().rect(32,128,24,256);
+				game().fillStyle = "lime";
+				game().fill();
+			}
+			// Piirrä heijastus/kiilto
+			game().beginPath();
+			game().rect(32,128,12,256);
+			game().fillStyle = "rgba(255,255,255,.1)";
+			game().fill();
 		}
 		
 		// Varjo
@@ -698,7 +724,7 @@ $(function(){
 			tummuus = Math.max(tummuus,0);
 		}
 
-		pelaajaNopeus=10+Math.round(5/300*matka); // Peli vaikenee, mitä pitemmälle pääsee
+		pelaajaNopeus=10+Math.round(0.01*matka); // Peli vaikenee, mitä pitemmälle pääsee
 		
 		// Kun vihu saa pelaajan kiinni, mene päävalikkoon
 		if(vihuSiirtyma<96){
@@ -718,6 +744,7 @@ $(function(){
 					rahat += matka;
 					kokoMatka += matka;
 					elvytettavissa=true;
+					tavoiteData[3]=parseFloat(tavoiteData[3])+1;
 				}
 				setTimeout(function(){
 					inaktiivinenMenu=false;
@@ -776,7 +803,7 @@ $(function(){
 							kirjoita("Aloita peli ➧",640+(Math.sin(pelaaNo)*4),520,true,32,"lime");
 						}else{
 							kirjoita("Osta & pelaa ➧",640+(Math.sin(pelaaNo)*4),512,true,32,"lime");
-							kirjoita(1000*Math.pow(2,biomi),670,536,false);
+							kirjoita(500*Math.pow(2,biomi),670,536,false);
 							game().drawImage(kolikkoKuva[0],640,520,24,24);
 						}
 						kirjoita("Tavoitteet",64,512,false);
@@ -787,8 +814,8 @@ $(function(){
 						//game().drawImage(taustaKuva[biomiTieSuoraanKuvat[biomi][0]],112,224,96,96);
 						game().textAlign="center";
 						//kirjoita(biomiTyypit[biomi],$("canvas").width()/2,256,true);
-						kirjoita("〈",64,256,true,48);
-						kirjoita("〉",$("canvas").width()-64,256,true,48);
+						kirjoita("<",64,256,true,48);
+						kirjoita(">",$("canvas").width()-64,256,true,48);
 						game().textAlign="start";
 					}
 				break;
@@ -849,16 +876,17 @@ $(function(){
 					kirjoita("m",256,256,false,24);
 
 					kirjoita("PELATUT PELIT",64,288,true,12);
-					kirjoita("---",64,320,true,32);
+					kirjoita(pad(tavoiteData[3],8),64,320,true,32);
 
-					kirjoita("K.A. MATKA/PELI",64,352,true,12);
-					kirjoita("---",64,384,true,32);
+					kirjoita("KESKIMÄÄRÄINEN MATKA/PELI",64,352,true,12);
+					kirjoita(pad(Math.round(kokoMatka/tavoiteData[3]),8),64,384,true,32);
 					kirjoita("m",256,384,false,24);
 
 					kirjoita("← Takaisin",64,512,true);
 				break;
 				case 4:
-					kirjoita("Tulossa pian!",64,128,true,64);
+					kirjoita("Tietoja",64,128,true,64);
+					kirjoita("Napsauta tähän avataksesi pelin tekijäluettelo...",64,192);
 					kirjoita("← Takaisin",64,512,true);
 				break;
 			}
@@ -874,7 +902,7 @@ $(function(){
 		}else{
 			// Versionumeron ja copyrightin printtaus
 			game().textAlign="end";
-			kirjoita("rev. 1.1.6 (c)",$("canvas").width()-8,$("canvas").height()-8,false,8);
+			kirjoita("rev. 1.1.6 (d)",$("canvas").width()-8,$("canvas").height()-8,false,8);
 			game().textAlign="start";
 			kirjoita("© 2013 Huhdin koulu",8,$("canvas").height()-8,false,8);
 		}
@@ -961,13 +989,14 @@ $(function(){
 										huuto[0].play();
 										hengissa=true;
 										matka=0;
+										bonusMatka=0;
 										tausta[0].volume=1;
 										suojakilpi=3;
 										inaktiivinenMenu=false;
 										pelikerrat=0;
 										navigator.vibrate(1000);
 										if(!omatKentat[biomi]){
-											if(osta(1000*Math.pow(2,biomi))){
+											if(osta(500*Math.pow(2,biomi))){
 												omatKentat[biomi]=true;
 											}else{
 												vihuSiirtyma=95;
@@ -1019,10 +1048,17 @@ $(function(){
 							klikkiAani[0].play();
 						}
 					}
-				}else if(tila==3 || tila==4){ // Tilastomenu
+				}else if(tila==3){ // Tilastomenu
 					if(y>448){ // Takaisin valikkoon
 						tila=0;
 						klikkiAani[0].play();
+					}
+				}else if(tila==4){ // Tietoja-menu
+					if(y>448){ // Takaisin valikkoon
+						tila=0;
+						klikkiAani[0].play();
+					}else{
+						document.location="pages/authors.html";
 					}
 				}
 			}
@@ -1041,6 +1077,12 @@ $(function(){
 					hyppy=false;
 				},500);
 			}
+		}
+	}).dblclick(function(){
+		if(hengissa && bonusMatka >= maxBonusMatka){
+			matka+=50;
+			bonusMatka=0;
+			maksuAani[0].play();
 		}
 	});
 	

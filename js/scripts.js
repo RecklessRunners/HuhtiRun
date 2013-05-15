@@ -169,7 +169,7 @@ $(function(){
 		"Juokse kuumassa auringossa\nvaroen tielle kaatuneita puita",
 		"Juokse niityllä kukkia\nihastellen sekä varoen tiellä\nolevia kiviä",
 		"Juokse laiturilla varoen\nlaiturilta tippumista",
-		"Tutki pimeää luolaa, mutta\nvaro tippumasta maassa oleviin\nkuiluihin"
+		"Luolassa on pimeää ja vaarallista, mutta toisaalta voit löytää sieltä arvokkaita jalokiviä"
 	];
 	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille
 		[0,0,0,3,3,4,5,5], // Aavikko
@@ -263,7 +263,8 @@ $(function(){
 	var ukkoX = 384;
 	var ukkoY = 192;
 	var pelaajaNopeus = 9;
-	var veriSiirtyma = 192;
+	var veriSiirtyma = 384;
+	var veriSiirtymaNyt = 384;
 
 	var vihu = lataaKuvat('vihu', 4);
 	var iVihu = 1;
@@ -402,6 +403,14 @@ $(function(){
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
+		var veriSiirtymaV = Math.abs((Math.max(veriSiirtymaNyt,veriSiirtyma)-Math.min(veriSiirtymaNyt,veriSiirtyma))/2);
+		if(veriSiirtyma != veriSiirtymaNyt){
+			if(veriSiirtyma<veriSiirtymaNyt){
+				veriSiirtymaNyt -= veriSiirtymaV;
+			}else{
+				veriSiirtymaNyt += veriSiirtymaV;
+			}
+		}
 
 		// Laske tavoitteiden suoritusprosentti
 		kokonaisSuoritus=0;
@@ -689,7 +698,7 @@ $(function(){
 				// Piirrä bonuspalkki vasempaan reunaan
 				game().beginPath();
 				game().rect(32,128,24,256);
-				game().fillStyle = "lime";
+				game().fillStyle = "#47A94B";
 				game().fill();
 			}
 			// Piirrä heijastus/kiilto
@@ -733,7 +742,8 @@ $(function(){
 			suojakilpi=0;
 		
 			if(hengissa){
-				veriSiirtyma=192;
+				tila=0;
+				veriSiirtyma=384;
 				navigator.vibrate(1000);
 				hengissa=false;
 				suojakilpi=0;
@@ -773,122 +783,118 @@ $(function(){
 			tummuus=0.25;
 		
 			game().fillStyle="rgba(128,0,0,.9)";
-			game().fillRect(0,320+veriSiirtyma,960,576);
+			game().fillRect(0,320+veriSiirtymaNyt-192,960,576);
 			for(i=0;i<10;i++){
-				game().drawImage(veri[0],96*i,320+veriSiirtyma-96);
+				game().drawImage(veri[0],96*i,320+veriSiirtymaNyt-96-192);
 			}
 			
 			// Aseta vihu pelaajan alle
 			vihuSiirtyma=95;
 			
-			switch(tila){
-				case 0:
-					// Kirjoita otsikko
+			if(tila==0){
+				if(elvytettavissa && matka >= 5 && rahat >= 100 * Math.pow(2,pelikerrat)){
+					kirjoita("Ohita",64,512,false);
+					kirjoita("Elvytä ➧",640,512,true,32);
+					kirjoita(100*Math.pow(2,pelikerrat),670,536,false);
+					game().drawImage(kolikkoKuva[0],640,520,24,24);
+				}else{
+					// Piirrä alamenun vaihtoehdot
+					kirjoita("Tavoitteet",64,512,false);
+					kirjoita("Pelitilastot",192,512,false);
+					kirjoita("Tietoja",320,512,false);
+
+					// Piirrä kentänvalitsimet
 					game().textAlign="center";
-					kirjoita("HuhtiRun",$("canvas").width()/2,112,true,64,"#FFF","'Fondamento'");
-					kirjoita("TM",$("canvas").width()*0.675,80,true,16);
+					kirjoita("<",64,256,true,48);
+					kirjoita(">",$("canvas").width()-64,256,true,48);
 					game().textAlign="start";
-
-					// Näytä rahatilanne vasemmassa yläkulmassa
-					game().drawImage(kolikkoKuva[0],24,24,24,24);
-					kirjoita(Math.round(tuhaterotin(rahat)),64,40,true);
-
-					if(elvytettavissa && matka >= 5 && rahat >= 100 * Math.pow(2,pelikerrat)){
-						kirjoita("Ohita",64,512,false);
-						kirjoita("Elvytä ➧",640,512,true,32);
-						kirjoita(100*Math.pow(2,pelikerrat),670,536,false);
-						game().drawImage(kolikkoKuva[0],640,520,24,24);
-					}else{
-						if(omatKentat[biomi]){
-							kirjoita("Aloita peli ➧",640+(Math.sin(pelaaNo)*4),520,true,32,"lime");
-						}else{
-							kirjoita("Osta & pelaa ➧",640+(Math.sin(pelaaNo)*4),512,true,32,"lime");
-							kirjoita(500*Math.pow(2,biomi),670,536,false);
-							game().drawImage(kolikkoKuva[0],640,520,24,24);
-						}
-						kirjoita("Tavoitteet",64,512,false);
-						kirjoita("Pelitilastot",192,512,false);
-						kirjoita("Tietoja",320,512,false);
-
-						// Piirrä kentänvalitsimet
-						//game().drawImage(taustaKuva[biomiTieSuoraanKuvat[biomi][0]],112,224,96,96);
-						game().textAlign="center";
-						//kirjoita(biomiTyypit[biomi],$("canvas").width()/2,256,true);
-						kirjoita("<",64,256,true,48);
-						kirjoita(">",$("canvas").width()-64,256,true,48);
-						game().textAlign="start";
-					}
-				break;
-				case 1:
-					kirjoita("Kauppa",64,128,true,64);
+				}
+				if(omatKentat[biomi]){
 					game().textAlign="end";
-					kirjoita("Tililläsi on "+Math.round(rahat)+"    ",$("canvas").width()-64,128,true);
+						kirjoita("Jatka ➧",$("canvas").width()-64+(Math.sin(pelaaNo)*4),520,true,32,"#47A94B");
 					game().textAlign="start";
-
-					game().save(); // Tallentaa canvasin asetukset
-					game().rotate(Math.PI/8);
-					kirjoita("Osta 200 m, saat 50 m kaupan päälle!",448,-128,false,22);
-					game().restore(); // Palauttaa canvasin asetukset
-
-					kirjoita("Buusti (=etumatka pelin alussa)",64,192,false);
-					kirjoita(Math.floor(buusti)+" m",384,192,false);
-					kirjoita("Osta +25 m (200    )",512,192,false);
-
-					kirjoita("Suojakilpi (=kuolemattomuus)",64,224,false);
-					kirjoita(Math.floor(suojakilpi)+" m",384,224,false);
-					kirjoita("Osta +25 m (100    )",512,224,false);
-
-					kirjoita("← Takaisin",64,512,true);
-				break;
-				case 2:
-					kirjoita(tavoitteet[tavoiteNo].nimi,256,192,true,24);
-					kirjoita(tavoitteet[tavoiteNo].kuvaus,256,224,false,20);
-					if(tavoitteet[tavoiteNo].vaatimus()>=1){
-						var mitaliSin = (Math.sin(pelaaNo/10)*10)-(Math.PI/2); // Mitali nauhoineen heiluu siniaallon mukaan
-						kirjoita(tehty,256,288,true,20,"lime");
-						game().drawImage(mitalinauha[0],-64+(mitaliSin+(mitaliSin/4)/2),-32);
-						game().drawImage(mitalit[tavoiteNo],64+mitaliSin/2,176);
-						/*game().drawImage(mitalinauha[0],-64,-32);
-						game().drawImage(mitalit[tavoiteNo],64,176);*/
-					}else{
-						kirjoita(Math.round(tavoitteet[tavoiteNo].vaatimus()*100) + " % suoritettu",256,288,false,20,"silver");
-						game().drawImage(placeholder[0],64,176,128,128);
-					}
-					
+				}else{
 					game().textAlign="end";
-					kirjoita("Seuraava 〉",$("canvas").width()-64,512,true);
-					kirjoita("Tavoitteista on suoritettu "+Math.round(kokonaisSuoritus*100)+" %",$("canvas").width()-64,128,true);
-					game().textAlign="center";
-					kirjoita("Takaisin valikkoon",$("canvas").width()/2,512,true);
+						kirjoita("Osta kenttä ➧",$("canvas").width()-64+(Math.sin(pelaaNo)*4),512,true,32,"#47A94B");
 					game().textAlign="start";
-					kirjoita("〈 Edellinen",64,512,true);
-					kirjoita("Tavoitteet",64,128,true,64);
-				break;
-				case 3:
-					kirjoita("Tilastot",64,128,true,64);
+					kirjoita(500*Math.pow(2,biomi),670,536,false);
+					game().drawImage(kolikkoKuva[0],640,520,24,24);
+				}
+				game().textAlign="center";
+				kirjoita(biomiKuvaukset[biomi],$("canvas").width()/2,144,true,12,"gold");
+				game().textAlign="start";
+			}
+			if(tila==0 || tila==1){
+				// Näytä rahatilanne vasemmassa yläkulmassa
+				game().drawImage(kolikkoKuva[0],24,24,24,24);
+				kirjoita(Math.round(tuhaterotin(rahat)),64,40,true);
 
-					kirjoita("ENNÄTYSMATKA",64,160,true,12);
-					kirjoita(pad(parhaatPisteet,8),64,192,true,32);
-					kirjoita("m",256,192,false,24);
+				// Kirjoita otsikko
+				game().textAlign="center";
+				kirjoita("HuhtiRun",$("canvas").width()/2,112,true,64,"#FFF","'Fondamento'");
+				kirjoita("TM",$("canvas").width()*0.675,80,true,16);
+				game().textAlign="start";
+			}
+			if(tila==1){
+				game().textAlign="center";
+				kirjoita("Parantele hahmoasi ja osta power-upeja",$("canvas").width()/2,144,true,12,"gold");
+				game().save();
+				game().rotate(Math.PI*0.2);
+				kirjoita("TULOSSA PIAN!",$("canvas").width()/2,0,true,60,"silver");
+				game().restore();
+				game().textAlign="start";
+				kirjoita("Aloita peli ➧",640+(Math.sin(pelaaNo)*4),520,true,32,"#47A94B");
+				veriSiirtyma=0;
+				kirjoita("Vaihda kenttää . . .",64,512,false);
+			}
+			if(tila==2){
+				kirjoita(tavoitteet[tavoiteNo].nimi,256,192,true,24);
+				kirjoita(tavoitteet[tavoiteNo].kuvaus,256,224,false,20);
+				if(tavoitteet[tavoiteNo].vaatimus()>=1){
+					var mitaliSin = (Math.sin(pelaaNo/10)*10)-(Math.PI/2); // Mitali nauhoineen heiluu siniaallon mukaan
+					kirjoita(tehty,256,288,true,20,"#47A94B");
+					game().drawImage(mitalinauha[0],-64+(mitaliSin+(mitaliSin/4)/2),-32);
+					game().drawImage(mitalit[tavoiteNo],64+mitaliSin/2,176);
+					/*game().drawImage(mitalinauha[0],-64,-32);
+					game().drawImage(mitalit[tavoiteNo],64,176);*/
+				}else{
+					kirjoita(Math.round(tavoitteet[tavoiteNo].vaatimus()*100) + " % suoritettu",256,288,false,20,"silver");
+					game().drawImage(placeholder[0],64,176,128,128);
+				}
+				
+				game().textAlign="end";
+				kirjoita("Seuraava 〉",$("canvas").width()-64,512,true);
+				kirjoita("Tavoitteista on suoritettu "+Math.round(kokonaisSuoritus*100)+" %",$("canvas").width()-64,128,true);
+				game().textAlign="center";
+				kirjoita("Takaisin valikkoon",$("canvas").width()/2,512,true);
+				game().textAlign="start";
+				kirjoita("〈 Edellinen",64,512,true);
+				kirjoita("Tavoitteet",64,128,true,64);
+			}
+			if(tila==3){
+				kirjoita("Tilastot",64,128,true,64);
 
-					kirjoita("YHTEENLASKETTU MATKA",64,224,true,12);
-					kirjoita(pad(kokoMatka,8),64,256,true,32);
-					kirjoita("m",256,256,false,24);
+				kirjoita("ENNÄTYSMATKA",64,160,true,12);
+				kirjoita(pad(parhaatPisteet,8),64,192,true,32);
+				kirjoita("m",256,192,false,24);
 
-					kirjoita("PELATUT PELIT",64,288,true,12);
-					kirjoita(pad(tavoiteData[3],8),64,320,true,32);
+				kirjoita("YHTEENLASKETTU MATKA",64,224,true,12);
+				kirjoita(pad(kokoMatka,8),64,256,true,32);
+				kirjoita("m",256,256,false,24);
 
-					kirjoita("KESKIMÄÄRÄINEN MATKA/PELI",64,352,true,12);
-					kirjoita(pad(Math.round(kokoMatka/tavoiteData[3]),8),64,384,true,32);
-					kirjoita("m",256,384,false,24);
+				kirjoita("PELATUT PELIT",64,288,true,12);
+				kirjoita(pad(tavoiteData[3],8),64,320,true,32);
 
-					kirjoita("← Takaisin",64,512,true);
-				break;
-				case 4:
-					kirjoita("Tietoja",64,128,true,64);
-					kirjoita("Napsauta tähän avataksesi pelin tekijäluettelo...",64,192);
-					kirjoita("← Takaisin",64,512,true);
-				break;
+				kirjoita("KESKIMÄÄRÄINEN MATKA/PELI",64,352,true,12);
+				kirjoita(pad(Math.round(kokoMatka/tavoiteData[3]),8),64,384,true,32);
+				kirjoita("m",256,384,false,24);
+
+				kirjoita("← Takaisin",64,512,false);
+			}
+			if(tila==4){
+				kirjoita("Tietoja",64,128,true,64);
+				kirjoita("Napsauta tähän avataksesi pelin tekijäluettelo...",64,192);
+				kirjoita("← Takaisin",64,512,false);
 			}
 		}
 		if(hengissa){
@@ -902,9 +908,9 @@ $(function(){
 		}else{
 			// Versionumeron ja copyrightin printtaus
 			game().textAlign="end";
-			kirjoita("rev. 1.1.6 (d)",$("canvas").width()-8,$("canvas").height()-8,false,8);
+			kirjoita("rev. 1.1.6 (e)",$("canvas").width()-8,$("canvas").height()-8,false,8);
 			game().textAlign="start";
-			kirjoita("© 2013 Huhdin koulu",8,$("canvas").height()-8,false,8);
+			kirjoita("© 2013",8,$("canvas").height()-8,false,8);
 		}
 	}
 
@@ -923,44 +929,46 @@ $(function(){
 				}
 			}
 		}else{
+			console.log("Tila "+tila+", posiitio ["+x+","+y+"]");
 			if(tila==0){
 				navigator.vibrate(100);
-					if(y>192 && y<288){
-						if(x<128){
-							biomi=Math.max(0,biomi-1);
-							klikkiAani[0].play();
-							alustaMaasto();
-							ukkoX=384;
-						}
-						if(x>$("canvas").width()-128){
-							biomi=Math.min(biomiTyypit.length-1,biomi+1);
-							klikkiAani[0].play();
-							alustaMaasto();
-							ukkoX=384;
-						}
+				if(y>192 && y<288){
+					if(x<128){
+						biomi=Math.max(0,biomi-1);
+						klikkiAani[0].play();
+						alustaMaasto();
+						ukkoX=384;
 					}
-					if(y>448){
-						if(x>=48 && x<176){ // Siirry tavoitteet-sivulle
-							tavoiteNo=0;
-							tila=2;
-							klikkiAani[0].play();
-						}
-						if(x>=176 && x<272){ // Siirry pelitilastoihin
-							tila=3;
-							klikkiAani[0].play();
-						}
-						if(x>=272 && x<384){ // Siirry tietoja-sivulle
-							tila=4;
-							klikkiAani[0].play();
-						}
-						if(x>=608){ 
-							if(elvytettavissa && rahat >= 100*Math.pow(2,pelikerrat)){ // Elvytä
-								tavoiteData[1]=true;
-								if(! inaktiivinenMenu && osta(100*Math.pow(2,pelikerrat))){
+					if(x>$("canvas").width()-128){
+						biomi=Math.min(biomiTyypit.length-1,biomi+1);
+						klikkiAani[0].play();
+						alustaMaasto();
+						ukkoX=384;
+					}
+				}
+				if(y>448){
+					if(x>=48 && x<176){ // Siirry tavoitteet-sivulle
+						tavoiteNo=0;
+						tila=2;
+						klikkiAani[0].play();
+					}
+					if(x>=176 && x<272){ // Siirry pelitilastoihin
+						tila=3;
+						klikkiAani[0].play();
+					}
+					if(x>=272 && x<384){ // Siirry tietoja-sivulle
+						tila=4;
+						klikkiAani[0].play();
+					}
+					if(x>=608){ 
+						if(elvytettavissa && rahat >= 100*Math.pow(2,pelikerrat)){ // Elvytä ja jatka peliä
+							//tavoiteData[1]=true;
+							if(! inaktiivinenMenu){
+								if(osta(100*Math.pow(2,pelikerrat))){
 									inaktiivinenMenu=true;
 									pelaajaNopeus=0;
 									setTimeout(function(){
-										veriSiirtyma=192;
+										veriSiirtyma=384;
 										vihuSiirtyma=256;
 										hengissa=true;
 										pelaajaNopeus=10;
@@ -976,92 +984,86 @@ $(function(){
 										}
 									},1000);
 								}
+							}
+						}else{
+							klikkiAani[0].play();
+							if(omatKentat[biomi]){
+								tila=1;
 							}else{
-								veriSiirtyma=192;
-								if(! inaktiivinenMenu){ // Aloita uusi peli
-									inaktiivinenMenu=true;
-									klikkiAani[0].play();
-									pelaajaNopeus=0;
-									setTimeout(function(){
-										alustaMaasto();
-										vihuSiirtyma=512;
-										pelaajaNopeus=10;
-										huuto[0].play();
-										hengissa=true;
-										matka=0;
-										bonusMatka=0;
-										tausta[0].volume=1;
-										suojakilpi=3;
-										inaktiivinenMenu=false;
-										pelikerrat=0;
-										navigator.vibrate(1000);
-										if(!omatKentat[biomi]){
-											if(osta(500*Math.pow(2,biomi))){
-												omatKentat[biomi]=true;
-											}else{
-												vihuSiirtyma=95;
-												hengissa=false;
-											}
-										}
-										if(buusti>0 && hengissa){
-											matka+=parseInt(buusti);
-											buusti=0;
-										}
-									},1000);
+								if(osta(250*Math.pow(2,biomi))){
+									omatKentat[biomi]=true;
+									localStorage.omatKentat=JSON.stringify(omatKentat);
+									tila=1;
 								}
 							}
 						}
 					}
-				}else if(tila==1){ // Kaupassa
-					if(y<448){
-						if(x>448 && x<448+256){
-							if(y>192-16 && y<192+16){
-								if(osta(200)){
-									buusti+=25;
-									if(buusti%200==0){
-										buusti+=50;
-									}
-								}
+				}
+		}else if(tila==1){
+			navigator.vibrate(100);
+			if(y>448){
+				if(x>=48 && x<256){ // Siirry takaisin
+					tila=0;
+					veriSiirtyma=384;
+					klikkiAani[0].play();
+				}
+				if(x>=608){ 
+					veriSiirtyma=384;
+					if(! inaktiivinenMenu){ // Aloita uusi peli
+						klikkiAani[0].play();
+						alustaMaasto();
+						vihuSiirtyma=512;
+						pelaajaNopeus=10;
+						huuto[0].play();
+						hengissa=true;
+						matka=0;
+						bonusMatka=0;
+						tausta[0].volume=1;
+						suojakilpi=3;
+						pelikerrat=0;
+						navigator.vibrate(1000);
+						if(!omatKentat[biomi]){
+							if(osta(250*Math.pow(2,biomi))){
+								omatKentat[biomi]=true;
+							}else{
+								vihuSiirtyma=95;
+								hengissa=false;
 							}
-							if(y>224-16 && y<224+16){
-								if(osta(100)){
-									suojakilpi+=25;
-								}
-							}
 						}
-					}else{
-						tila=0; // Siirry takaisin menuun
-						klikkiAani[0].play();
-					}
-				}else if(tila==2){ // Tavoitemenu
-					if(y>448){
-						if(x<$("canvas").width()/3){ // Edellinen
-							tavoiteNo = Math.max(0,tavoiteNo-1);
-							klikkiAani[0].play();
-						}
-						if(x>$("canvas").width()/3 && x<$("canvas").width()/3*2){ // Siirry takaisin menuun
-							tila=0;
-							klikkiAani[0].play();
-						}
-						if(x>$("canvas").width()/3*2){ // Seuraava
-							tavoiteNo = Math.min(tavoitteet.length-1,tavoiteNo+1);
-							klikkiAani[0].play();
-						}
-					}
-				}else if(tila==3){ // Tilastomenu
-					if(y>448){ // Takaisin valikkoon
-						tila=0;
-						klikkiAani[0].play();
-					}
-				}else if(tila==4){ // Tietoja-menu
-					if(y>448){ // Takaisin valikkoon
-						tila=0;
-						klikkiAani[0].play();
-					}else{
-						document.location="pages/authors.html";
+						matka+=parseInt(buusti);
+						buusti=0;
 					}
 				}
 			}
+		}else if(tila==2){ // Tavoitemenu
+			if(y>448){
+				if(x<$("canvas").width()/3){ // Edellinen
+					tavoiteNo = Math.max(0,tavoiteNo-1);
+					klikkiAani[0].play();
+				}
+				if(x>$("canvas").width()/3 && x<$("canvas").width()/3*2){ // Siirry takaisin menuun
+					tila=0;
+					klikkiAani[0].play();
+				}
+				if(x>$("canvas").width()/3*2){ // Seuraava
+					tavoiteNo = Math.min(tavoitteet.length-1,tavoiteNo+1);
+					klikkiAani[0].play();
+				}
+			}
+		}else if(tila==3){ // Tilastomenu
+			if(y>448){ // Takaisin valikkoon
+				tila=0;
+				klikkiAani[0].play();
+			}
+		}else if(tila==4){ // Tietoja-menu
+			if(y>448){ // Takaisin valikkoon
+				tila=0;
+				klikkiAani[0].play();
+			}else{
+				document.location="pages/authors.html";
+			}
+		}
+		}
 	}).mousemove(function(e){
 		var x = Math.floor(e.pageX-$("canvas").offset().left);
 		var y = Math.floor(e.pageY-$("canvas").offset().top);
@@ -1144,7 +1146,7 @@ $(function(){
 			return true;
 		}else{
 			dramaattinen[0].play();
-			alert("Rahasi eivät riitä :-(\nTarvitset "+Math.floor(hinta-rahat)+"     lisää rahaa ostaaksesi tämän");
+			alert("Voi ei, rahasi ei riitä tähän ostokseen!\nTarvitset "+Math.floor(hinta-rahat)+" (HR) lisää ostaaksesi tämän.");
 			return false;
 		}
 	}

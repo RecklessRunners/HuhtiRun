@@ -60,11 +60,11 @@ $(function(){
 	}
 
 	// Kuvat
-	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',7);
+	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',8);
 	var tieVasemmalle = lataaKuvat('upcoming/kaannosv',3);
 	var tieOikealle = lataaKuvat('upcoming/kaannoso',4);
 	var taustaKuva = lataaKuvat('upcoming/tausta',8);
-	var tieVaakaan = lataaKuvat('upcoming/tievaaka',3);
+	var tieVaakaan = lataaKuvat('upcoming/tievaaka',4);
 	var tieOikeaYlos = lataaKuvat('upcoming/kaannosoy',3);
 	var tieVasenYlos = lataaKuvat('upcoming/kaannosvy',3);
 	var varjo = lataaKuvat('varjo',0);
@@ -181,13 +181,13 @@ $(function(){
 		[0,1,4],
 		[2,3,5],
 		[6],
-		[7]
+		[7,7,7,8]
 	];
 	var biomiTieVaakaanKuvat = [
 		[0],
 		[1],
 		[2],
-		[3]
+		[3,3,3,4]
 	];
 	var biomiTieVYKuvat = [
 		[1],
@@ -231,7 +231,7 @@ $(function(){
 	if(localStorage.parhaatPisteet == null || localStorage.parhaatPisteet == undefined){
 		/* Tarpeellinen? */
 		var parhaatPisteet = 0;
-		var rahat = 500;
+		var rahat = 0;
 		var buusti = 0;
 		var suojakilpi = 0;
 		var kokoMatka = 0;
@@ -557,13 +557,22 @@ $(function(){
 			matka += Math.abs(ukkoLiikkuuX)/250;
 		}
 
-		// Tunnista tietyyppi (kuolee mikäli kompastuu puuhun ym.)
+		// Tunnista tietyyppi (kuolee mikäli kompastuu puuhun, tippuu kuiluun ym.)
+		// Suoraan menevät tiet
 		if(!hyppy && suojakilpi<=0 && siirtoY>144){
-			if(maasto[Math.round(ukkoX/192)][1]==tieSuoraan[1] || maasto[Math.round(ukkoX/192)][1]==tieSuoraan[4]){
+			if(maasto[Math.round(ukkoX/192)][1]==tieSuoraan[1] || maasto[Math.round(ukkoX/192)][1]==tieSuoraan[4] || maasto[Math.round(ukkoX/192)][1]==tieSuoraan[8]){
 				vihuSiirtyma=95;
 			}
 		}
-		
+
+		// Vaakaan menevät tiet
+		// xxxxxxxxxxxxxxxxxxxxxxxx
+		if(!hyppy && suojakilpi<=0){
+			if(maasto[Math.round(ukkoX/192)][1]==tieVaakaan[4]){
+				vihuSiirtyma=95;
+			}
+		}
+
 		// Maaston liikuttaminen
 		if(tauko){
 			game().textAlign="center";
@@ -817,7 +826,7 @@ $(function(){
 					game().textAlign="end";
 						kirjoita("Osta kenttä ➧",$("canvas").width()-64+(Math.sin(pelaaNo)*4),512,true,32,"#47A94B");
 					game().textAlign="start";
-					kirjoita(500*Math.pow(2,biomi),670,536,false);
+					kirjoita(200*Math.pow(2,biomi),670,536,false);
 					game().drawImage(kolikkoKuva[0],640,520,24,24);
 				}
 				game().textAlign="center";
@@ -837,15 +846,28 @@ $(function(){
 			}
 			if(tila==1){
 				game().textAlign="center";
-				kirjoita("Parantele hahmoasi ja osta power-upeja",$("canvas").width()/2,144,true,12,"gold");
-				game().save();
-				game().rotate(Math.PI*0.2);
-				kirjoita("TULOSSA PIAN!",$("canvas").width()/2,0,true,60,"silver");
-				game().restore();
+				kirjoita("Halutessasi voit ostaa power-upeja ennen peliä",$("canvas").width()/2,144,true,12,"gold");
+
+				kirjoita("Bonusta nopeammin",$("canvas").width()/4,192,true);
+				kirjoita("Bonusmittari täyttyy",$("canvas").width()/4,384);
+				kirjoita("lyhemmältä matkalta",$("canvas").width()/4,408);
+				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4,432,true,12,"gray");
+
+				kirjoita("Bonusta enemmän",$("canvas").width()/4*2,192,true);
+				kirjoita("Saat enemmän pisteitä",$("canvas").width()/4*2,384);
+				kirjoita("bonusmittarin täyttyessä",$("canvas").width()/4*2,408);
+				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4*2,432,true,12,"gray");
+
+				kirjoita("Alkupotkaisu",$("canvas").width()/4*3,192,true);
+				kirjoita("Saa oikein kunnon",$("canvas").width()/4*3,384);
+				kirjoita("alkupotkaisu pelissä",$("canvas").width()/4*3,408);
+				kirjoita("0 METRIÄ",$("canvas").width()/4*3,432,true,12,"gray");
+
+				game().textAlign="end";
+				kirjoita("Aloita peli ➧",$("canvas").width()-64+(Math.sin(pelaaNo)*4),520,true,32,"#47A94B");
 				game().textAlign="start";
-				kirjoita("Aloita peli ➧",640+(Math.sin(pelaaNo)*4),520,true,32,"#47A94B");
 				veriSiirtyma=0;
-				kirjoita("Vaihda kenttää . . .",64,512,false);
+				kirjoita("← Takaisin",64,512,false);
 			}
 			if(tila==2){
 				kirjoita(tavoitteet[tavoiteNo].nimi,256,192,true,24);
@@ -908,7 +930,7 @@ $(function(){
 		}else{
 			// Versionumeron ja copyrightin printtaus
 			game().textAlign="end";
-			kirjoita("rev. 1.1.6 (e)",$("canvas").width()-8,$("canvas").height()-8,false,8);
+			kirjoita("rev. 1.1.6 (f)",$("canvas").width()-8,$("canvas").height()-8,false,8);
 			game().textAlign="start";
 			kirjoita("© 2013",8,$("canvas").height()-8,false,8);
 		}
@@ -990,7 +1012,7 @@ $(function(){
 							if(omatKentat[biomi]){
 								tila=1;
 							}else{
-								if(osta(250*Math.pow(2,biomi))){
+								if(osta(200*Math.pow(2,biomi))){
 									omatKentat[biomi]=true;
 									localStorage.omatKentat=JSON.stringify(omatKentat);
 									tila=1;
@@ -1023,7 +1045,7 @@ $(function(){
 						pelikerrat=0;
 						navigator.vibrate(1000);
 						if(!omatKentat[biomi]){
-							if(osta(250*Math.pow(2,biomi))){
+							if(osta(200*Math.pow(2,biomi))){
 								omatKentat[biomi]=true;
 							}else{
 								vihuSiirtyma=95;

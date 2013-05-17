@@ -43,7 +43,11 @@ $(function(){
 		var taulu = [];
 		for(var i=0;i<=nmax;i++){
 			var img = new Image();
+			img.onload=function(){
+				ladatutTiedostot++;
+			};
 			img.src="img/"+nimi+i+".png";
+			kaikkiTiedostot++;
 			taulu.push(img);
 		}
 		return taulu;
@@ -52,14 +56,31 @@ $(function(){
 		var taulu = [];
 		for(var i=0;i<=nmax;i++){
 			var snd = new Audio();
+			/*snd.canplaythrough=function(){
+				ladatutTiedostot++;
+			};*/
 			snd.src="snd/"+nimi+i+".wav";
 			snd.load();
+			//kaikkiTiedostot++;
 			taulu.push(snd);
 		}
 		return taulu;
 	}
+	
+	var kaikkiTiedostot = 0;
+	var ladatutTiedostot = 0;
 
 	// Kuvat
+	//var latain = lataaKuvat("lataa",0);
+
+	var ukko = [
+		lataaKuvat("ukko/0a",2),	// 0a
+		lataaKuvat("ukko/45a",2),	// 45a
+		lataaKuvat("ukko/90a",2),	// 90a
+		lataaKuvat("ukko/-45a",2),	//-45a
+		lataaKuvat("ukko/-90a",2)	//-90a
+	];
+
 	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',8);
 	var tieVasemmalle = lataaKuvat('upcoming/kaannosv',3);
 	var tieOikealle = lataaKuvat('upcoming/kaannoso',4);
@@ -108,6 +129,8 @@ $(function(){
 	var pelikerrat=0;
 
 	var maxBonusMatka = 50;
+
+	var asteluku = 0;
 	
 	var tummuus = 1;
 	var biomiLaskuri=0;
@@ -258,7 +281,6 @@ $(function(){
 
 	var klikkiPos = [0,0];
 	
-	var ukko = lataaKuvat('ukko', 2);
 	var iUkko=0;
 	var ukkoX = 384;
 	var ukkoY = 192;
@@ -430,10 +452,29 @@ $(function(){
 			liikkuuY=true;
 		}else{
 			var posErotus = ((Math.max(ukkoX,tavoiteX)-Math.min(ukkoX,tavoiteX)))/4;
-			if(tavoiteX < ukkoX){
-				ukkoX-=posErotus;
-			}else{
+
+			if(tavoiteX > ukkoX){
 				ukkoX+=posErotus;
+				if(posErotus < 12){
+					asteluku=0;
+				}
+				if(posErotus >= 12 && posErotus < 24){
+					asteluku=1;
+				}
+				if(posErotus >= 24){
+					asteluku=2;
+				}
+			}else{
+				ukkoX-=posErotus;
+				if(posErotus < 12){
+					asteluku=0;
+				}
+				if(posErotus >= 12 && posErotus < 24){
+					asteluku=3;
+				}
+				if(posErotus >= 24){
+					asteluku=4;
+				}
 			}
 			liikkuuY=false;
 		}
@@ -464,7 +505,7 @@ $(function(){
 		}
 		
 		iUkko+=1;
-		if(iUkko>=ukko.length){
+		if(iUkko>=ukko[asteluku].length){
 			iUkko=0;
 		}
 		iVihu+=1;
@@ -819,9 +860,11 @@ $(function(){
 					game().textAlign="start";
 				}
 				if(omatKentat[biomi]){
-					game().textAlign="end";
-						kirjoita("Jatka ➧",$("canvas").width()-64+(Math.sin(pelaaNo)*4),520,true,32,"#47A94B");
-					game().textAlign="start";
+					if(!elvytettavissa){
+						game().textAlign="end";
+							kirjoita("Jatka ➧",$("canvas").width()-64+(Math.sin(pelaaNo)*4),520,true,32,"#47A94B");
+						game().textAlign="start";
+					}
 				}else{
 					game().textAlign="end";
 						kirjoita("Osta kenttä ➧",$("canvas").width()-64+(Math.sin(pelaaNo)*4),512,true,32,"#47A94B");
@@ -930,9 +973,18 @@ $(function(){
 		}else{
 			// Versionumeron ja copyrightin printtaus
 			game().textAlign="end";
-			kirjoita("rev. 1.1.6 (f)",$("canvas").width()-8,$("canvas").height()-8,false,8);
+			kirjoita("rev. 1.1.6 (g)",$("canvas").width()-8,$("canvas").height()-8,false,8);
 			game().textAlign="start";
 			kirjoita("© 2013",8,$("canvas").height()-8,false,8);
+		}
+		if(ladatutTiedostot<kaikkiTiedostot){
+			game().fillStyle="#000";
+			game().fillRect(0,0,960,576);
+			game().textAlign="center";
+			game().drawImage(ukko[0][0],$("canvas").width()/2-96,256);
+			kirjoita(Math.round(100/kaikkiTiedostot*ladatutTiedostot),$("canvas").width()/2,192,true,32);
+			kirjoita("L A D A T A A N",$("canvas").width()/2,224,true,12);
+			game().textAlign="start";
 		}
 	}
 
@@ -1090,7 +1142,7 @@ $(function(){
 		var x = Math.floor(e.pageX-$("canvas").offset().left);
 		var y = Math.floor(e.pageY-$("canvas").offset().top);
 		if(y<$("canvas").height()*.8){
-			if(hengissa && !tauko && !hyppy){
+			if(hengissa && !tauko){
 				tavoiteX=x-96;
 			}
 		}else{
@@ -1153,10 +1205,15 @@ $(function(){
 			}
 		}
 		if(hyppy){
-			game().drawImage(ukko[i],x-24,y-24,240,240);
+			game().drawImage(ukko[asteluku][i],x-24,y-24,240,240);
 		}else{
-			game().drawImage(ukko[i],x,y);
+			try{
+				game().drawImage(ukko[asteluku][i],x,y);
+			}catch(e){
+				console.log("Kuvan piirto feilas. Asteluku: "+asteluku+" I: "+i);
+			}
 		}
+		//game().drawImage(ukko[2][i],x,y);
 		game().globalAlpha=1;
 	}
 	// Ostotoiminto kauppaa varten

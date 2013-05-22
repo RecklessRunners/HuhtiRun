@@ -88,13 +88,13 @@ $(function(){
 	];
 
 	var palkki = lataaKuvat('palkki',0);
-	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',8);
-	var tieVasemmalle = lataaKuvat('upcoming/kaannosv',3);
-	var tieOikealle = lataaKuvat('upcoming/kaannoso',4);
-	var taustaKuva = lataaKuvat('upcoming/tausta',8);
-	var tieVaakaan = lataaKuvat('upcoming/tievaaka',4);
-	var tieOikeaYlos = lataaKuvat('upcoming/kaannosoy',3);
-	var tieVasenYlos = lataaKuvat('upcoming/kaannosvy',3);
+	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',9);
+	var tieVasemmalle = lataaKuvat('upcoming/kaannosv',4);
+	var tieOikealle = lataaKuvat('upcoming/kaannoso',5);
+	var taustaKuva = lataaKuvat('upcoming/tausta',10);
+	var tieVaakaan = lataaKuvat('upcoming/tievaaka',5);
+	var tieOikeaYlos = lataaKuvat('upcoming/kaannosoy',4);
+	var tieVasenYlos = lataaKuvat('upcoming/kaannosvy',4);
 	var varjo = lataaKuvat('varjo',0);
 	var veri = lataaKuvat('veri',0);
 	//var futisKentta = lataaKuvat('futis/bg',0);
@@ -196,55 +196,64 @@ $(function(){
 		"Aavikko",
 		"Niitty",
 		"Meri",
-		"Luola"
+		"Luola",
+		"Metsä"
 	];
 	var biomiKuvaukset = [
 		"Juokse kuumassa auringossa\nvaroen tielle kaatuneita puita",
 		"Juokse niityllä kukkia\nihastellen sekä varoen tiellä\nolevia kiviä",
 		"Juokse laiturilla varoen\nlaiturilta tippumista",
-		"Luolassa on pimeää ja vaarallista, mutta toisaalta voit löytää sieltä arvokkaita jalokiviä"
+		"Luolassa on pimeää ja vaarallista, mutta toisaalta voit löytää sieltä arvokkaita jalokiviä",
+		"Lenkkeile luonnon helmassa lintujen laulua kunnellen"
 	];
 	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille
 		[0,0,0,3,3,4,5,5], // Aavikko
 		[1,2], // Ruoho
 		[6], // Meri
-		[7,8] // Luola
+		[7,8], // Luola
+		[9,10] // Metsä
 	];
 	var biomiTieSuoraanKuvat = [
 		[0,1,4],
 		[2,3,5],
 		[6],
-		[7,7,7,8]
+		[7,7,7,8],
+		[9]
 	];
 	var biomiTieVaakaanKuvat = [
 		[0],
 		[1],
 		[2],
-		[3,3,3,4]
+		[3,3,3,4],
+		[5]
 	];
 	var biomiTieVYKuvat = [
 		[1],
 		[0],
 		[2],
-		[3]
+		[3],
+		[4]
 	];
 	var biomiTieOYKuvat = [
 		[0],
 		[1],
 		[2],
-		[3]
+		[3],
+		[4]
 	];
 	var biomiTieVasKuvat = [
 		[0],
 		[1],
 		[2],
-		[3]
+		[3],
+		[4]
 	];
 	var biomiTieOikKuvat = [
 		[2],
 		[0,1],
 		[3],
-		[4]
+		[4],
+		[5]
 	];
     
 	var lintu = lataaKuvat('lintu', 8);
@@ -1010,7 +1019,7 @@ $(function(){
 		}else{
 			// Versionumeron ja copyrightin printtaus
 			game().textAlign="end";
-			kirjoita("rev. 1.1.6 (g)",$("canvas").width()-8,$("canvas").height()-8,false,8);
+			kirjoita("rev. 1.1.6 (h)",$("canvas").width()-8,$("canvas").height()-8,false,8);
 			game().textAlign="start";
 			kirjoita("© 2013",8,$("canvas").height()-8,false,8);
 		}

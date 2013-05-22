@@ -304,8 +304,8 @@ $(function(){
 	var ukkoX = 384;
 	var ukkoY = 192;
 	var pelaajaNopeus = 9;
-	var veriSiirtyma = 384;
-	var veriSiirtymaNyt = 384;
+	var veriSiirtyma = 256;
+	var veriSiirtymaNyt = 256;
 
 	var vihu = lataaKuvat('vihu', 4);
 	var iVihu = 1;
@@ -821,7 +821,7 @@ $(function(){
 		
 			if(hengissa){
 				tila=0;
-				veriSiirtyma=384;
+				veriSiirtyma=256;
 				navigator.vibrate(1000);
 				hengissa=false;
 				suojakilpi=0;
@@ -899,8 +899,20 @@ $(function(){
 
 					// Piirrä kentänvalitsimet
 					game().textAlign="center";
-					kirjoita("<",64,256,true,48);
-					kirjoita(">",$("canvas").width()-64,256,true,48);
+					if(biomi>0){
+						kirjoita("<",64,256,true,48);
+					}
+					if(biomi<biomiTyypit.length-1){
+						kirjoita(">",$("canvas").width()-64,256,true,48);
+					}
+					for(biomiI=0;biomiI<biomiTyypit.length;biomiI++){
+						var palloX = ($("canvas").width()/2)+(biomiI*16)-(biomiTyypit.length*16/2)+5;
+						if(biomiI==biomi){
+							kirjoita("●",palloX,416,true,10);
+						}else{
+							kirjoita("○",palloX,416,true,10);
+						}
+					}
 					game().textAlign="start";
 				}
 				if(omatKentat[biomi]){
@@ -913,11 +925,12 @@ $(function(){
 					game().textAlign="end";
 						kirjoita("Osta kenttä ➧",$("canvas").width()-64+(Math.sin(pelaaNo)*4),512,true,32,"#47A94B");
 					game().textAlign="start";
-					kirjoita(200*Math.pow(2,biomi),670,536,false);
+					kirjoita(100*Math.pow(2,biomi),670,536,false);
 					game().drawImage(kolikkoKuva[0],640,520,24,24);
 				}
 				game().textAlign="center";
-				kirjoita(biomiKuvaukset[biomi],$("canvas").width()/2,144,true,12,"gold");
+				kirjoita("Jännittävä seikkailupeli eri maastoissa",$("canvas").width()/2,144,true,16,"#FFF","Source Sans Pro");
+				kirjoita(biomiTyypit[biomi],$("canvas").width()/2,384,true,14,"#FFF","Source Sans Pro");
 				game().textAlign="start";
 			}
 			if(tila==0 || tila==1){
@@ -1019,7 +1032,7 @@ $(function(){
 		}else{
 			// Versionumeron ja copyrightin printtaus
 			game().textAlign="end";
-			kirjoita("rev. 1.1.6 (h)",$("canvas").width()-8,$("canvas").height()-8,false,8);
+			kirjoita("rev. 1.1.6 (i)",$("canvas").width()-8,$("canvas").height()-8,false,8);
 			game().textAlign="start";
 			kirjoita("© 2013",8,$("canvas").height()-8,false,8);
 		}
@@ -1114,7 +1127,7 @@ $(function(){
 									inaktiivinenMenu=true;
 									pelaajaNopeus=0;
 									setTimeout(function(){
-										veriSiirtyma=384;
+										veriSiirtyma=256;
 										vihuSiirtyma=256;
 										hengissa=true;
 										pelaajaNopeus=10;
@@ -1136,7 +1149,7 @@ $(function(){
 							if(omatKentat[biomi]){
 								tila=1;
 							}else{
-								if(osta(200*Math.pow(2,biomi))){
+								if(osta(100*Math.pow(2,biomi))){
 									omatKentat[biomi]=true;
 									localStorage.omatKentat=JSON.stringify(omatKentat);
 									tila=1;
@@ -1150,7 +1163,7 @@ $(function(){
 			if(y>448){
 				if(x>=48 && x<256){ // Siirry takaisin
 					tila=0;
-					veriSiirtyma=384;
+					veriSiirtyma=256;
 					klikkiAani[0].play();
 				}
 				if(x>=608){ 
@@ -1169,7 +1182,7 @@ $(function(){
 						pelikerrat=0;
 						navigator.vibrate(1000);
 						if(!omatKentat[biomi]){
-							if(osta(200*Math.pow(2,biomi))){
+							if(osta(100*Math.pow(2,biomi))){
 								omatKentat[biomi]=true;
 							}else{
 								vihuSiirtyma=95;

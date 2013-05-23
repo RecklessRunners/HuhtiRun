@@ -87,7 +87,6 @@ $(function(){
 		lataaKuvat("ukko/-90a",2)	//-90a
 	];
 
-	var palkki = lataaKuvat('palkki',0);
 	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',9);
 	var tieVasemmalle = lataaKuvat('upcoming/kaannosv',4);
 	var tieOikealle = lataaKuvat('upcoming/kaannoso',5);
@@ -96,13 +95,15 @@ $(function(){
 	var tieOikeaYlos = lataaKuvat('upcoming/kaannosoy',4);
 	var tieVasenYlos = lataaKuvat('upcoming/kaannosvy',4);
 	var varjo = lataaKuvat('varjo',0);
+	var kolikkoKuva = lataaKuvat('kolikko',0);
 	var veri = lataaKuvat('veri',0);
 	//var futisKentta = lataaKuvat('futis/bg',0);
 	var placeholder = lataaKuvat('mitalit/placeholder',0);
 	var mitalit = lataaKuvat('mitalit/',4);
 	var mitalinauha = lataaKuvat('mitalit/mitalinauha',0);
+	var palkki = lataaKuvat('palkki',0);
+	var kiilto = lataaKuvat('kiilto',0);
 	var hyppyKuva = lataaKuvat('hyppy',0);
-	var kolikkoKuva = lataaKuvat('kolikko',0);
 	
 	// Äänet
 	var hyppyAani = lataaAanet("jump",0);
@@ -128,6 +129,9 @@ $(function(){
 	korkeaAani[0].play();
 
 	var tila = 0;
+
+	var versioId = ""; // Muuttuu automaattisesti
+	$.ajax({url:".git/refs/heads/master",success:function(resp){versioId=resp;}});
 
 	var suojakilpi = 4000;
 	var suojakilpiTeho = 0.1;
@@ -207,8 +211,8 @@ $(function(){
 		"Lenkkeile luonnon helmassa lintujen laulua kunnellen"
 	];
 	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille
-		[0,0,0,3,3,4,5,5], // Aavikko
-		[1,2], // Ruoho
+		[0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,3,4,4,4,5], // Aavikko
+		[1,2], // Niitty
 		[6], // Meri
 		[7,8], // Luola
 		[9,10] // Metsä
@@ -304,8 +308,8 @@ $(function(){
 	var ukkoX = 384;
 	var ukkoY = 192;
 	var pelaajaNopeus = 9;
-	var veriSiirtyma = 256;
-	var veriSiirtymaNyt = 256;
+	var veriSiirtyma = 320;
+	var veriSiirtymaNyt = 320;
 
 	var vihu = lataaKuvat('vihu', 4);
 	var iVihu = 1;
@@ -445,7 +449,7 @@ $(function(){
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
-		var veriSiirtymaV = Math.abs((Math.max(veriSiirtymaNyt,veriSiirtyma)-Math.min(veriSiirtymaNyt,veriSiirtyma))/1.5);
+		var veriSiirtymaV = Math.abs((Math.max(veriSiirtymaNyt,veriSiirtyma)-Math.min(veriSiirtymaNyt,veriSiirtyma))/2.5);
 		if(veriSiirtyma != veriSiirtymaNyt){
 			if(veriSiirtyma<veriSiirtymaNyt){
 				veriSiirtymaNyt -= veriSiirtymaV;
@@ -821,7 +825,7 @@ $(function(){
 		
 			if(hengissa){
 				tila=0;
-				veriSiirtyma=256;
+				veriSiirtyma=320;
 				navigator.vibrate(1000);
 				hengissa=false;
 				suojakilpi=0;
@@ -913,6 +917,7 @@ $(function(){
 							kirjoita("○",palloX,416,true,10);
 						}
 					}
+					kirjoita(biomiTyypit[biomi],$("canvas").width()/2,384,true,14,"#FFF","Source Sans Pro");
 					game().textAlign="start";
 				}
 				if(omatKentat[biomi]){
@@ -930,7 +935,6 @@ $(function(){
 				}
 				game().textAlign="center";
 				kirjoita("Jännittävä seikkailupeli eri maastoissa",$("canvas").width()/2,144,true,16,"#FFF","Source Sans Pro");
-				kirjoita(biomiTyypit[biomi],$("canvas").width()/2,384,true,14,"#FFF","Source Sans Pro");
 				game().textAlign="start";
 			}
 			if(tila==0 || tila==1){
@@ -950,20 +954,23 @@ $(function(){
 				game().textAlign="center";
 				kirjoita("Halutessasi voit ostaa power-upeja ennen peliä",$("canvas").width()/2,144,true,12,"gold");
 
-				kirjoita("Bonusta nopeammin",$("canvas").width()/4,192,true);
-				kirjoita("Bonusmittari täyttyy",$("canvas").width()/4,384);
-				kirjoita("lyhemmältä matkalta",$("canvas").width()/4,408);
-				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4,432,true,12,"gray");
+				game().drawImage(kiilto[0],$("canvas").width()/4-96,192+veriSiirtymaNyt/9);
+				kirjoita("Bonusta nopeammin",$("canvas").width()/4,192+veriSiirtymaNyt/9,true);
+				kirjoita("Bonusmittari täyttyy",$("canvas").width()/4,396+veriSiirtymaNyt/9);
+				kirjoita("lyhemmältä matkalta",$("canvas").width()/4,420+veriSiirtymaNyt/9);
+				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4,444+veriSiirtymaNyt/9,true,12,"gray");
 
-				kirjoita("Bonusta enemmän",$("canvas").width()/4*2,192,true);
-				kirjoita("Saat enemmän pisteitä",$("canvas").width()/4*2,384);
-				kirjoita("bonusmittarin täyttyessä",$("canvas").width()/4*2,408);
-				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4*2,432,true,12,"gray");
+				game().drawImage(kiilto[0],$("canvas").width()/4*2-96,192+veriSiirtymaNyt/6);
+				kirjoita("Bonusta enemmän",$("canvas").width()/4*2,192+veriSiirtymaNyt/6,true);
+				kirjoita("Saat enemmän pisteitä",$("canvas").width()/4*2,396+veriSiirtymaNyt/6);
+				kirjoita("bonusmittarin täyttyessä",$("canvas").width()/4*2,420+veriSiirtymaNyt/6);
+				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4*2,444+veriSiirtymaNyt/6,true,12,"gray");
 
-				kirjoita("Alkupotkaisu",$("canvas").width()/4*3,192,true);
-				kirjoita("Saa oikein kunnon",$("canvas").width()/4*3,384);
-				kirjoita("alkupotkaisu pelissä",$("canvas").width()/4*3,408);
-				kirjoita("0 METRIÄ",$("canvas").width()/4*3,432,true,12,"gray");
+				game().drawImage(kiilto[0],$("canvas").width()/4*3-96,192+veriSiirtymaNyt/3);
+				kirjoita("Alkupotkaisu",$("canvas").width()/4*3,192+veriSiirtymaNyt/3,true);
+				kirjoita("Hanki itsellesi hieman",$("canvas").width()/4*3,396+veriSiirtymaNyt/3);
+				kirjoita("etumatkaa pelin alkaessa",$("canvas").width()/4*3,420+veriSiirtymaNyt/3);
+				kirjoita("0 METRIÄ",$("canvas").width()/4*3,444+veriSiirtymaNyt/3,true,12,"gray");
 
 				game().textAlign="end";
 				kirjoita("Aloita peli ➧",$("canvas").width()-64+(Math.sin(pelaaNo)*4),520,true,32,"#47A94B");
@@ -1017,7 +1024,9 @@ $(function(){
 			}
 			if(tila==4){
 				kirjoita("Tietoja",64,128,true,64);
-				kirjoita("Napsauta tähän avataksesi pelin tekijäluettelo...",64,192);
+				kirjoita("Tekijät >",64,192);
+				kirjoita("Pelin versionumero:",64,360,true);
+				kirjoita(versioId,64,384,false,16,"#FFF","Courier New");
 				kirjoita("← Takaisin",64,512,false);
 			}
 		}
@@ -1030,11 +1039,9 @@ $(function(){
 			game().fillRect(oikeaReuna-13,13,12,24);
 			game().fillRect(oikeaReuna-31,13,12,24);
 		}else{
-			// Versionumeron ja copyrightin printtaus
-			game().textAlign="end";
-			kirjoita("rev. 1.1.6 (i)",$("canvas").width()-8,$("canvas").height()-8,false,8);
-			game().textAlign="start";
-			kirjoita("© 2013",8,$("canvas").height()-8,false,8);
+			game().globalAlpha=0.5;
+			kirjoita(versioId.substring(0,8),8,$("canvas").height()-8,false,10,"#FFF","Courier New");
+			game().globalAlpha=1;
 		}
 		if(virheLadatessa){
 			game().fillStyle="#400000";
@@ -1127,7 +1134,7 @@ $(function(){
 									inaktiivinenMenu=true;
 									pelaajaNopeus=0;
 									setTimeout(function(){
-										veriSiirtyma=256;
+										veriSiirtyma=320;
 										vihuSiirtyma=256;
 										hengissa=true;
 										pelaajaNopeus=10;
@@ -1163,11 +1170,11 @@ $(function(){
 			if(y>448){
 				if(x>=48 && x<256){ // Siirry takaisin
 					tila=0;
-					veriSiirtyma=256;
+					veriSiirtyma=320;
 					klikkiAani[0].play();
 				}
 				if(x>=608){ 
-					veriSiirtyma=384;
+					veriSiirtyma=320;
 					if(! inaktiivinenMenu){ // Aloita uusi peli
 						klikkiAani[0].play();
 						alustaMaasto();

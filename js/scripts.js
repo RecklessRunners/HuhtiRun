@@ -117,6 +117,8 @@ $(function(){
 	var huuto = lataaAanet("scream",0);
 	var kilina = lataaAanet("gain",0);
 	var menuMusiikki = lataaAanet("menu",0);
+	var loppuAani = lataaAanet("end",0);
+	var pisteytysAani = lataaAanet("coins",0);
 
 	tausta[0].loop=true;
 	tausta[0].play();
@@ -211,11 +213,11 @@ $(function(){
 		"Lenkkeile luonnon helmassa lintujen laulua kunnellen"
 	];
 	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille
-		[0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,3,4,4,4,5], // Aavikko
-		[1,2], // Niitty
-		[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,11,12], // Meri
-		[7,8], // Luola
-		[9,10] // Metsä
+		[0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,3,4,4,4,5],
+		[1,2],
+		[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,11,12], // 2 % todennäköisyys olla muu kuin normaali meri
+		[7,8],
+		[9,10]
 	];
 	var biomiTieSuoraanKuvat = [
 		[0,1,4],
@@ -272,6 +274,8 @@ $(function(){
 	var kokoMatka = 0;
 
 	var kolikot = [];
+
+	var pisteytetaan=false;
 	
 	// Lataa pelitiedot selaimesta
 	if(localStorage.parhaatPisteet == null || localStorage.parhaatPisteet == undefined){
@@ -384,7 +388,7 @@ $(function(){
 
     function jatkaTieVasempaan(ind){
         //Arvotaan, kuinka kauas mennään vasempaan, eli arvotaan indeksi, jossa käännytään ylös
-        ylos = Math.floor( Math.random()*(ind-1) );
+        ylos = Math.floor(Math.random()*(ind-1));
 
         maasto[ind][0] = tieVasemmalle[biomiTieVasKuvat[biomi][Math.floor(Math.random()*biomiTieVasKuvat[biomi].length)]];
         maastomuoto[ind][0]=1; //Tie
@@ -752,7 +756,7 @@ $(function(){
 		if(hengissa){
 			var pyorista50 = Math.floor(matka/50)*50;
 			if(matka >= 50 && matka >= pyorista50 && matka <= pyorista50+5){
-				kirjoita(pyorista50,384,128);
+				//kirjoita(pyorista50,384,128);
 			}
 			kirjoita(pad(Math.round(matka),6),32,48,true,24); // Kirjoita nykyiset pisteet
 
@@ -824,6 +828,7 @@ $(function(){
 			suojakilpi=0;
 		
 			if(hengissa){
+				pisteytetaan=false;
 				tila=0;
 				veriSiirtyma=320;
 				navigator.vibrate(1000);
@@ -855,14 +860,22 @@ $(function(){
 					localStorage.tavoiteData=JSON.stringify(tavoiteData);
 					localStorage.omatKentat=JSON.stringify(omatKentat);
 					console.log(tavoiteData);
-					setTimeout(function(){
-						if(!inaktiivinenMenu){
-							elvytettavissa=false;
-						}
-					},2000);
-				},1000);
+					pisteytetaan=true;
+					pisteytysAani[0].play();
+				},500);
 			}else{
-				pisteytys -= pisteytys / 5;
+				if(pisteytetaan){
+					if(pisteytys>5){
+						pisteytys -= pisteytys / 10;
+					}else{
+						loppuAani[0].play();
+						//pisteytysAani[0].stop();
+						pisteytetaan=false;
+						setTimeout(function(){
+							elvytettavissa=false;
+						},500);
+					}
+				}
 			}
 
 			tummuus=0.25;
@@ -882,7 +895,7 @@ $(function(){
 			vihuSiirtyma=95;
 			
 			if(tila==0){
-				if(elvytettavissa && matka >= 5 && rahat >= 100 * Math.pow(2,pelikerrat)){
+				if((elvytettavissa || pisteytetaan) && matka >= 5 && rahat >= 100 * Math.pow(2,pelikerrat)){
 					game().textAlign="center";
 					if(pisteytys>5){
 						kirjoita(Math.round(pisteytys),$("canvas").width()/2,256,true,64);

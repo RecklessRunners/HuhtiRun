@@ -87,9 +87,9 @@ $(function(){
 		lataaKuvat("ukko/-90a",2)	//-90a
 	];
 
-	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',9);
+	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',10);
 	var tieVasemmalle = lataaKuvat('upcoming/kaannosv',4);
-	var tieOikealle = lataaKuvat('upcoming/kaannoso',5);
+	var tieOikealle = lataaKuvat('upcoming/kaannoso',6);
 	var taustaKuva = lataaKuvat('upcoming/tausta',10);
 	var tieVaakaan = lataaKuvat('upcoming/tievaaka',5);
 	var tieOikeaYlos = lataaKuvat('upcoming/kaannosoy',4);
@@ -222,7 +222,7 @@ $(function(){
 		[2,3,5],
 		[6],
 		[7,7,7,8],
-		[9]
+		[9,10]
 	];
 	var biomiTieVaakaanKuvat = [
 		[0],
@@ -257,7 +257,7 @@ $(function(){
 		[0,1],
 		[3],
 		[4],
-		[5]
+		[5,6]
 	];
     
 	var lintu = lataaKuvat('lintu', 8);

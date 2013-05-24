@@ -90,7 +90,7 @@ $(function(){
 	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',10);
 	var tieVasemmalle = lataaKuvat('upcoming/kaannosv',4);
 	var tieOikealle = lataaKuvat('upcoming/kaannoso',6);
-	var taustaKuva = lataaKuvat('upcoming/tausta',10);
+	var taustaKuva = lataaKuvat('upcoming/tausta',12);
 	var tieVaakaan = lataaKuvat('upcoming/tievaaka',5);
 	var tieOikeaYlos = lataaKuvat('upcoming/kaannosoy',4);
 	var tieVasenYlos = lataaKuvat('upcoming/kaannosvy',4);
@@ -213,7 +213,7 @@ $(function(){
 	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille
 		[0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,3,4,4,4,5], // Aavikko
 		[1,2], // Niitty
-		[6], // Meri
+		[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,11,12], // Meri
 		[7,8], // Luola
 		[9,10] // Metsä
 	];

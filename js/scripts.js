@@ -87,18 +87,17 @@ $(function(){
 		lataaKuvat("ukko/-90a",2)	//-90a
 	];
 
-	var tieRisteys = lataaKuvat('upcoming/risteys',4);
-	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',10);
-	var tieVasemmalle = lataaKuvat('upcoming/kaannosv',4);
-	var tieOikealle = lataaKuvat('upcoming/kaannoso',6);
-	var taustaKuva = lataaKuvat('upcoming/tausta',12);
-	var tieVaakaan = lataaKuvat('upcoming/tievaaka',5);
-	var tieOikeaYlos = lataaKuvat('upcoming/kaannosoy',4);
-	var tieVasenYlos = lataaKuvat('upcoming/kaannosvy',4);
+	var tieRisteys = lataaKuvat('maasto/risteys',4);
+	var tieSuoraan = lataaKuvat('maasto/tiesuoraan',10);
+	var tieVasemmalle = lataaKuvat('maasto/kaannosv',4);
+	var tieOikealle = lataaKuvat('maasto/kaannoso',6);
+	var taustaKuva = lataaKuvat('maasto/tausta',12);
+	var tieVaakaan = lataaKuvat('maasto/tievaaka',5);
+	var tieOikeaYlos = lataaKuvat('maasto/kaannosoy',4);
+	var tieVasenYlos = lataaKuvat('maasto/kaannosvy',4);
 	var varjo = lataaKuvat('varjo',0);
 	var kolikkoKuva = lataaKuvat('kolikko',0);
 	var veri = lataaKuvat('veri',0);
-	//var futisKentta = lataaKuvat('futis/bg',0);
 	var placeholder = lataaKuvat('mitalit/placeholder',0);
 	var mitalit = lataaKuvat('mitalit/',4);
 	var mitalinauha = lataaKuvat('mitalit/mitalinauha',0);

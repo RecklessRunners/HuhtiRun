@@ -143,6 +143,7 @@ $(function(){
 	var pelikerrat=0;
 
 	var maxBonusMatka = 50;
+	var tieMuutos = 0;
 
 	var asteluku = 0;
 
@@ -714,6 +715,7 @@ $(function(){
 			console.log("Biomia on ollut "+biomiLaskuri+" blokkia");
 			
 			if(hengissa && !tauko){
+				tieMuutos += 1;
 				matka += 1;
 				bonusMatka += 1;
 				if(suojakilpi>0){
@@ -739,32 +741,40 @@ $(function(){
 			// 3. Päivitä maasto / maastomuoto
 
 			var Suunta = Math.random();
-
-			if (tie == 0){
-				//Vasen reuna: ylös tai oikealle
-				if(Suunta < 0.5){ //Oikealle
-					tie = jatkaTieOikeaan(tie);
-				}else{ //Ylös
-					tie = jatkaTieYlos(tie); 
-				}
-			}else if (tie==4){
-				//Oikea reuna; ylös tai vasemmalle
-				if(Suunta < 0.5){ //Vasemmalle
-					tie = jatkaTieVasempaan(tie);
-				}else{ //Ylös
-					tie = jatkaTieYlos(tie);
+			if(tieMuutos>1){
+				if (tie == 0){
+					//Vasen reuna: ylös tai oikealle
+					if(Suunta < 0.75){ //Oikealle
+						tie = jatkaTieOikeaan(tie);
+						tieMuutos=0;
+					}else{ //Ylös
+						tie = jatkaTieYlos(tie);
+					}
+				}else if (tie==4){
+					//Oikea reuna; ylös tai vasemmalle
+					if(Suunta < 0.75){ //Vasemmalle
+						tie = jatkaTieVasempaan(tie);
+						tieMuutos=0;
+					}else{ //Ylös
+						tie = jatkaTieYlos(tie);
+					}
+				}else{
+					//Tie on oikean ja vasemman reunan välissä
+					if (Suunta < 0.3){ // Vasemmalle
+						tie = jatkaTieVasempaan(tie);
+						tieMuutos=0;
+					}else if(Suunta < 0.6){ // Oikealle
+						tie = jatkaTieOikeaan(tie); 
+						tieMuutos=0;
+					}else if(Suunta < 0.75){ // Risteys
+						tie = jatkaTieRisteykseen(tie);
+						tieMuutos=0;
+					}else{ // Ylös
+						tie = jatkaTieYlos(tie);
+					}
 				}
 			}else{
-				//Tie on oikean ja vasemman reunan välissä
-				if (Suunta < 0.2){ // Vasemmalle
-					tie = jatkaTieVasempaan(tie);
-				}else if(Suunta < 0.4){ // Oikealle
-					tie = jatkaTieOikeaan(tie); 
-				}else if(Suunta < 0.6){ // Risteys
-					tie = jatkaTieRisteykseen(tie);
-				}else{ // Ylös
-					tie = jatkaTieYlos(tie);
-				}
+				tie = jatkaTieYlos(tie);
 			}
 
 		}

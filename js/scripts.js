@@ -87,6 +87,7 @@ $(function(){
 		lataaKuvat("ukko/-90a",2)	//-90a
 	];
 
+	var tieRisteys = lataaKuvat('upcoming/risteys',4);
 	var tieSuoraan = lataaKuvat('upcoming/tiesuoraan',10);
 	var tieVasemmalle = lataaKuvat('upcoming/kaannosv',4);
 	var tieOikealle = lataaKuvat('upcoming/kaannoso',6);
@@ -217,7 +218,7 @@ $(function(){
 		[1,2],
 		[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,11,12], // 2 % todennäköisyys olla muu kuin normaali meri
 		[7,8],
-		[9,10]
+		[9,9,9,10]
 	];
 	var biomiTieSuoraanKuvat = [
 		[0,1,4],
@@ -386,9 +387,44 @@ $(function(){
         return ylos;
     }
 
+    function jatkaTieRisteykseen(ind){
+		// Täytetään maastografiikka
+		for (var i=0; i<5; i++){
+			maasto[i][0] = taustaKuva[biomiKuvat[biomi][Math.floor(Math.random()*biomiKuvat[biomi].length)]];
+		}
+
+        // Arvo, kuinka kauas mennään oikeaan/vasempaan, eli arvotaan indeksi, jossa käännytään ylös
+        ylos = Math.floor(Math.random()*5);
+
+		// Estä uuden indeksin olemasta sama kuin nykyinen
+		while(ylos == ind){ 
+			ylos = Math.floor(Math.random()*5);
+		}
+
+		// Täytä välit tiellä
+		if(ylos>ind){ // Risteys oikea
+        	maasto[ylos][0] = tieOikeaYlos[biomiTieOYKuvat[biomi][Math.floor(Math.random()*biomiTieOYKuvat[biomi].length)]];
+			for (var i=0; i<ylos; i++){
+				maasto[i][0] = tieVaakaan[biomiTieVaakaanKuvat[biomi][Math.floor(Math.random()*biomiTieVaakaanKuvat[biomi].length)]];
+				maastomuoto[i][0] = 1;
+			}
+		}else{ // Risteys vasen
+			maasto[ylos][0] = tieVasenYlos[biomiTieVYKuvat[biomi][Math.floor(Math.random()*biomiTieVYKuvat[biomi].length)]];
+			for (var i=4; i>ylos; i--){
+				maasto[i][0] = tieVaakaan[biomiTieVaakaanKuvat[biomi][Math.floor(Math.random()*biomiTieVaakaanKuvat[biomi].length)]];
+				maastomuoto[i][0] = 1;
+			}
+		}
+
+		// Aseta risteyksen kuva oikeaan kohtaan
+        maasto[ind][0] = tieRisteys[biomi];
+
+        return ylos;
+    }
+
     function jatkaTieVasempaan(ind){
-        //Arvotaan, kuinka kauas mennään vasempaan, eli arvotaan indeksi, jossa käännytään ylös
-        ylos = Math.floor(Math.random()*(ind-1));
+        //Arvotaan, kuinka kauas mennään vasempaan, eli arvotaan indeksi, jossa vasemmalta käännytään ylös
+        ylos = Math.floor(Math.random()*(ind-1)); // Kuten järkikin sanoo, uusi arvottu indeksi (X-posiitio) on siis aina pienempi kuin nykyinen indeksi
 
         maasto[ind][0] = tieVasemmalle[biomiTieVasKuvat[biomi][Math.floor(Math.random()*biomiTieVasKuvat[biomi].length)]];
         maastomuoto[ind][0]=1; //Tie
@@ -413,23 +449,18 @@ $(function(){
     }
 
     function jatkaTieYlos(ind){
+		maasto[ind][0] = tieSuoraan[biomiTieSuoraanKuvat[biomi][Math.floor(Math.random()*biomiTieSuoraanKuvat[biomi].length)]];
+		maastomuoto[ind][0]=1;
 
-        maasto[ind][0] = tieSuoraan[biomiTieSuoraanKuvat[biomi][Math.floor(Math.random()*biomiTieSuoraanKuvat[biomi].length)]];
-        maastomuoto[ind][0]=1;
+		var iTausta = [0, 1, 2, 3, 4];
+		iTausta.splice(ind,1);
+		for(var i in iTausta){
+			maasto[iTausta[i]][0] = taustaKuva[biomiKuvat[biomi][Math.floor(Math.random()*biomiKuvat[biomi].length)]];
+			maastomuoto[iTausta[i]][0]=0;
+		}
 
-        
-        //Täytetään muut taustalla
-        var iTausta = [0, 1, 2, 3, 4];
-        iTausta.splice(ind, 1);
-        for ( var i in iTausta ){
-          maasto[iTausta[i]][0] = taustaKuva[biomiKuvat[biomi][Math.floor(Math.random()*biomiKuvat[biomi].length)]];
-          maastomuoto[iTausta[i]][0]=0;
-        }
-
-
-        return ind;
+		return ind;
     }
-
 
 	var ukkoLiikkuuX = 0;
 	var siirtoY = 0;	
@@ -628,8 +659,10 @@ $(function(){
 
 		// Tunnista tietyyppi (kuolee mikäli kompastuu puuhun, tippuu kuiluun ym.)
 		// Suoraan menevät tiet
+
+			var ukonRuutu = Math.max(1,Math.min(4,Math.round(ukkoX/192)));
 		
-			if(maasto[Math.round(ukkoX/192)][1]==tieSuoraan[1] || maasto[Math.round(ukkoX/192)][1]==tieSuoraan[4] || maasto[Math.round(ukkoX/192)][1]==tieSuoraan[8]){
+			if(maasto[ukonRuutu][1]==tieSuoraan[1] || maasto[ukonRuutu][1]==tieSuoraan[4] || maasto[ukonRuutu][1]==tieSuoraan[8]){
 				if(hyppy){
 					tutoriaali[0] = true;
 				}else{
@@ -704,36 +737,35 @@ $(function(){
 			// 	i=4 => Ei oikealle
 			// 2. Tee välisuorat
 			// 3. Päivitä maasto / maastomuoto
-            var Suunta = Math.random();
 
-            if (tie == 0){
-                //Vasen reuna: ylös tai oikealle
-                if (Suunta < 0.5){ //Oikealle
-                    tie = jatkaTieOikeaan(tie);
-                }else{ //Ylös
-                    tie = jatkaTieYlos(tie); 
-                    
-                }
-            }else
-            if (tie==4){
-                //Oikea reuna; ylös tai vasemmalle
-                if (Suunta < 0.5){ //Vasemmalle
-                    tie = jatkaTieVasempaan(tie);
-                }else{ //Ylös
-                    tie = jatkaTieYlos(tie);
-                }
-            }else{
-            //Tie on oikean ja vasemman reunan välissä
-                if (Suunta < 0.4){
-                    //Vasemmalle
-                    tie = jatkaTieVasempaan(tie);
-                }else
-                if (Suunta < 0.8){ //Oikealle
-                    tie = jatkaTieOikeaan(tie); 
-                }else{ //Ylos
-                    tie = jatkaTieYlos(tie);
-                }
-            }
+			var Suunta = Math.random();
+
+			if (tie == 0){
+				//Vasen reuna: ylös tai oikealle
+				if(Suunta < 0.5){ //Oikealle
+					tie = jatkaTieOikeaan(tie);
+				}else{ //Ylös
+					tie = jatkaTieYlos(tie); 
+				}
+			}else if (tie==4){
+				//Oikea reuna; ylös tai vasemmalle
+				if(Suunta < 0.5){ //Vasemmalle
+					tie = jatkaTieVasempaan(tie);
+				}else{ //Ylös
+					tie = jatkaTieYlos(tie);
+				}
+			}else{
+				//Tie on oikean ja vasemman reunan välissä
+				if (Suunta < 0.2){ // Vasemmalle
+					tie = jatkaTieVasempaan(tie);
+				}else if(Suunta < 0.4){ // Oikealle
+					tie = jatkaTieOikeaan(tie); 
+				}else if(Suunta < 0.6){ // Risteys
+					tie = jatkaTieRisteykseen(tie);
+				}else{ // Ylös
+					tie = jatkaTieYlos(tie);
+				}
+			}
 
 		}
 		
@@ -862,7 +894,7 @@ $(function(){
 					console.log(tavoiteData);
 					pisteytetaan=true;
 					pisteytysAani[0].play();
-				},500);
+				},1000);
 			}else{
 				if(pisteytetaan){
 					if(pisteytys>5){
@@ -873,7 +905,7 @@ $(function(){
 						pisteytetaan=false;
 						setTimeout(function(){
 							elvytettavissa=false;
-						},500);
+						},2000);
 					}
 				}
 			}
@@ -899,8 +931,10 @@ $(function(){
 					game().textAlign="center";
 					if(pisteytys>5){
 						kirjoita(Math.round(pisteytys),$("canvas").width()/2,256,true,64);
+						game().drawImage(kolikkoKuva[0],416,256,24,24);
+						kirjoita(rahat,$("canvas").width()/2,288,true);
 					}else{
-						game().drawImage(kolikkoKuva[0],256+16,192,64,64);
+						game().drawImage(kolikkoKuva[0],256,192+8,64,64);
 						kirjoita(rahat,$("canvas").width()/2,256,true,64);
 					}
 					game().textAlign="start";

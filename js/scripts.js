@@ -1008,7 +1008,7 @@ $(function(){
 					game().drawImage(kolikkoKuva[0],640,520,24,24);
 				}
 				game().textAlign="center";
-				kirjoita("Valitse mieleisesi kenttä ja aloita pelaamaan",$("canvas").width()/2,144,true,16,"#FFF","'Source Sans Pro'");
+				kirjoita("Valitse mieleisesi kenttä ja juokse!",$("canvas").width()/2,144,true,16,"#FFF","'Source Sans Pro'");
 				game().textAlign="end";
 				game().drawImage(facebook[0],$("canvas").width()-146,0);
 				game().drawImage(facebook[1],$("canvas").width()-100,24-(Math.sin(pelaaNo)*3));

@@ -324,7 +324,7 @@ $(function(){
 	var veriSiirtyma = 384;
 	var veriSiirtymaNyt = 384;
 
-	var vihu = lataaKuvat("vihu", 4);
+	var vihu = lataaKuvat("vihu", 3);
 	var iVihu = 1;
 	var vihuX = [];
 

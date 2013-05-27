@@ -10,6 +10,10 @@ body{
 	text-align:center;
 	color:#FFF;
 	font-family: 'Oxygen', sans-serif;
+	overflow: hidden; 
+	-ms-content-zooming: none;
+	-moz-content-zooming: none;
+	-webkit-content-zooming: none;
 }
 a{
 	color:#0080FF;

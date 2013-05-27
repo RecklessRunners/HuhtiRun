@@ -13,6 +13,8 @@ $(function(){
 		}
 	};
 
+	store={"close":function(){}};
+
 	// Etunollat
 	function pad(number,length) {
 		var str = ''+number;
@@ -26,13 +28,16 @@ $(function(){
 		return num;
 	}
 	
-	var canvas = $("canvas")[0];
-
-	if(canvas.getContext && navigator.userAgent.indexOf("Firefox") == -1){
-		document.location="pages/unsupported.html";
+	// Kaiken ydin
+	function game(){
+		var canvas = $("canvas")[0];
+		if(canvas.getContext && navigator.userAgent.indexOf("Firefox") != -1){
+			return canvas.getContext('2d');
+		}else{
+			document.location="pages/unsupported.html";
+			return false;
+		}
 	}
-
-	var ctx = canvas.getContext("2d");
 
 	function lataaKuvat(nimi, nmax){
 		var taulu = [];
@@ -135,8 +140,8 @@ $(function(){
 
 	var suojakilpi = 4000;
 	var suojakilpiTeho = 0.1;
-	var hengissa = false;
-	var ukkoToleranssi = 40;
+	var hengissa = true;
+	var ukkoToleranssi = 24;
 	var pelikerrat=0;
 
 	var maxBonusMatka = 50;
@@ -226,7 +231,7 @@ $(function(){
 		[9,9,9,10]
 	];
 	var biomiTieSuoraanKuvat = [
-		[0,0,0,4],
+		[0,1,4],
 		[2,3,5],
 		[6],
 		[7,7,7,8],
@@ -267,6 +272,12 @@ $(function(){
 		[4],
 		[5,5,5,5,6,7]
 	];
+    
+	var lintu = lataaKuvat("lintu", 8);
+	var iLintu=0; // Linnun animaatio - framen n:o
+	var lintuX = 512; // Linnun sijainti X
+	var lintuY = 128; // Linnun sijainti Y
+	var lintuK = 1.25; // Linnun kallistuskulma (px)
 
 	var inaktiivinenMenu = false;
 	var tavoiteX = 0;	
@@ -463,33 +474,25 @@ $(function(){
 	var siirtoY = 0;	
 	setInterval(paivita,50);
 
-	function kirjoita(teksti,tekstiX,tekstiY,lihavoitu,fonttikoko,vari,fontti){
-		
-		tekstiX = tekstiX || 0;
-		tekstiY = tekstiY || 0;
-		lihavoitu = lihavoitu || false;
-		fonttikoko = fonttikoko || 16;
-		vari = vari || "#FFF";
-		fontti = fontti || "sans-serif";
-		
-		ctx.fillStyle = "#000";
+	function kirjoita(teksti,x,y,lihavoitu,fonttikoko=16,vari="#FFF",fontti="sans-serif"){
+		game().fillStyle = "#000";
 		if(lihavoitu){
-			ctx.font = "bold "+fonttikoko+"px "+fontti+",sans-serif";
+			game().font = "bold "+fonttikoko+"px "+fontti+",sans-serif";
 		}else{
-			ctx.font = fonttikoko+"px "+fontti+",sans-serif";
+			game().font = fonttikoko+"px "+fontti+",sans-serif";
 		}
-		ctx.fillText(teksti,tekstiX+1,tekstiY+1);
+		game().fillText(teksti,x+1,y+1);
 		if(inaktiivinenMenu){
-			ctx.fillStyle = "#C0C0C0";
+			game().fillStyle = "#C0C0C0";
 		}else{
-			ctx.fillStyle = vari;
+			game().fillStyle = vari;
 		}
-		ctx.fillText(teksti,tekstiX,tekstiY);
+		game().fillText(teksti,x,y);
 	}
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
-		//ukkoToleranssi=24+Math.min(0,24-24/50*matka);
+		ukkoToleranssi=24+Math.min(0,24-24/50*matka);
 
 		var veriSiirtymaV = Math.abs((Math.max(veriSiirtymaNyt,veriSiirtyma)-Math.min(veriSiirtymaNyt,veriSiirtyma))/2.5);
 		if(veriSiirtyma != veriSiirtymaNyt){
@@ -593,6 +596,7 @@ $(function(){
 		piirraVihu(iVihu,vihuX.shift(), ukkoY+vihuSiirtyma);
 		piirraVarjo();
 		piirraUkko(iUkko,ukkoX,ukkoY);
+		piirraLintu(iLintu,lintuX,lintuY);
 		piirraHyppyNappi();
 		
 		// Pelaajan ohjauskomennot
@@ -693,17 +697,17 @@ $(function(){
 
 		// Maaston liikuttaminen
 		if(tauko){
-			ctx.textAlign="center";
+			game().textAlign="center";
 			var keskiosa = {"x":$("canvas").width()/2,"y":$("canvas").height()/2};
 			kirjoita("Tauolla",keskiosa.x,keskiosa.y,true,48);
-			ctx.textAlign="start";
+			game().textAlign="start";
 		}else{
 			siirtoY+=pelaajaNopeus;
 		}
 
 		$.each(kolikot,function(i,v){
 			var kolikkoY = (matka-v[1])*192+siirtoY-48;
-			ctx.drawImage(kolikkoKuva[0],v[0],kolikkoY);
+			game().drawImage(kolikkoKuva[0],v[0],kolikkoY);
 			if(kolikkoY > ukkoY && kolikkoY < ukkoY+96 && ukkoX > v[0]-24-96 && ukkoX < v[0]+72){
 				//kolikot.splice(i,1);
 				kolikot[i][1]=$("canvas").height();
@@ -784,6 +788,21 @@ $(function(){
 			}
 
 		}
+		
+		// Linnun liikerata
+		iLintu++;
+		if (iLintu >= lintu.length){
+			iLintu = 0;
+		}
+		lintuX += 8;
+		lintuY += lintuK+16*Math.sin(lintuX*.1);
+		if(lintuX>$("canvas").width()+512){
+			if(hengissa){
+				lintuX=-512;
+			}
+			lintuY=(Math.random()*($("canvas").height()/2))+$("canvas").height()/4;
+			lintuK=(Math.random()-.5)*6;
+		}
 
 		// Kirjoita matka näytölle 50 metrin välein
 		if(hengissa){
@@ -791,28 +810,24 @@ $(function(){
 			if(matka >= 50 && matka >= pyorista50 && matka <= pyorista50+5){
 				//kirjoita(pyorista50,384,128);
 			}
-			kirjoita(Math.round(matka),32,48,true,24); // Kirjoita nykyiset pisteet
+			kirjoita(pad(Math.round(matka),6),32,48,true,24); // Kirjoita nykyiset pisteet
 
 			if(bonusMatka<maxBonusMatka){
 				//kirjoita(Math.min(100,Math.round(100/maxBonusMatka*bonusMatka))+"% bonus",32,64,true,12);
 
 				// Piirrä bonuspalkki vasempaan reunaan
-				ctx.beginPath();
-				ctx.strokeStyle="transparent";
-				ctx.lineWidth = 0;
-				ctx.rect(32,128,16,256);
-				ctx.fillStyle = "rgba(0,0,0,.5)";
-				ctx.fill();
-				ctx.strokeStyle="rgba(0,0,0,.25)";
-				ctx.stroke();
+				game().beginPath();
+				game().rect(32,128,24,256);
+				game().fillStyle = "rgba(0,0,0,.5)";
+				game().fill();
+				game().strokeStyle="rgba(0,0,0,.25)";
+				game().stroke();
 
-				ctx.beginPath();
-				ctx.strokeStyle="transparent";
-				ctx.lineWidth = 0;
+				game().beginPath();
 				var pylvasK = Math.min(256,Math.round(256/maxBonusMatka*bonusMatka));
-				ctx.rect(32,256-pylvasK+128,16,pylvasK);
-				ctx.fillStyle = "gold";
-				ctx.fill();
+				game().rect(32,256-pylvasK+128,24,pylvasK);
+				game().fillStyle = "gold";
+				game().fill();
 			}else{
 				bonusMatka=maxBonusMatka;
 				if(matka%2){
@@ -820,43 +835,39 @@ $(function(){
 				}
 
 				// Piirrä bonuspalkki vasempaan reunaan
-				ctx.beginPath();
-				ctx.strokeStyle="transparent";
-				ctx.lineWidth = 0;
-				ctx.rect(32,128,16,256);
-				ctx.fillStyle = "#47A94B";
-				ctx.fill();
+				game().beginPath();
+				game().rect(32,128,24,256);
+				game().fillStyle = "#47A94B";
+				game().fill();
 			}
 			// Piirrä heijastus/kiilto
-			ctx.beginPath();
-			ctx.strokeStyle="transparent";
-			ctx.lineWidth = 0;
-			ctx.rect(32,128,8,256);
-			ctx.fillStyle = "rgba(255,255,255,.1)";
-			ctx.fill();
+			game().beginPath();
+			game().rect(32,128,12,256);
+			game().fillStyle = "rgba(255,255,255,.1)";
+			game().fill();
 		}
 		
 		// Varjo
-		//ctx.fillStyle="rgba(0,0,0,.2)";
+		//game().fillStyle="rgba(0,0,0,.2)";
 
 		if(vihuSiirtyma<192 && hengissa){
-			ctx.textAlign="center";
+			game().textAlign="center";
 			var keskiosa = {"x":$("canvas").width()/2,"y":$("canvas").height()/2};
 			kirjoita("♥",keskiosa.x,keskiosa.y,true,Math.ceil(Math.random()*32)+64,"red");
 			kirjoita("Olet hengenvaarassa",keskiosa.x,keskiosa.y+32,true,16,"red");
-			ctx.textAlign="start";
+			game().textAlign="start";
 		}
 
 		if(biomi==3){
 			tummuus += .005;
 			tummuus = Math.min(tummuus,.7);
-			ctx.fillStyle="rgba(0,0,0,"+Math.min(tummuus,.7)+")";
-			ctx.fillRect(0,0,960,576);
+			game().fillStyle="rgba(0,0,0,"+Math.min(tummuus,.7)+")";
+			game().fillRect(0,0,960,576);
 		}else{
 			tummuus -= .02;
 			if(tummuus>0){
-				ctx.fillStyle="rgba(0,0,0,"+Math.min(tummuus,.7)+")";
-				ctx.fillRect(0,0,960,576);
+				game().fillStyle="rgba(0,0,0,"+Math.min(tummuus,.7)+")";
+				game().fillRect(0,0,960,576);
 			}
 			tummuus = Math.max(tummuus,0);
 		}
@@ -881,6 +892,7 @@ $(function(){
 				suojakilpi=0;
 				pisteytys=matka;
 				dramaattinen[0].play();
+				inaktiivinenMenu=true;
 				//kolikot=[];
 				if(matka >= 5){
 					rahat += matka;
@@ -889,6 +901,7 @@ $(function(){
 					tavoiteData[3]=parseFloat(tavoiteData[3])+1;
 				}
 				setTimeout(function(){
+					inaktiivinenMenu=false;
 					tavoiteData[0]=Math.max(tavoiteData[0],rahat);
 					tavoiteData[2]=Math.max(tavoiteData[2],pelikerrat);
 
@@ -906,7 +919,7 @@ $(function(){
 					pisteytetaan=true;
 					pisteytysAani[0].currentTime=0;
 					pisteytysAani[0].play();
-				},1500);
+				},1000);
 			}else{
 				if(pisteytetaan){
 					if(pisteytys>2.5){
@@ -914,50 +927,48 @@ $(function(){
 					}else{
 						pisteytysAani[0].pause();
 						loppuAani[0].play();
+						//pisteytysAani[0].stop();
 						pisteytetaan=false;
 						setTimeout(function(){
-							
 							elvytettavissa=false;
 							alustaMaasto();
-						},3000);
+						},2000);
 					}
 				}
 			}
 
 			tummuus=0.25;
 		
-			ctx.fillStyle="rgba(128,0,0,.9)";
-			ctx.fillRect(0,352+veriSiirtymaNyt-192,960,576);
+			game().fillStyle="rgba(128,0,0,.9)";
+			game().fillRect(0,352+veriSiirtymaNyt-192,960,576);
 
 			for(i=0;i<20;i++){
-				ctx.drawImage(veri[0],96*i,352+veriSiirtymaNyt-96-192,96,96);
-				ctx.drawImage(palkki[0],96*i,96,96,96);
+				game().drawImage(veri[0],96*i,352+veriSiirtymaNyt-96-192,96,96);
+				game().drawImage(palkki[0],96*i,96,96,96);
 			}
 
-			ctx.fillStyle="rgba(0,0,0,.25)";
-			ctx.fillRect(0,0,960,96);
+			game().fillStyle="rgba(0,0,0,.25)";
+			game().fillRect(0,0,960,96);
 			
 			// Aseta vihu pelaajan alle
 			vihuSiirtyma=95;
 			
 			if(tila==0){
-				if((elvytettavissa || pisteytetaan) && matka >= 5){
-					ctx.textAlign="center";
+				if((elvytettavissa || pisteytetaan) && matka >= 5 && rahat >= 100 * Math.pow(2,pelikerrat)){
+					game().textAlign="center";
 					if(pisteytys>2.5){
 						kirjoita(Math.round(pisteytys),$("canvas").width()/2,256,true,64);
-						ctx.drawImage(kolikkoKuva[0],416,256+8,24,24);
-						kirjoita(Math.round(rahat-pisteytys),$("canvas").width()/2,288,true);
+						game().drawImage(kolikkoKuva[0],416,256,24,24);
+						kirjoita(rahat,$("canvas").width()/2,288,true);
 					}else{
-						ctx.drawImage(kolikkoKuva[0],256,192+8,64,64);
+						game().drawImage(kolikkoKuva[0],256,192+8,64,64);
 						kirjoita(rahat,$("canvas").width()/2,256,true,64);
 					}
-					ctx.textAlign="start";
+					game().textAlign="start";
 					kirjoita("Ohita",64,512,false);
-					if(elvytettavissa){
-						kirjoita("Elvytä ➧",640,512,true,32);
-						kirjoita(100*Math.pow(2,pelikerrat),670,536,false);
-						ctx.drawImage(kolikkoKuva[0],640,520,24,24);
-					}
+					kirjoita("Elvytä ➧",640,512,true,32);
+					kirjoita(100*Math.pow(2,pelikerrat),670,536,false);
+					game().drawImage(kolikkoKuva[0],640,520,24,24);
 				}else{
 					// Piirrä alamenun vaihtoehdot
 					kirjoita("Tavoitteet",64,512,false);
@@ -965,7 +976,7 @@ $(function(){
 					kirjoita("Tietoja",320,512,false);
 
 					// Piirrä kentänvalitsimet
-					ctx.textAlign="center";
+					game().textAlign="center";
 					if(biomi>0){
 						kirjoita("<",64,256,true,48);
 					}
@@ -981,67 +992,67 @@ $(function(){
 						}
 					}
 					kirjoita(biomiTyypit[biomi],$("canvas").width()/2,384,true,14,"#FFF","Source Sans Pro");
-					ctx.textAlign="start";
+					game().textAlign="start";
 				}
 				if(omatKentat[biomi]){
 					if(!elvytettavissa){
-						ctx.textAlign="end";
+						game().textAlign="end";
 							kirjoita("Uusi peli ➧",$("canvas").width()-64,520,true,32,"#47A94B");
-						ctx.textAlign="start";
+						game().textAlign="start";
 					}
 				}else{
-					ctx.textAlign="end";
+					game().textAlign="end";
 						kirjoita("Osta kenttä ➧",$("canvas").width()-64,512,true,32,"#47A94B");
-					ctx.textAlign="start";
+					game().textAlign="start";
 					kirjoita(100*Math.pow(2,biomi),670,536,false);
-					ctx.drawImage(kolikkoKuva[0],640,520,24,24);
+					game().drawImage(kolikkoKuva[0],640,520,24,24);
 				}
-				ctx.textAlign="center";
-				kirjoita("Valitse mieleisesi kenttä ja juokse!",$("canvas").width()/2,144,true,16,"#FFF","'Source Sans Pro'");
-				ctx.textAlign="end";
-				ctx.drawImage(facebook[0],$("canvas").width()-146,0);
-				ctx.drawImage(facebook[1],$("canvas").width()-100,24-(Math.sin(pelaaNo)*3));
+				game().textAlign="center";
+				kirjoita("Valitse mieleisesi kenttä ja aloita pelaamaan",$("canvas").width()/2,144,true,16,"#FFF","'Source Sans Pro'");
+				game().textAlign="end";
+				game().drawImage(facebook[0],$("canvas").width()-146,0);
+				game().drawImage(facebook[1],$("canvas").width()-100,24-(Math.sin(pelaaNo)*3));
 				kirjoita("Tykkää meistä",$("canvas").width()-22,120,true,18,"#FFF","'Source Sans Pro'");
-				ctx.textAlign="start";
+				game().textAlign="start";
 			}
 			if(tila==0 || tila==1){
 				if(!elvytettavissa){
 					// Näytä rahatilanne vasemmassa yläkulmassa
-					ctx.drawImage(kolikkoKuva[0],24,24,24,24);
+					game().drawImage(kolikkoKuva[0],24,24,24,24);
 					kirjoita(Math.round(tuhaterotin(rahat)),64,40,true);
 				}
 
 				// Kirjoita otsikko
-				ctx.textAlign="center";
+				game().textAlign="center";
 				kirjoita("HuhtiRun",$("canvas").width()/2,112,true,64,"#FFF","'Fondamento'");
 				kirjoita("TM",$("canvas").width()*0.675,80,true,16);
-				ctx.textAlign="start";
+				game().textAlign="start";
 			}
 			if(tila==1){
-				ctx.textAlign="center";
+				game().textAlign="center";
 				kirjoita("Halutessasi voit ostaa power-upeja ennen peliä",$("canvas").width()/2,144,true,12,"gold");
 
-				ctx.drawImage(kiilto[0],$("canvas").width()/4-96,192+veriSiirtymaNyt/9);
+				game().drawImage(kiilto[0],$("canvas").width()/4-96,192+veriSiirtymaNyt/9);
 				kirjoita("Bonusta nopeammin",$("canvas").width()/4,192+veriSiirtymaNyt/9,true);
 				kirjoita("Bonusmittari täyttyy",$("canvas").width()/4,396+veriSiirtymaNyt/9);
 				kirjoita("lyhemmältä matkalta",$("canvas").width()/4,420+veriSiirtymaNyt/9);
 				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4,444+veriSiirtymaNyt/9,true,12,"gray");
 
-				ctx.drawImage(kiilto[0],$("canvas").width()/4*2-96,192+veriSiirtymaNyt/6);
+				game().drawImage(kiilto[0],$("canvas").width()/4*2-96,192+veriSiirtymaNyt/6);
 				kirjoita("Bonusta enemmän",$("canvas").width()/4*2,192+veriSiirtymaNyt/6,true);
 				kirjoita("Saat enemmän pisteitä",$("canvas").width()/4*2,396+veriSiirtymaNyt/6);
 				kirjoita("bonusmittarin täyttyessä",$("canvas").width()/4*2,420+veriSiirtymaNyt/6);
 				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4*2,444+veriSiirtymaNyt/6,true,12,"gray");
 
-				ctx.drawImage(kiilto[0],$("canvas").width()/4*3-96,192+veriSiirtymaNyt/3);
+				game().drawImage(kiilto[0],$("canvas").width()/4*3-96,192+veriSiirtymaNyt/3);
 				kirjoita("Alkupotkaisu",$("canvas").width()/4*3,192+veriSiirtymaNyt/3,true);
 				kirjoita("Hanki itsellesi hieman",$("canvas").width()/4*3,396+veriSiirtymaNyt/3);
 				kirjoita("etumatkaa pelin alkaessa",$("canvas").width()/4*3,420+veriSiirtymaNyt/3);
 				kirjoita("0 METRIÄ",$("canvas").width()/4*3,444+veriSiirtymaNyt/3,true,12,"gray");
 
-				ctx.textAlign="end";
+				game().textAlign="end";
 				kirjoita("Aloita peli ➧",$("canvas").width()-64,520,true,32,"#47A94B");
-				ctx.textAlign="start";
+				game().textAlign="start";
 				veriSiirtyma=0;
 				kirjoita("← Takaisin",64,512,false);
 			}
@@ -1051,21 +1062,21 @@ $(function(){
 				if(tavoitteet[tavoiteNo].vaatimus()>=1){
 					var mitaliSin = (Math.sin(pelaaNo/10)*10)-(Math.PI/2); // Mitali nauhoineen heiluu siniaallon mukaan
 					kirjoita(tehty,256,288,true,20,"#47A94B");
-					ctx.drawImage(mitalinauha[0],-64+(mitaliSin+(mitaliSin/4)/2),-32);
-					ctx.drawImage(mitalit[tavoiteNo],64+mitaliSin/2,176);
-					/*ctx.drawImage(mitalinauha[0],-64,-32);
-					ctx.drawImage(mitalit[tavoiteNo],64,176);*/
+					game().drawImage(mitalinauha[0],-64+(mitaliSin+(mitaliSin/4)/2),-32);
+					game().drawImage(mitalit[tavoiteNo],64+mitaliSin/2,176);
+					/*game().drawImage(mitalinauha[0],-64,-32);
+					game().drawImage(mitalit[tavoiteNo],64,176);*/
 				}else{
 					kirjoita(Math.round(tavoitteet[tavoiteNo].vaatimus()*100) + " % suoritettu",256,288,false,20,"silver");
-					ctx.drawImage(placeholder[0],64,176,128,128);
+					game().drawImage(placeholder[0],64,176,128,128);
 				}
 				
-				ctx.textAlign="end";
+				game().textAlign="end";
 				kirjoita("Seuraava 〉",$("canvas").width()-64,512);
 				kirjoita("Tavoitteista on suoritettu "+Math.round(kokonaisSuoritus*100)+" %",$("canvas").width()-64,128,true);
-				ctx.textAlign="center";
+				game().textAlign="center";
 				kirjoita("Takaisin valikkoon",$("canvas").width()/2,512);
-				ctx.textAlign="start";
+				game().textAlign="start";
 				kirjoita("〈 Edellinen",64,512);
 				kirjoita("Tavoitteet",64,128,true,64);
 			}
@@ -1099,80 +1110,80 @@ $(function(){
 		}
 		if(hengissa){
 			var oikeaReuna = $("canvas").width()-12;
-			ctx.fillStyle="#000";
-			ctx.fillRect(oikeaReuna-12,12,12,24);
-			ctx.fillRect(oikeaReuna-30,12,12,24);
-			ctx.fillStyle="#FFF";
-			ctx.fillRect(oikeaReuna-13,13,12,24);
-			ctx.fillRect(oikeaReuna-31,13,12,24);
+			game().fillStyle="#000";
+			game().fillRect(oikeaReuna-12,12,12,24);
+			game().fillRect(oikeaReuna-30,12,12,24);
+			game().fillStyle="#FFF";
+			game().fillRect(oikeaReuna-13,13,12,24);
+			game().fillRect(oikeaReuna-31,13,12,24);
 		}else{
-			ctx.globalAlpha=0.5;
+			game().globalAlpha=0.5;
 			kirjoita(versioId.substring(0,8),8,$("canvas").height()-8,false,10,"#FFF","Courier New");
-			ctx.globalAlpha=1;
+			game().globalAlpha=1;
 		}
 		if(virheLadatessa){
-			ctx.fillStyle="#400000";
-			ctx.fillRect(0,0,960,576);
-			ctx.textAlign="center";
-			ctx.beginPath();
-			ctx.moveTo(0,224);
-			ctx.lineTo($("canvas").width(),224);
-			ctx.lineWidth = 2;
-			ctx.strokeStyle="#FFF";
-			ctx.stroke();
+			game().fillStyle="#400000";
+			game().fillRect(0,0,960,576);
+			game().textAlign="center";
+			game().beginPath();
+			game().moveTo(0,224);
+			game().lineTo($("canvas").width(),224);
+			game().lineWidth = 2;
+			game().strokeStyle="#FFF";
+			game().stroke();
 			kirjoita("V I R H E   L A T A U K S E S S A",$("canvas").width()/2,256,true,12);
 			kirjoita(virheTiedosto,$("canvas").width()/2,384,true,12,"#808080");
-			ctx.textAlign="start";
+			game().textAlign="start";
 		}else{
 			if(ladatutTiedostot<kaikkiTiedostot){
-				ctx.fillStyle="#000";
-				ctx.fillRect(0,0,960,576);
-				ctx.textAlign="center";
-				ctx.beginPath();
-				ctx.moveTo(0,512);
-				ctx.lineTo($("canvas").width(),512);
-				ctx.lineWidth = 3;
-				ctx.strokeStyle="#202020";
-				ctx.stroke();
+				game().fillStyle="#000";
+				game().fillRect(0,0,960,576);
+				game().textAlign="center";
+				game().beginPath();
+				game().moveTo(0,512);
+				game().lineTo($("canvas").width(),512);
+				game().lineWidth = 3;
+				game().strokeStyle="#202020";
+				game().stroke();
 
-				ctx.moveTo(0,64);
-				ctx.lineTo($("canvas").width(),64);
-				ctx.lineWidth = 3;
-				ctx.strokeStyle="#202020";
-				ctx.stroke();
+				game().moveTo(0,64);
+				game().lineTo($("canvas").width(),64);
+				game().lineWidth = 3;
+				game().strokeStyle="#202020";
+				game().stroke();
 
-				ctx.beginPath();
-				ctx.moveTo(0,512);
-				ctx.lineTo($("canvas").width()/kaikkiTiedostot*ladatutTiedostot,512);
-				ctx.lineWidth = 3;
-				ctx.strokeStyle="#808080";
-				ctx.stroke();
+				game().beginPath();
+				game().moveTo(0,512);
+				game().lineTo($("canvas").width()/kaikkiTiedostot*ladatutTiedostot,512);
+				game().lineWidth = 3;
+				game().strokeStyle="#808080";
+				game().stroke();
 
 				kirjoita("L A D A T A A N   " + Math.round(100/kaikkiTiedostot*ladatutTiedostot)+"   %",$("canvas").width()/2,512+24,true,12,"#808080");
-				ctx.textAlign="start";
+				game().textAlign="start";
 
 				/*kirjoita("O D O T T A E S S A S I   P E L I N   L A T A U T U M I S T A   V O I T   P E L A T A   P I N G - P O N G I A",$("canvas").width()/2,48,true,12,"#808080");
 				kirjoita("L A D A T A A N   " + Math.round(100/kaikkiTiedostot*ladatutTiedostot)+"   %",$("canvas").width()/2,512+24,true,12,"#808080");
-				ctx.textAlign="start";
+				game().textAlign="start";
 
-				ctx.beginPath();
-				ctx.moveTo(32,Math.round((y-48)/16)*16);
-				ctx.lineTo(32,Math.round((y+48)/16)*16);
-				ctx.lineWidth = 16;
-				ctx.strokeStyle="#FFF";
-				ctx.stroke();
+				game().beginPath();
+				game().moveTo(32,Math.round((y-48)/16)*16);
+				game().lineTo(32,Math.round((y+48)/16)*16);
+				game().lineWidth = 16;
+				game().strokeStyle="#FFF";
+				game().stroke();
 
-				ctx.beginPath();
-				ctx.moveTo($("canvas").width()-32,Math.round((pingPongVY-48)/2)*2);
-				ctx.lineTo($("canvas").width()-32,Math.round((pingPongVY+48)/2)*2);
-				ctx.lineWidth = 16;
-				ctx.strokeStyle="#FFF";
-				ctx.stroke();
+				game().beginPath();
+				game().moveTo($("canvas").width()-32,Math.round((pingPongVY-48)/2)*2);
+				game().lineTo($("canvas").width()-32,Math.round((pingPongVY+48)/2)*2);
+				game().lineWidth = 16;
+				game().strokeStyle="#FFF";
+				game().stroke();
 
-				ctx.beginPath();
-				ctx.rect(pingPongX,pingPongY,16,16);
-				ctx.fillStyle = "#FFF";
-				ctx.fill();
+				game().beginPath();
+				game().rect(pingPongX,pingPongY,16,16);
+				game().fillStyle = "#FFF";
+				game().fill();
 
 				pingPongX += pingPongNX;
 				pingPongY += pingPongNY;
@@ -1242,7 +1253,7 @@ $(function(){
 					}
 				}
 				if(y>448){
-					if(x>=48 && x<176 && !elvytettavissa){ // Siirry tavoitteet-sivulle
+					if(x>=48 && x<176){ // Siirry tavoitteet-sivulle
 						tavoiteNo=0;
 						tila=2;
 						klikkiAani[0].play();
@@ -1359,12 +1370,6 @@ $(function(){
 			}
 		}
 		}
-		if(elvytettavissa){
-			if(x>=48 && x<176 && y>448){
-				tila=0;
-				elvytettavissa=false;
-			}
-		}
 	}).mouseup(function(e){
 		e.preventDefault();
 		x = Math.floor(e.pageX-$("canvas").offset().left);
@@ -1387,7 +1392,7 @@ $(function(){
 
 		}else{
 			if(y<$("canvas").height()*.8){
-				if(hengissa && !tauko && suojakilpi<=2){
+				if(hengissa && !tauko && suojakilpi<=0){
 					tavoiteX=x-96;
 				}
 			}else{
@@ -1413,29 +1418,39 @@ $(function(){
 	function piirraMaasto(siirtoY){
 		for (var i=0; i<maasto.length; i++){
 			for (var j=0; j<maasto[i].length; j++){
-				ctx.drawImage(maasto[i][j], i*192, (j-1)*192 + siirtoY);
+				game().drawImage(maasto[i][j], i*192, (j-1)*192 + siirtoY);
 			}
 		}
 	}
-		
+	
+	// TODO: Siirrä oliomuotoon.
+	
+	function piirraLintu(i,x,y){
+		game().drawImage(lintu[i],x,y);
+	}
+	
 	function piirraVarjo(){
 		if(hyppy && hengissa){
-			ctx.drawImage(varjo[0],ukkoX+48,ukkoY+96);
+			game().drawImage(varjo[0],ukkoX+48,ukkoY+96);
 		}
 	}
 	
 	function piirraVihu(i,x,y){
 		if(hengissa || elvytettavissa){
-			ctx.drawImage(vihu[i],x,y);
+			if(hengissa){
+				game().drawImage(vihu[i],x,y);
+			}else{
+				game().drawImage(vihu[0],x,y);
+			}
 		}
 	}
 	
 	function piirraHyppyNappi(){
 		if(hengissa){
 			if(hyppy){
-				ctx.drawImage(hyppyKuva[0],64,$("canvas").height()-64,64,32);
+				game().drawImage(hyppyKuva[0],64,$("canvas").height()-64,64,32);
 			}else{
-				ctx.drawImage(hyppyKuva[0],64,$("canvas").height()-96);
+				game().drawImage(hyppyKuva[0],64,$("canvas").height()-96);
 			}
 		}
 	}
@@ -1444,22 +1459,22 @@ $(function(){
 		if(hengissa || (!hengissa && !elvytettavissa)){
 			if(suojakilpi>0){
 				if(suojakilpi<=5){
-					ctx.globalAlpha=Math.random();
+					game().globalAlpha=Math.random();
 				}else{
-					ctx.globalAlpha=0.25;
+					game().globalAlpha=0.25;
 				}
 			}
 			if(hyppy){
-				ctx.drawImage(ukko[asteluku][i],x-24,y-24,240,240);
+				game().drawImage(ukko[asteluku][i],x-24,y-24,240,240);
 			}else{
 				try{
-					ctx.drawImage(ukko[asteluku][i],x,y);
+					game().drawImage(ukko[asteluku][i],x,y);
 				}catch(e){
 					console.log("Kuvan piirto feilas. Asteluku: "+asteluku+" I: "+i);
 				}
 			}
 		}
-		ctx.globalAlpha=1;
+		game().globalAlpha=1;
 	}
 	// Ostotoiminto kauppaa varten
 	function osta(hinta){

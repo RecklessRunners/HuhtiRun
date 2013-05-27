@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Selainta ei tueta</title>
+		<title>Selaintasi ei tueta</title>
 		<meta charset="UTF-8" />
-		<link href="http://fonts.googleapis.com/css?family=Alef" rel="stylesheet" />
 		<style>
 			body{
-				font-family:'Alef',sans-serif,sans,Arial;
+				font-family:sans-serif,sans,Arial;
 				font-size:20px;
 				background-color:#22568f;
 				color:#FFF;
 				text-align:center;
-				text-shadow:1px 1px 0 rgba(0,0,0,.75),0 0 8px rgba(0,0,0,.25);
+				text-shadow:1px 1px 0 rgba(0,0,0,.5),0 0 8px #000;
+				background-image:url(../img/firefox.png);
+				background-position:center center;
+				background-repeat:no-repeat;
 			}
 			a{
 				color:#0080FF;
@@ -33,25 +35,14 @@
 				margin-left:auto;
 				margin-right:auto;
 			}
-			.info{
-				background-color:#000;
-				background-color:rgba(0,0,0,.75);
-				padding:16px;
-				border-radius:8px;
-				border:1px solid rgba(0,0,0,.25);
-			}
 		</style>
 	</head>
 	<body>
-		<div class="info">
-			<h1>Selaintasi ei tueta</h1>
-			<p>
-				Käytätkö Internet Exploreria, Chromea, Operaa tai Safaria?
-			</p>
-			<p>
-				Ole hyvä ja <a href="http://firefox.com/">päivitä Mozilla Firefox -nettiselaimen uusimpaan versioon</a> saadaksesi pelin toimimaan. Firefox on markkinoiden nopein, turvallisin, helpoin ja tyylikkäin www-selain.
-			</p>
-		</div>
+		<h1>Selaintasi ei tueta</h1>
+		<h2>Valitettavasti <span id="selainNimi">selaimesi</span> ei tue HuhtiRun -peliä</h2>
+		<p>
+			Ole hyvä ja <a href="http://firefox.com/">päivitä Firefoxin uusimpaan versioon</a> saadaksesi pelin toimimaan. Firefox on markkinoiden nopein, turvallisin, helpoin ja tyylikkäin selain.
+		</p>
 		<div id="fx_logo">
 		</div>
 	</body>

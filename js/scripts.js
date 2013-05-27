@@ -996,19 +996,18 @@ $(function(){
 					kirjoita(100*Math.pow(2,biomi),670,536,false);
 					ctx.drawImage(kolikkoKuva[0],640,520,24,24);
 				}
-<<<<<<< HEAD
 				ctx.textAlign="center";
 				kirjoita("Valitse mieleisesi kenttä ja juokse!",$("canvas").width()/2,144,true,16,"#FFF","'Source Sans Pro'");
 				ctx.textAlign="end";
 				ctx.drawImage(facebook[0],$("canvas").width()-146,0);
 				ctx.drawImage(facebook[1],$("canvas").width()-100,24-(Math.sin(pelaaNo)*3));
-=======
+
 				game().textAlign="center";
 				kirjoita("Valitse mieleisesi kenttä ja juokse!",$("canvas").width()/2,144,true,16,"#FFF","'Source Sans Pro'");
 				game().textAlign="end";
 				game().drawImage(facebook[0],$("canvas").width()-146,0);
 				game().drawImage(facebook[1],$("canvas").width()-100,24-(Math.sin(pelaaNo)*3));
->>>>>>> 22bcae6e3fe608c3cf01e83708ee789c728e461a
+
 				kirjoita("Tykkää meistä",$("canvas").width()-22,120,true,18,"#FFF","'Source Sans Pro'");
 				ctx.textAlign="start";
 			}

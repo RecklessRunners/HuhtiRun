@@ -1,6 +1,6 @@
-// 20.fi/9621
-
 $(function(){
+
+	console.log("*************************\n* HuhtiRun              *\n*************************");
 
 	// Poistumisvahvistus
 	window.onbeforeunload = function (e) {
@@ -12,8 +12,6 @@ $(function(){
 			return "Pelisi jää kesken";
 		}
 	};
-
-	store={"close":function(){}};
 
 	// Etunollat
 	function pad(number,length) {
@@ -28,12 +26,13 @@ $(function(){
 		return num;
 	}
 
+	// Estää pelin pelaamisen huonoilla ja bugisilla selaimilla
 	if(navigator.userAgent.indexOf("Firefox") == -1){
 		document.location="pages/unsupported.html";
 	}
 	
 	var canvas = $("canvas")[0];
-	var ctx = canvas.getContext('2d');
+	var ctx = canvas.getContext("2d");
 
 	function lataaKuvat(nimi, nmax){
 		var taulu = [];
@@ -131,8 +130,8 @@ $(function(){
 	var hiiriAlasX = 0;
 	var x,y = 0;
 
-	var versioId = ""; // Muuttuu automaattisesti
-	$.ajax({url:".git/refs/heads/master",success:function(resp){versioId=resp;}});
+	var versioId = ""; // Muuttuu automaattisesti kommitin id:n mukaan
+	$.ajax({url:".git/refs/heads/master",success:function(resp){versioId=resp;console.log("Versio "+resp);}});
 
 	var suojakilpi = 2;
 	var suojakilpiTeho = 0.1;
@@ -159,13 +158,16 @@ $(function(){
 	var biomiLaskuri=0;
 	var elvytettavissa = false;
 	var kokonaisSuoritus = 0;
-
-	// Kaupasta ostetut kentät
-	var omatKentat = [true,false,false,false];
-
-	var pelaaNo = 0; // Ei deskriptiivinen nimi
+	var parhaatPisteet = 0;
 	
-	var tavoiteData = [0,false,0,0,0,0,0,0,0,0,0,0];
+	var pelaaNo = 0; // Ei-deskriptiivinen nimi
+
+	// Ostetut kentät
+	omatKentat = "[true,false,false,false,false]";
+
+	// Tavoitteet
+	tavoiteData = "[0,0,0,0,0,0,0,0]"; // Sisältää tavoitteisiin liittyvää raakadataa
+	
 	var tavoitteet = [
 		{
 			nimi:"Noviisi",
@@ -194,16 +196,13 @@ $(function(){
 		},
 		{
 			nimi:"Rikas",
-			kuvaus:"Hanki 20 000     vähintään kerran",
+			kuvaus:"Hanki 20 000 (HR) vähintään kerran",
 			vaatimus:function(){return 1/20000*tavoiteData[0];}
 		}
 	];
 	var tavoiteNo = 0; // Tavoitteen numero, jota katsotaan Tavoitteet-sivulla
-
-	//alert(localStorage.length);
 	
 	// Biomit
-	// Arvotaan tietyn tyyppistä tietä ja maastoa, kun ollaan aavikolla, ruohikossa, merellä jne.
 	var biomi = 0;
 	var biomiTyypit = [
 		"Aavikko",
@@ -273,36 +272,31 @@ $(function(){
 	var tavoiteX = 0;	
 	var hyppy = false;
 	var kokoMatka = 0;
+	var rahat = 0;
 
 	var kolikot = [];
 
-	var pisteytetaan=false;
+	var pisteytetaan = false;
 	
-	// Lataa pelitiedot selaimesta
-	if(localStorage.parhaatPisteet == null || localStorage.parhaatPisteet == undefined){
-		/* Tarpeellinen? */
-		var parhaatPisteet = 0;
-		var rahat = 0;
-		var buusti = 0;
-		var suojakilpi = 0;
-		var kokoMatka = 0;
-		var tavoiteData = [0,false,0,0,0,0,0,0,0,0,0];
-		/* ???????????????? */
-
-		localStorage.parhaatPisteet=parhaatPisteet;
-		localStorage.rahat=rahat;
-		localStorage.buusti=buusti;
-		localStorage.suojakilpi=suojakilpi;
-		localStorage.kokoMatka=kokoMatka;
-		localStorage.tavoiteData=tavoiteData;
+	// Tarkistetaan onko selaimeen tallennettu pelitietoja
+	if(! isNaN(localStorage.rahat)){
+		// Ladataan tallennetut pelitiedot
+		console.log("Ladataan tallennettuja pelitietoja...");
+		parhaatPisteet	= parseInt(localStorage.parhaatPisteet);
+		rahat			= parseInt(localStorage.rahat);
+		kokoMatka		= parseInt(localStorage.kokoMatka);
+		tavoiteData		= JSON.parse(localStorage.tavoiteData);
+		omatKentat		= JSON.parse(localStorage.omatKentat);
+		console.log("Pelitietojen lataaminen onnistui!");
 	}else{
-		var parhaatPisteet = parseInt(localStorage.parhaatPisteet);
-		var rahat = parseInt(localStorage.rahat);
-		var buusti = parseInt(localStorage.buusti);
-		var suojakilpi = parseInt(localStorage.kilpi);
-		var kokoMatka = parseInt(localStorage.kokoMatka);
-		var tavoiteData = JSON.parse(localStorage.tavoiteData);
-		var omatKentat = JSON.parse(localStorage.omatKentat);
+		// Luodaan uudet pelitiedot mikäli puuttuvat
+		console.log("Luodaan uusia pelitietoja...");
+		localStorage.parhaatPisteet	= parhaatPisteet;
+		localStorage.rahat			= rahat;
+		localStorage.kokoMatka		= kokoMatka;
+		localStorage.tavoiteData	= tavoiteData;
+		localStorage.omatKentat		= omatKentat;
+		console.log("Uudet pelitiedot on nyt luotu!");
 	}
 
 	var klikkiPos = [0,0];
@@ -317,6 +311,8 @@ $(function(){
 	var vihu = lataaKuvat("vihu", 3);
 	var iVihu = 1;
 	var vihuX = [];
+	
+	var tekijaSkrolli = 32;
 
 	// Vihun perässä seuraaminen
     for (var i=1; i < 5; i++){
@@ -652,7 +648,6 @@ $(function(){
 					bonusMatka = Math.round(bonusMatka/2);
 					auts[0].play();
 				}
-				console.log(maasto);
 			}
 		}
 
@@ -715,7 +710,6 @@ $(function(){
 		if (siirtoY >= 192){
 			siirtoY=0;
 			biomiLaskuri+=1;
-			console.log("Biomia on ollut "+biomiLaskuri+" blokkia");
 			
 			if(hengissa && !tauko){
 				tieMuutos += 1;
@@ -884,16 +878,17 @@ $(function(){
 					tavoiteData[2]=Math.max(tavoiteData[2],pelikerrat);
 
 					// Pelitietojen tallennus
+					
 					parhaatPisteet = Math.max(parhaatPisteet,matka);
+					
 					localStorage.parhaatPisteet=parhaatPisteet;
 					localStorage.rahat=rahat;
-					localStorage.buusti=buusti;
-					localStorage.kilpi=suojakilpi;
-					localStorage.kilpiTeho=suojakilpiTeho;
 					localStorage.kokoMatka=kokoMatka;
 					localStorage.tavoiteData=JSON.stringify(tavoiteData);
 					localStorage.omatKentat=JSON.stringify(omatKentat);
-					console.log(tavoiteData);
+					
+					console.log("Pelitiedot on nyt tallennettu!");
+					
 					pisteytetaan=true;
 					pisteytysAani[0].currentTime=0;
 					pisteytysAani[0].play();
@@ -951,7 +946,7 @@ $(function(){
 					// Piirrä alamenun vaihtoehdot
 					kirjoita("Tavoitteet",64,512,false);
 					kirjoita("Tilastot",192,512,false);
-					kirjoita("Tietoja",320,512,false);
+					kirjoita("Tietoja pelistä",320,512,false);
 
 					// Piirrä kentänvalitsimet
 					ctx.textAlign="center";
@@ -1081,10 +1076,66 @@ $(function(){
 				kirjoita("← Takaisin",64,512,false);
 			}
 			if(tila==4){
-				kirjoita("Tietoja",64,128,true,64);
-				kirjoita("Tekijät >",64,192);
-				kirjoita("Pelin versionumero:",64,360,true);
-				kirjoita(versioId,64,384,false,16,"#FFF","Courier New");
+				var tekijat = {
+					"HuhtiRun -pelin tekijät":[""],
+					"Ohjelmointi" : [
+						"Petja Touru",
+						"Markku Leino"
+					],
+					"Grafiikka" : [
+						"Ossi Parikka",
+						"Petja Touru"
+					],
+					"Käsikirjoitus" : [
+						"Lauri Pyhälä",
+						"Ossi Parikka",
+						"Mikko Hyyryläinen",
+						"Petja Touru"
+					],
+					"Musiikki & äänet" : [
+						"Freesound.org -sivuston käyttäjät:",
+						"blacklizard77",
+						"Dj Chronos",
+						"notchfilter",
+						"primeval_polypod",
+						"Timbre",
+						"+ muutamia Public Domain -ääniä"
+					],
+					"Suurkiitos kaikille pelin tekoon osallistuneille!":[],
+				}
+			
+				kirjoita("Tietoja pelistä",64,128,true,64);
+				ctx.globalAlpha=0.5;
+				ctx.drawImage(ukko[3][0],512,192,288,288);
+				ctx.globalAlpha=1;
+				
+				tekijaLaskuri = 0;
+				tekijaSkrolli -= 1;
+				
+				$.each(tekijat,function(tekijaKat,tekijaKatJasenet){
+					tekijaLaskuri++;
+					var tekijaKatY = 192+tekijaLaskuri*24+tekijaSkrolli;
+					ctx.globalAlpha=1-Math.max(0,Math.min(1,1/16*(176-tekijaKatY)));
+					if(tekijaKatY<512-24){
+						kirjoita(tekijaKat,64,tekijaKatY,true);
+					}
+					ctx.globalAlpha=1;
+					$.each(tekijaKatJasenet,function(tekija,v){
+						tekijaLaskuri++;
+						var tekijaKatJasenY = 192+tekijaLaskuri*24+tekijaSkrolli-24;
+						ctx.globalAlpha=1-Math.max(0,Math.min(1,1/16*(176-tekijaKatJasenY)));
+						if(tekijaKatJasenY<512-24){
+							kirjoita(v,256,192+(tekijaLaskuri*24-24)+tekijaSkrolli);
+						}
+						ctx.globalAlpha=1;
+					});
+				});
+				
+				ctx.textAlign="end";
+				kirjoita("Pelin versionumero",$("canvas").width()-64,512-24,true);
+				kirjoita(versioId || "????????????????????????????????????????",$("canvas").width()-64,512,false,16,"#FFF","Courier New");
+				ctx.textAlign="start";
+				
 				kirjoita("← Takaisin",64,512,false);
 			}
 		}
@@ -1243,6 +1294,8 @@ $(function(){
 						klikkiAani[0].play();
 					}
 					if(x>=272 && x<384){ // Siirry tietoja-sivulle
+						veriSiirtyma=0;
+						tekijaSkrolli = 32;
 						tila=4;
 						klikkiAani[0].play();
 					}
@@ -1343,10 +1396,9 @@ $(function(){
 			}
 		}else if(tila==4){ // Tietoja-menu
 			if(y>448){ // Takaisin valikkoon
+				veriSiirtyma=384;
 				tila=0;
 				klikkiAani[0].play();
-			}else{
-				document.location="pages/authors.html";
 			}
 		}
 		}

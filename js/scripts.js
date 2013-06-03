@@ -281,8 +281,16 @@ $(function(){
 
 	var kolikot = [];
 
-	var pisteytetaan = false;
+	pisteytetaan = false;
+
+	asetukset = {
+		varina 		: true
+	};
+	asetukset = JSON.stringify(asetukset);
 	
+	// Muunnetaan vanhan tyyppinen pelitallennus uuteen
+	pelitallennusVersio = 1; // Ei käytössä -- vielä
+
 	// Tarkistetaan onko selaimeen tallennettu pelitietoja
 	if(! isNaN(localStorage.rahat)){
 		// Ladataan tallennetut pelitiedot
@@ -292,6 +300,7 @@ $(function(){
 		matkaYht		= parseInt(localStorage.matkaYht);
 		tavoiteData		= JSON.parse(localStorage.tavoiteData);
 		omatKentat		= JSON.parse(localStorage.omatKentat);
+		asetukset		= JSON.parse(localStorage.asetukset);
 		console.log("Pelitietojen lataaminen onnistui!");
 	}else{
 		// Luodaan uudet pelitiedot mikäli puuttuvat
@@ -301,7 +310,18 @@ $(function(){
 		localStorage.matkaYht		= matkaYht;
 		localStorage.tavoiteData	= tavoiteData;
 		localStorage.omatKentat		= omatKentat;
+		localStorage.asetukset		= asetukset;
 		console.log("Uudet pelitiedot on nyt luotu!");
+		location.reload();
+	}
+
+	function varise(aika){
+		if(asetukset.varina){
+			navigator.vibrate(aika);
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	var klikkiPos = [0,0];
@@ -650,7 +670,7 @@ $(function(){
 				vihuSiirtyma -= 64 + Math.round(Math.random()*48);
 				suojakilpi+=2;
 				if(hengissa){
-					navigator.vibrate(500);
+					varise(500);
 					bonuspisteet = Math.round(bonuspisteet/2);
 					auts[0].play();
 				}
@@ -847,7 +867,7 @@ $(function(){
 				pisteytetaan=false;
 				tila=0;
 				veriSiirtyma=384;
-				navigator.vibrate(1000);
+				varise(1000);
 				hengissa=false;
 				suojakilpi=0;
 				pisteytys=pisteet;
@@ -882,8 +902,9 @@ $(function(){
 				},1000);
 			}else{
 				if(pisteytetaan){
-					if(pisteytys>2.5){
+					if(pisteytys>3.75){
 						pisteytys -= pisteytys / 10;
+						varise(50);
 					}else{
 						pisteytysAani[0].pause();
 						loppuAani[0].play();
@@ -919,7 +940,7 @@ $(function(){
 			if(tila==0){
 				if((elvytettavissa || pisteytetaan) && pisteet >= 5 && rahat >= 100 * Math.pow(2,pelikerrat)){
 					ctx.textAlign="center";
-					if(pisteytys>2.5){
+					if(pisteytys>3.75){
 						kirjoita(Math.round(pisteytys),$("canvas").width()/2,256,true,64,"#FFF","'Raleway'");
 						ctx.drawImage(kolikkoKuva[0],416,256+16,24,24);
 						kirjoita(rahat,$("canvas").width()/2,288,true);
@@ -934,9 +955,10 @@ $(function(){
 					ctx.drawImage(kolikkoKuva[0],640,520,24,24);
 				}else{
 					// Piirrä alamenun vaihtoehdot
-					kirjoita("Tavoitteet",64,512,false);
-					kirjoita("Tilastot",192,512,false);
-					kirjoita("Tietoja pelistä",320,512,false);
+					kirjoita("Tavoitteet",64,512,true,12);
+					kirjoita("Tilastot",176,512,true,12);
+					kirjoita("Asetukset",272,512,true,12);
+					kirjoita("Tekijät ym.",384,512,true,12);
 
 					// Piirrä kentänvalitsimet
 					ctx.textAlign="center";
@@ -955,7 +977,6 @@ $(function(){
 					ctx.textAlign="start";
 				}
 				if(!elvytettavissa){
-					console.log(omatKentat);
 					if(omatKentat[biomi]){
 						ctx.textAlign="end";
 							ctx.drawImage(kiilto[0],$("canvas").width()-256,416);
@@ -1123,10 +1144,25 @@ $(function(){
 				});
 				
 				ctx.textAlign="end";
-				kirjoita("Pelin versionumero",$("canvas").width()-64,512-24,true);
-				kirjoita(versioId || "????????????????????????????????????????",$("canvas").width()-64,512,false,16,"#FFF","Courier New");
+				kirjoita("Versio n:o",$("canvas").width()-64,512-24,true);
+				kirjoita(versioId.substr(0,20) || "????????????????????",$("canvas").width()-64,512,false,16,"#FFF","Courier New");
 				ctx.textAlign="start";
 				
+				kirjoita("← Takaisin",64,512,false);
+			}
+			if(tila==5){
+				kirjoita("Asetukset",64,128,true,48,"#FFF","'Raleway'");
+
+				kirjoita("Käytä värinää sitä tukevissa laitteissa",64,192,false);
+				if(asetukset.varina){
+					kirjoita("Päällä",512,192,false);
+				}else{
+					kirjoita("Pois",512,192,false);
+				}
+
+				kirjoita("Pelin ohjaaminen",64,224,false);
+				kirjoita("Hiiri/Kosketusnäyttö (toistaiseksi ainut vaihtoehto)",512,224,false);
+
 				kirjoita("← Takaisin",64,512,false);
 			}
 		}
@@ -1140,7 +1176,7 @@ $(function(){
 			ctx.fillRect(oikeaReuna-31,13,12,24);
 		}else{
 			ctx.globalAlpha=0.5;
-			kirjoita(versioId.substring(0,8),8,$("canvas").height()-8,false,10,"#FFF","Courier New");
+			kirjoita(versioId.substring(0,5),8,$("canvas").height()-8,false,10,"#FFF","Courier New");
 			ctx.globalAlpha=1;
 		}
 		if(virheLadatessa){
@@ -1244,7 +1280,7 @@ $(function(){
 		var randomiNopeus = 10 + Math.round(Math.random()*10);
 		if(hengissa){
 			klikkiPos=[x,y];
-			navigator.vibrate(100);
+			varise(100);
 			if(x>$("canvas").width()-48 && y<64){
 				if(tauko){
 					tauko=false;
@@ -1254,7 +1290,7 @@ $(function(){
 			}
 		}else{
 			if(tila==0){
-				navigator.vibrate(100);
+				varise(100);
 				if(y<146){
 					if(x>$("canvas").width()-146){
 						window.location="https://facebook.com/HuhtiRun";
@@ -1280,22 +1316,27 @@ $(function(){
 					ukkoX=384;
 				}
 				if(y>448){
-					if(x>=48 && x<176){ // Siirry tavoitteet-sivulle
+					if(x>=48 && x<160){ // Siirry Tavoitteet-sivulle
 						tavoiteNo=0;
 						tila=2;
 						klikkiAani[0].play();
 					}
-					if(x>=176 && x<272){ // Siirry pelitilastoihin
+					if(x>=160 && x<264){ // Siirry Tilastot-sivulle
 						tila=3;
 						klikkiAani[0].play();
 					}
-					if(x>=272 && x<496){ // Siirry tietoja-sivulle
+					if(x>=264 && x<376){ // Siirry Asetukset-sivulle
+						veriSiirtyma=0;
+						tila=5;
+						klikkiAani[0].play();
+					}
+					if(x>=376 && x<472){ // Siirry Tietoja-sivulle
 						veriSiirtyma=0;
 						tekijaSkrolli = 192;
 						tila=4;
 						klikkiAani[0].play();
 					}
-					if(x>=608){ 
+					if(x>=736){ 
 						if(elvytettavissa){ // Elvytä ja jatka peliä
 							if(! inaktiivinenMenu){
 								if(osta(100*Math.pow(2,pelikerrat),"Elvytys",false)){
@@ -1311,7 +1352,7 @@ $(function(){
 										inaktiivinenMenu=false;
 										pelikerrat+=1;
 										tavoiteData[2]=Math.max(tavoiteData[2],pelikerrat);
-										navigator.vibrate(1000);
+										varise(1000);
 									},1000);
 								}
 							}
@@ -1330,7 +1371,7 @@ $(function(){
 					}
 				}
 		}else if(tila==1){
-			navigator.vibrate(100);
+			varise(100);
 			if(y>448){
 				if(x>=48 && x<256){ // Siirry takaisin
 					tila=0;
@@ -1352,7 +1393,7 @@ $(function(){
 						tausta[0].volume=1;
 						suojakilpi+=3;
 						pelikerrat=0;
-						navigator.vibrate(1000);
+						varise(1000);
 					}
 				}
 			}
@@ -1381,6 +1422,23 @@ $(function(){
 				veriSiirtyma=384;
 				tila=0;
 				klikkiAani[0].play();
+			}
+		}else if(tila==5){ // Asetukset-menu
+			if(y>448){ // Takaisin valikkoon
+				veriSiirtyma=384;
+				tila=0;
+				klikkiAani[0].play();
+			}
+			if(x > 480){
+				if(y >= 176 && y < 208){
+					klikkiAani[0].play();
+					if(asetukset.varina){
+						asetukset.varina=false;
+					}else{
+						asetukset.varina=true;
+					}
+					localStorage.asetukset=JSON.stringify(asetukset);
+				}
 			}
 		}
 		}

@@ -103,6 +103,8 @@ $(function(){
 	var kiilto = lataaKuvat("kiilto",0);
 	var hyppyKuva = lataaKuvat("hyppy",0);
 	var facebook = lataaKuvat("facebook",1);
+
+	var kimalle = lataaKuvat("mitalit/kimalle",0);
 	
 	// Äänet ja musiikki
 	var hyppyAani = lataaAanet("jump",0);
@@ -163,7 +165,7 @@ $(function(){
 	var biomiLaskuri=0;
 	var elvytettavissa = false;
 	var kokonaisSuoritus = 0;
-	var parhaatPisteet = 0;
+	var parhaatPisteet = "[0,0,0,0,0]";
 	
 	var pelaaNo = 0; // Ei-deskriptiivinen nimi
 
@@ -177,17 +179,17 @@ $(function(){
 		{
 			nimi:"Noviisi",
 			kuvaus:"Juokse 250 metriä yhden pelin aikana",
-			vaatimus:function(){return 1/250*parhaatPisteet;}
+			vaatimus:function(){return 1/250*parhaatPisteet[0];}
 		},
 		{
 			nimi:"Urheilija",
 			kuvaus:"Juokse 500 metriä yhden pelin aikana",
-			vaatimus:function(){return 1/500*parhaatPisteet;}
+			vaatimus:function(){return 1/500*parhaatPisteet[0];}
 		},
 		{
 			nimi:"Huippu-urheilija",
 			kuvaus:"Juokse 750 metriä yhden pelin aikana",
-			vaatimus:function(){return 1/750*parhaatPisteet;}
+			vaatimus:function(){return 1/750*parhaatPisteet[0];}
 		},
 		{
 			nimi:"Addikti",
@@ -287,15 +289,16 @@ $(function(){
 		varina 		: true
 	};
 	asetukset = JSON.stringify(asetukset);
-	
-	// Muunnetaan vanhan tyyppinen pelitallennus uuteen
-	pelitallennusVersio = 1; // Ei käytössä -- vielä
+
+	// Nykyisen pelitallennuksen versionumero
+	// TÄRKEÄ! MUUTA AINA YHTÄ ISOMMAKSI, KUN PELITALLENNUSMUOTOON TULEE MUUTOKSIA!
+	pelitallennusVersio = 1;
 
 	// Tarkistetaan onko selaimeen tallennettu pelitietoja
 	if(! isNaN(localStorage.rahat)){
 		// Ladataan tallennetut pelitiedot
 		console.log("Ladataan tallennettuja pelitietoja...");
-		parhaatPisteet	= parseInt(localStorage.parhaatPisteet);
+		parhaatPisteet	= JSON.parse(localStorage.parhaatPisteet);
 		rahat			= parseInt(localStorage.rahat);
 		matkaYht		= parseInt(localStorage.matkaYht);
 		tavoiteData		= JSON.parse(localStorage.tavoiteData);
@@ -305,14 +308,34 @@ $(function(){
 	}else{
 		// Luodaan uudet pelitiedot mikäli puuttuvat
 		console.log("Luodaan uusia pelitietoja...");
-		localStorage.parhaatPisteet	= parhaatPisteet;
-		localStorage.rahat			= rahat;
-		localStorage.matkaYht		= matkaYht;
-		localStorage.tavoiteData	= tavoiteData;
-		localStorage.omatKentat		= omatKentat;
-		localStorage.asetukset		= asetukset;
+		localStorage.parhaatPisteet			= parhaatPisteet;
+		localStorage.rahat					= rahat;
+		localStorage.matkaYht				= matkaYht;
+		localStorage.tavoiteData			= tavoiteData;
+		localStorage.omatKentat				= omatKentat;
+		localStorage.asetukset				= asetukset;
+		localStorage.pelitallennusVersio	= pelitallennusVersio;
 		console.log("Uudet pelitiedot on nyt luotu!");
 		location.reload();
+	}
+
+	// Muunnetaan vanhan tyyppinen pelitallennus uuteen
+	// Tämä mahdollistaa sen, että pelitietoja ei tarvitse poistaa jos/kun tallennusmuotoon tulee muutoksia
+	while(parseInt(localStorage.pelitallennusVersio) < pelitallennusVersio || isNaN(parseInt(localStorage.pelitallennusVersio))){
+		var uusiVersio;
+		console.log("Päivitetään pelitallennus...");
+		switch(localStorage.pelitallennusVersio){
+			case 0:
+			case "":
+			case undefined:
+			case "undefined":
+				parhaatPisteet=[localStorage.parhaatPisteet,0,0,0,0];
+				localStorage.parhaatPisteet=JSON.stringify(parhaatPisteet);
+				uusiVersio=1;
+			break;
+		}
+		localStorage.pelitallennusVersio=uusiVersio;
+		console.log("Pelitallennus päivitetty versioon "+uusiVersio+" onnistuneesti.");
 	}
 
 	function varise(aika){
@@ -883,12 +906,9 @@ $(function(){
 					inaktiivinenMenu=false;
 					tavoiteData[0]=Math.max(tavoiteData[0],rahat);
 					tavoiteData[2]=Math.max(tavoiteData[2],pelikerrat);
-
+					
 					// Pelitietojen tallennus
-					
-					parhaatPisteet = Math.max(parhaatPisteet,pisteet);
-					
-					localStorage.parhaatPisteet=parhaatPisteet;
+					localStorage.parhaatPisteet=JSON.stringify(parhaatPisteet);
 					localStorage.rahat=rahat;
 					localStorage.matkaYht=matkaYht;
 					localStorage.tavoiteData=JSON.stringify(tavoiteData);
@@ -916,6 +936,11 @@ $(function(){
 							}
 							elvytettavissa=false;
 							tummuus=0.5;
+							// Parhaat pisteet
+							parhaatPisteet.push(pisteet);
+							parhaatPisteet.sort(function(a,b){return b-a});
+							parhaatPisteet.splice(5,1);
+							localStorage.parhaatPisteet=JSON.stringify(parhaatPisteet);
 						},2000);
 					}
 				}
@@ -980,12 +1005,12 @@ $(function(){
 					if(omatKentat[biomi]){
 						ctx.textAlign="end";
 							ctx.drawImage(kiilto[0],$("canvas").width()-256,416);
-							kirjoita("Uusi peli ➧",$("canvas").width()-64,512,true,32,"#47A94B","'Playfair Display'");
+							kirjoita("Uusi peli ➧",$("canvas").width()-64,512,true,32,"#47A94B","'Source Sans Pro'");
 						ctx.textAlign="start";
 					}else{
 						ctx.textAlign="end";
 							ctx.drawImage(kiilto[0],$("canvas").width()-256,416);
-							kirjoita("Osta kenttä ➧",$("canvas").width()-64,512,true,32,"#47A94B","'Playfair Display'");
+							kirjoita("Osta kenttä ➧",$("canvas").width()-64,512,true,32,"#47A94B","'Source Sans Pro'");
 						ctx.textAlign="start";
 						kirjoita(100*Math.pow(2,biomi),670+48,536,false);
 						ctx.drawImage(kolikkoKuva[0],640+48,520,24,24);
@@ -1038,52 +1063,73 @@ $(function(){
 
 				ctx.textAlign="end";
 					ctx.drawImage(kiilto[0],$("canvas").width()-256,416);
-					kirjoita("Juokse ➧",$("canvas").width()-64,520,true,32,"#47A94B","'Playfair Display'");
+					kirjoita("Juokse ➧",$("canvas").width()-64,512,true,32,"#47A94B","'Source Sans Pro'");
 				ctx.textAlign="start";
 				veriSiirtyma=0;
 				kirjoita("← Takaisin",64,512,false);
 			}
 			if(tila==2){
-				kirjoita(tavoitteet[tavoiteNo].nimi,256,192,true,24);
-				kirjoita(tavoitteet[tavoiteNo].kuvaus,256,224,false,20);
+				kirjoita(tavoitteet[tavoiteNo].nimi,320,192,true,20);
+				kirjoita(tavoitteet[tavoiteNo].kuvaus,320,224,false);
 				if(tavoitteet[tavoiteNo].vaatimus()>=1){
 					var mitaliSin = (Math.sin(pelaaNo/10)*10)-(Math.PI/2); // Mitali nauhoineen heiluu siniaallon mukaan
-					kirjoita(tehty,256,288,true,20,"#47A94B");
-					ctx.drawImage(mitalinauha[0],-64+(mitaliSin+(mitaliSin/4)/2),-32);
-					ctx.drawImage(mitalit[tavoiteNo],64+mitaliSin/2,176);
+					kirjoita(tehty,320,288,true,16,"#47A94B");
+					ctx.drawImage(kiilto[0],96,128);
+					ctx.drawImage(mitalinauha[0],64+(mitaliSin+(mitaliSin/4)/2),-104);
+					ctx.drawImage(mitalit[tavoiteNo],128+mitaliSin/2,192);
+					if(Math.random()>0.75){
+						var kimalleKoko = 8+Math.random()*8;
+						ctx.drawImage(kimalle[0],(128+mitaliSin/2)+Math.random()*128-(kimalleKoko/2),192+Math.random()*128-(kimalleKoko/2),kimalleKoko,kimalleKoko);
+					}
 					/*ctx.drawImage(mitalinauha[0],-64,-32);
 					ctx.drawImage(mitalit[tavoiteNo],64,176);*/
 				}else{
-					kirjoita(Math.round(tavoitteet[tavoiteNo].vaatimus()*100) + " % suoritettu",256,288,false,20,"silver");
-					ctx.drawImage(placeholder[0],64,176,128,128);
+					kirjoita(Math.round(tavoitteet[tavoiteNo].vaatimus()*100) + " % suoritettu",320,288,true,16,"silver");
+					ctx.drawImage(placeholder[0],128,192,128,128);
 				}
+				kirjoita("Tavoitteet",64,128,true,48,"#FFF","'Raleway'");
+
+				for(tavoiteI=0;tavoiteI<tavoitteet.length;tavoiteI++){
+					var palloX = ($("canvas").width()/2)+(tavoiteI*16)-(tavoitteet.length*16/2)+5;
+					if(tavoiteI==tavoiteNo){
+						kirjoita("●",palloX,416,true,10);
+					}else{
+						kirjoita("○",palloX,416,true,10);
+					}
+				}	
+
+				// Piirrä tavoitteen valitsimet
+				ctx.textAlign="center";
+				kirjoita("<",64,256,true,48);
+				kirjoita(">",$("canvas").width()-64,256,true,48);
 				
 				ctx.textAlign="end";
-				kirjoita("Seuraava 〉",$("canvas").width()-64,512);
 				kirjoita("Suoritettu "+Math.round(kokonaisSuoritus*100)+" %",$("canvas").width()-64,112,true);
-				ctx.textAlign="center";
-				kirjoita("Takaisin valikkoon",$("canvas").width()/2,512);
+
 				ctx.textAlign="start";
-				kirjoita("〈 Edellinen",64,512);
-				kirjoita("Tavoitteet",64,128,true,48,"#FFF","'Raleway'");
+				kirjoita("← Takaisin",64,512);
 			}
 			if(tila==3){
 				kirjoita("Tilastot",64,128,true,48,"#FFF","'Raleway'");
 
-				kirjoita("ENNÄTYSPISTEET",64,160,true,12);
-				kirjoita(pad(parhaatPisteet,8),64,192,true,32);
-				kirjoita("m",256,192,false,24);
+				kirjoita("YHTEENLASKETTU MATKA",64,176,true,12);
+				kirjoita(pad(matkaYht,8),64,208,true,32);
+				kirjoita("m",256,208,false,24);
 
-				kirjoita("YHTEENLASKETTU MATKA",64,224,true,12);
-				kirjoita(pad(matkaYht,8),64,256,true,32);
-				kirjoita("m",256,256,false,24);
+				kirjoita("PELATUT PELIT",64,256,true,12);
+				kirjoita(pad(tavoiteData[3],8),64,288,true,32);
 
-				kirjoita("PELATUT PELIT",64,288,true,12);
-				kirjoita(pad(tavoiteData[3],8),64,320,true,32);
+				kirjoita("KESKIMÄÄRÄINEN MATKA/PELI",64,336,true,12);
+				kirjoita(pad(Math.round(matkaYht/tavoiteData[3]),8),64,368,true,32);
+				kirjoita("m",256,368,false,24);
 
-				kirjoita("KESKIMÄÄRÄINEN MATKA/PELI",64,352,true,12);
-				kirjoita(pad(Math.round(matkaYht/tavoiteData[3]),8),64,384,true,32);
-				kirjoita("m",256,384,false,24);
+				kirjoita("PARHAAT PISTEET",384,176,true,12);
+
+				var sijoitusVarit = ["gold","silver","#A38051","#404040","#404040"];
+				for(i=0;i<5;i++){
+					kirjoita("#"+(i+1),384,208+(32*i)-5,true,16,sijoitusVarit[i]);
+					kirjoita(pad(parhaatPisteet[i],5),424,208+(32*i),true,32,sijoitusVarit[i]);
+				}
 
 				kirjoita("← Takaisin",64,512,false);
 			}
@@ -1317,11 +1363,13 @@ $(function(){
 				}
 				if(y>448){
 					if(x>=48 && x<160){ // Siirry Tavoitteet-sivulle
+						veriSiirtyma=0;
 						tavoiteNo=0;
 						tila=2;
 						klikkiAani[0].play();
 					}
 					if(x>=160 && x<264){ // Siirry Tilastot-sivulle
+						veriSiirtyma=0;
 						tila=3;
 						klikkiAani[0].play();
 					}
@@ -1398,22 +1446,28 @@ $(function(){
 				}
 			}
 		}else if(tila==2){ // Tavoitemenu
+			klikkiAani[0].play();
+			if(x<$("canvas").width()/3){ // Edellinen
+				tavoiteNo -= 1;
+				if(tavoiteNo == -1){
+					tavoiteNo = tavoitteet.length-1;
+				}
+			}
+			if(x>$("canvas").width()/3*2){ // Seuraava
+				tavoiteNo += 1;
+				if(tavoiteNo>tavoitteet.length-1){
+					tavoiteNo=0;
+				}
+			}
 			if(y>448){
-				if(x<$("canvas").width()/3){ // Edellinen
-					tavoiteNo = Math.max(0,tavoiteNo-1);
-					klikkiAani[0].play();
-				}
-				if(x>$("canvas").width()/3 && x<$("canvas").width()/3*2){ // Siirry takaisin menuun
+				if(x>$("canvas").width()/3 && x<$("canvas").width()/3*2){ // Paluu valikkoon
+					veriSiirtyma=384;
 					tila=0;
-					klikkiAani[0].play();
-				}
-				if(x>$("canvas").width()/3*2){ // Seuraava
-					tavoiteNo = Math.min(tavoitteet.length-1,tavoiteNo+1);
-					klikkiAani[0].play();
 				}
 			}
 		}else if(tila==3){ // Tilastomenu
 			if(y>448){ // Takaisin valikkoon
+				veriSiirtyma=384;
 				tila=0;
 				klikkiAani[0].play();
 			}

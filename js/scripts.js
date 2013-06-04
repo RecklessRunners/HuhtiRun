@@ -117,20 +117,9 @@ $(function(){
 	var skratsaus = lataaAanet("scratch",0);
 	var huuto = lataaAanet("scream",0);
 	var kilina = lataaAanet("gain",0);
-	var menuMusiikki = lataaAanet("menu",0);
+	var menuMusiikki = lataaAanet("lobby",0);
 	var loppuAani = lataaAanet("end",0);
 	var pisteytysAani = lataaAanet("coins",0);
-
-	// Kaikenmaailman muuttujia ja funktioita . . .
-	tausta[0].loop=true;
-	tausta[0].play();
-
-	menuMusiikki[0].loop=true;
-	menuMusiikki[0].play();
-
-	korkeaAani[0].loop=true;
-	korkeaAani[0].volume=0;
-	korkeaAani[0].play();
 
 	var tila = 0;
 
@@ -286,13 +275,14 @@ $(function(){
 	pisteytetaan = false;
 
 	asetukset = {
-		varina 		: true
+		varina 		: true,
+		aani		: true
 	};
 	asetukset = JSON.stringify(asetukset);
 
 	// Nykyisen pelitallennuksen versionumero
 	// TÄRKEÄ! MUUTA AINA YHTÄ ISOMMAKSI, KUN PELITALLENNUSMUOTOON TULEE MUUTOKSIA!
-	pelitallennusVersio = 1;
+	pelitallennusVersio = 2;
 
 	// Tarkistetaan onko selaimeen tallennettu pelitietoja
 	if(! isNaN(localStorage.rahat)){
@@ -325,13 +315,18 @@ $(function(){
 		var uusiVersio;
 		console.log("Päivitetään pelitallennus...");
 		switch(localStorage.pelitallennusVersio){
-			case 0:
-			case "":
-			case undefined:
+			case "0":
 			case "undefined":
+				// Mahdollista useampien pisteiden tallennus
 				parhaatPisteet=[localStorage.parhaatPisteet,0,0,0,0];
 				localStorage.parhaatPisteet=JSON.stringify(parhaatPisteet);
 				uusiVersio=1;
+			break;
+			case "1":
+				// Mahdollista äänen päälle/pois laittaminen
+				asetukset["aani"]=1;
+				localStorage.asetukset=asetukset;
+				uusiVersio=2;
 			break;
 		}
 		localStorage.pelitallennusVersio=uusiVersio;
@@ -346,6 +341,25 @@ $(function(){
 			return false;
 		}
 	}
+
+	function soitaAani(aaniFilu){
+		if(asetukset.aani){
+			aaniFilu.play();
+		}
+	}
+
+	// Kaikenmaailman muuttujia ja funktioita . . .
+	tausta[0].loop=true;
+	tausta[0].volume=0;
+	soitaAani(tausta[0]);
+
+	menuMusiikki[0].loop=true;
+	menuMusiikki[0].volume=0;
+	soitaAani(menuMusiikki[0]);
+
+	korkeaAani[0].loop=true;
+	korkeaAani[0].volume=0;
+	soitaAani(korkeaAani[0]);
 
 	var klikkiPos = [0,0];
 	
@@ -590,7 +604,7 @@ $(function(){
 		if(tauko){
 			aanenVoimakkuus=0.1;
 		}else{
-			aanenVoimakkuus=Math.max(0,Math.min(1,1/176*(vihuSiirtyma-80)));
+			aanenVoimakkuus=Math.min(1,1/176*(vihuSiirtyma-80));
 		}
 		if(hengissa){
 			korkeaAani[0].volume=Math.max(0,.6-aanenVoimakkuus);
@@ -605,11 +619,12 @@ $(function(){
 			}
 			tausta[0].volume=Math.max(0,tausta[0].volume-0.02);
 		}
+
+		// Siirtää vihollista hitaasti taaksepäin
 		if(Math.ceil(Math.random()*16)==16 && !tauko){
 			vihuSiirtyma -= Math.floor(3/512*vihuSiirtyma);
 		}
 
-		// Siirtää vihollista hitaasti taaksepäin
 		vihuSiirtyma = Math.min(384,vihuSiirtyma+.375);
 		if(vihuSiirtyma>256 && !tauko){
 			vihuSiirtyma-=1.5;
@@ -641,7 +656,7 @@ $(function(){
 			//e.preventDefault();
 			if(e.keyCode==32){
 				if(!hyppy){
-					hyppyAani[0].play();
+					soitaAani(hyppyAani[0]);
 					hyppy=true;
 					setTimeout(function(){
 						hyppy=false;
@@ -695,7 +710,7 @@ $(function(){
 				if(hengissa){
 					varise(500);
 					bonuspisteet = Math.round(bonuspisteet/2);
-					auts[0].play();
+					soitaAani(auts[0]);
 				}
 			}
 		}
@@ -894,7 +909,7 @@ $(function(){
 				hengissa=false;
 				suojakilpi=0;
 				pisteytys=pisteet;
-				dramaattinen[0].play();
+				soitaAani(dramaattinen[0]);
 				inaktiivinenMenu=true;
 				//kolikot=[];
 				if(pisteet >= 5){
@@ -918,7 +933,7 @@ $(function(){
 					
 					pisteytetaan=true;
 					pisteytysAani[0].currentTime=0;
-					pisteytysAani[0].play();
+					soitaAani(pisteytysAani[0]);
 				},1000);
 			}else{
 				if(pisteytetaan){
@@ -927,7 +942,7 @@ $(function(){
 						varise(50);
 					}else{
 						pisteytysAani[0].pause();
-						loppuAani[0].play();
+						soitaAani(loppuAani[0]);
 						pisteytetaan=false;
 						setTimeout(function(){
 							tavoiteData[3]=parseFloat(tavoiteData[3])+1; // Laske kaikkien pelattujen pelien määrä
@@ -980,10 +995,12 @@ $(function(){
 					ctx.drawImage(kolikkoKuva[0],640,520,24,24);
 				}else{
 					// Piirrä alamenun vaihtoehdot
+					ctx.globalAlpha=0.75;
 					kirjoita("Tavoitteet",64,512,true,12);
 					kirjoita("Tilastot",176,512,true,12);
 					kirjoita("Asetukset",272,512,true,12);
 					kirjoita("Tekijät ym.",384,512,true,12);
+					ctx.globalAlpha=1;
 
 					// Piirrä kentänvalitsimet
 					ctx.textAlign="center";
@@ -1012,8 +1029,8 @@ $(function(){
 							ctx.drawImage(kiilto[0],$("canvas").width()-256,416);
 							kirjoita("Osta kenttä ➧",$("canvas").width()-64,512,true,32,"#47A94B","'Source Sans Pro'");
 						ctx.textAlign="start";
-						kirjoita(100*Math.pow(2,biomi),670+48,536,false);
-						ctx.drawImage(kolikkoKuva[0],640+48,520,24,24);
+						kirjoita(100*Math.pow(2,biomi),670+58,536,false);
+						ctx.drawImage(kolikkoKuva[0],640+58,520,24,24);
 					}
 				}
 
@@ -1157,6 +1174,7 @@ $(function(){
 						"notchfilter",
 						"primeval_polypod",
 						"Timbre",
+						"flowerdove2168",
 						"+ muutamia Public Domain -ääniä"
 					],
 					"Suurkiitos kaikille pelin tekoon osallistuneille!":[],
@@ -1199,15 +1217,22 @@ $(function(){
 			if(tila==5){
 				kirjoita("Asetukset",64,128,true,48,"#FFF","'Raleway'");
 
-				kirjoita("Käytä värinää sitä tukevissa laitteissa",64,192,false);
+				kirjoita("Värinä (sitä tukevissa laitteissa)",64,192,false);
 				if(asetukset.varina){
 					kirjoita("Päällä",512,192,false);
 				}else{
 					kirjoita("Pois",512,192,false);
 				}
 
-				kirjoita("Pelin ohjaaminen",64,224,false);
-				kirjoita("Hiiri/Kosketusnäyttö (toistaiseksi ainut vaihtoehto)",512,224,false);
+				kirjoita("Äänet ja musiikki",64,224,false);
+				if(asetukset.aani){
+					kirjoita("Päällä",512,224,false);
+				}else{
+					kirjoita("Pois",512,224,false);
+				}
+
+				kirjoita("Pelin ohjaaminen",64,256,false);
+				kirjoita("Hiiri/Kosketusnäyttö (toistaiseksi ainut vaihtoehto)",512,256,false);
 
 				kirjoita("← Takaisin",64,512,false);
 			}
@@ -1357,7 +1382,7 @@ $(function(){
 							biomi=0;
 						}
 					}
-					klikkiAani[0].play();
+					soitaAani(klikkiAani[0]);
 					alustaMaasto();
 					ukkoX=384;
 				}
@@ -1366,25 +1391,25 @@ $(function(){
 						veriSiirtyma=0;
 						tavoiteNo=0;
 						tila=2;
-						klikkiAani[0].play();
+						soitaAani(klikkiAani[0]);
 					}
 					if(x>=160 && x<264){ // Siirry Tilastot-sivulle
 						veriSiirtyma=0;
 						tila=3;
-						klikkiAani[0].play();
+						soitaAani(klikkiAani[0]);
 					}
 					if(x>=264 && x<376){ // Siirry Asetukset-sivulle
 						veriSiirtyma=0;
 						tila=5;
-						klikkiAani[0].play();
+						soitaAani(klikkiAani[0]);
 					}
 					if(x>=376 && x<472){ // Siirry Tietoja-sivulle
 						veriSiirtyma=0;
 						tekijaSkrolli = 192;
 						tila=4;
-						klikkiAani[0].play();
+						soitaAani(klikkiAani[0]);
 					}
-					if(x>=736){ 
+					if(x>=512){ 
 						if(elvytettavissa){ // Elvytä ja jatka peliä
 							if(! inaktiivinenMenu){
 								if(osta(100*Math.pow(2,pelikerrat),"Elvytys",false)){
@@ -1405,7 +1430,7 @@ $(function(){
 								}
 							}
 						}else{ // Siirry pelin "aulaan" (Osta kenttä, jos ei ole vielä ostettu)
-							klikkiAani[0].play();
+							soitaAani(klikkiAani[0]);
 							if(omatKentat[biomi]){
 								tila=1;
 							}else{
@@ -1424,17 +1449,17 @@ $(function(){
 				if(x>=48 && x<256){ // Siirry takaisin
 					tila=0;
 					veriSiirtyma=384;
-					klikkiAani[0].play();
+					soitaAani(klikkiAani[0]);
 				}
-				if(x>=608){ 
+				if(x>=512){ 
 					veriSiirtyma=384;
 					if(! inaktiivinenMenu){ // Aloita uusi peli
 						tila=0;
-						klikkiAani[0].play();
+						soitaAani(klikkiAani[0]);
 						alustaMaasto();
 						vihuSiirtyma=512;
 						pelaajaNopeus=10;
-						huuto[0].play();
+						soitaAani(huuto[0]);
 						hengissa=true;
 						pisteet=0;
 						bonuspisteet=0;
@@ -1446,7 +1471,7 @@ $(function(){
 				}
 			}
 		}else if(tila==2){ // Tavoitemenu
-			klikkiAani[0].play();
+			soitaAani(klikkiAani[0]);
 			if(x<$("canvas").width()/3){ // Edellinen
 				tavoiteNo -= 1;
 				if(tavoiteNo == -1){
@@ -1467,29 +1492,39 @@ $(function(){
 			if(y>448){ // Takaisin valikkoon
 				veriSiirtyma=384;
 				tila=0;
-				klikkiAani[0].play();
+				soitaAani(klikkiAani[0]);
 			}
 		}else if(tila==4){ // Tietoja-menu
 			if(y>448){ // Takaisin valikkoon
 				veriSiirtyma=384;
 				tila=0;
-				klikkiAani[0].play();
+				soitaAani(klikkiAani[0]);
 			}
 		}else if(tila==5){ // Asetukset-menu
 			if(y>448){ // Takaisin valikkoon
 				veriSiirtyma=384;
 				tila=0;
-				klikkiAani[0].play();
+				soitaAani(klikkiAani[0]);
 			}
 			if(x > 480){
-				if(y >= 176 && y < 208){
-					klikkiAani[0].play();
+				if(y >= 192-16 && y < 192+16){
+					soitaAani(klikkiAani[0]);
 					if(asetukset.varina){
 						asetukset.varina=false;
 					}else{
 						asetukset.varina=true;
 					}
 					localStorage.asetukset=JSON.stringify(asetukset);
+				}
+				if(y >= 224-16 && y < 224+16){
+					soitaAani(klikkiAani[0]);
+					if(asetukset.aani){
+						asetukset.aani=false;
+					}else{
+						asetukset.aani=true;
+					}
+					localStorage.asetukset=JSON.stringify(asetukset);
+					location.reload();
 				}
 			}
 		}
@@ -1505,7 +1540,7 @@ $(function(){
 			}else{
 				biomi=Math.max(0,biomi-1);
 			}
-			klikkiAani[0].play();
+			soitaAani(klikkiAani[0]);
 			alustaMaasto();
 			ukkoX=384;
 		}
@@ -1522,7 +1557,7 @@ $(function(){
 			}else{
 				if(hengissa){
 					if(!hyppy){
-						hyppyAani[0].play();
+						soitaAani(hyppyAani[0]);
 						hyppy=true;
 						setTimeout(function(){
 							hyppy=false;
@@ -1535,7 +1570,7 @@ $(function(){
 		if(hengissa && bonuspisteet >= maxBonuspisteet){
 			pisteet+=20;
 			bonuspisteet=0;
-			maksuAani[0].play();
+			soitaAani(maksuAani[0]);
 		}
 	});
 	
@@ -1605,13 +1640,13 @@ $(function(){
 			if(kysy){
 				rahat-=hinta;
 				localStorage.rahat=rahat;
-				maksuAani[0].play();
+				soitaAani(maksuAani[0]);
 				return true;
 			}else{
 				return false;
 			}
 		}else{
-			dramaattinen[0].play();
+			soitaAani(dramaattinen[0]);
 			alert("Tarvitset "+Math.floor(hinta-rahat)+" (HR) lisää ostaaksesi tämän.");
 			return false;
 		}

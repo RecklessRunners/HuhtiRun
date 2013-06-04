@@ -1459,11 +1459,9 @@ $(function(){
 					tavoiteNo=0;
 				}
 			}
-			if(y>448){
-				if(x>$("canvas").width()/3 && x<$("canvas").width()/3*2){ // Paluu valikkoon
-					veriSiirtyma=384;
-					tila=0;
-				}
+			if(y>448){ // Paluu valikkoon
+				veriSiirtyma=384;
+				tila=0;
 			}
 		}else if(tila==3){ // Tilastomenu
 			if(y>448){ // Takaisin valikkoon

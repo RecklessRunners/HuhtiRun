@@ -298,12 +298,13 @@ $(function(){
 	}else{
 		// Luodaan uudet pelitiedot mikäli puuttuvat
 		console.log("Luodaan uusia pelitietoja...");
-		localStorage.parhaatPisteet			= parhaatPisteet;
+		localStorage.parhaatPisteet			= JSON.stringify(parhaatPisteet);
 		localStorage.rahat					= rahat;
 		localStorage.matkaYht				= matkaYht;
-		localStorage.tavoiteData			= tavoiteData;
-		localStorage.omatKentat				= omatKentat;
-		localStorage.asetukset				= asetukset;
+		localStorage.tavoiteData			= JSON.stringify(tavoiteData);
+		localStorage.omatKentat				= JSON.stringify(omatKentat);
+		localStorage.asetukset				= JSON.stringify(asetukset);
+
 		localStorage.pelitallennusVersio	= pelitallennusVersio;
 		console.log("Uudet pelitiedot on nyt luotu!");
 		location.reload();
@@ -325,7 +326,7 @@ $(function(){
 			case "1":
 				// Mahdollista äänen päälle/pois laittaminen
 				asetukset["aani"]=1;
-				localStorage.asetukset=asetukset;
+				localStorage.asetukset=JSON.stringify(asetukset);
 				uusiVersio=2;
 			break;
 			case "2":
@@ -922,24 +923,12 @@ $(function(){
 				inaktiivinenMenu=true;
 				//kolikot=[];
 				if(pisteet > 9){
-					rahat += pisteet;
-					matkaYht += pisteet;
 					elvytettavissa=true;
 				}
 				setTimeout(function(){
 					inaktiivinenMenu=false;
 					tavoiteData[0]=Math.max(tavoiteData[0],rahat);
 					tavoiteData[2]=Math.max(tavoiteData[2],pelikerrat);
-					
-					// Pelitietojen tallennus
-					localStorage.parhaatPisteet=JSON.stringify(parhaatPisteet);
-					localStorage.rahat=rahat;
-					localStorage.matkaYht=matkaYht;
-					localStorage.tavoiteData=JSON.stringify(tavoiteData);
-					localStorage.omatKentat=JSON.stringify(omatKentat);
-					
-					console.log("Pelitiedot on nyt tallennettu!");
-					
 					pisteytetaan=true;
 					pisteytysAani[0].currentTime=0;
 					soitaAani(pisteytysAani[0]);
@@ -959,14 +948,26 @@ $(function(){
 							}
 							elvytettavissa=false;
 							tummuus=0.5;
-							// Parhaat pisteet
+							
 							if(pisteet>9){
+								// Parhaat pisteet
 								parhaatPisteet.push(pisteet);
 								parhaatPisteet.sort(function(a,b){return b-a});
 								parhaatPisteet.splice(10,1);
 								localStorage.parhaatPisteet=JSON.stringify(parhaatPisteet);
+
 								tavoiteData[3]=parseFloat(tavoiteData[3])+1; // Laske kaikkien pelattujen pelien määrä
 								localStorage.tavoiteData=JSON.stringify(tavoiteData);
+
+								rahat += pisteet;
+								matkaYht += pisteet;
+
+								// Pelitietojen tallennus
+								localStorage.parhaatPisteet=JSON.stringify(parhaatPisteet);
+								localStorage.rahat=rahat;
+								localStorage.matkaYht=matkaYht;
+								localStorage.tavoiteData=JSON.stringify(tavoiteData);
+								localStorage.omatKentat=JSON.stringify(omatKentat);
 							}
 						},2000);
 					}
@@ -1170,7 +1171,7 @@ $(function(){
 					}
 
 					kirjoita(i+1,384,208+(32*i)-6,true,16);
-					kirjoita(parhaatPisteet[i],424,208+(32*i),true,32,sijoitusVarit[i]);
+					kirjoita(parhaatPisteet[i],424,208+(32*i),false,32,sijoitusVarit[i],"'Source Sans Pro'");
 				}
 
 				kirjoita("← Takaisin",64,512,false);
@@ -1441,15 +1442,15 @@ $(function(){
 						if(elvytettavissa){ // Elvytä ja jatka peliä
 							if(! inaktiivinenMenu){
 								if(osta(100*Math.pow(2,pelikerrat),"Elvytys",false)){
-								veriSiirtyma=384;
-								vihuSiirtyma=256;
-								hengissa=true;
-								pelaajaNopeus=10;
-								tausta[0].volume=1;
-								suojakilpi+=3;
-								pelikerrat+=1;
-								tavoiteData[2]=Math.max(tavoiteData[2],pelikerrat);
-								varise(1000);
+									veriSiirtyma=384;
+									vihuSiirtyma=256;
+									hengissa=true;
+									pelaajaNopeus=10;
+									tausta[0].volume=1;
+									suojakilpi+=3;
+									pelikerrat+=1;
+									tavoiteData[2]=Math.max(tavoiteData[2],pelikerrat);
+									varise(1000);
 								}
 							}
 						}else{ // Siirry pelin "aulaan" (Osta kenttä, jos ei ole vielä ostettu)

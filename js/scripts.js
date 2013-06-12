@@ -34,12 +34,18 @@ $(function(){
 	var canvas = $("canvas")[0];
 	var ctx = canvas.getContext("2d");
 
+	hidasLataus=false;
+
 	function lataaKuvat(nimi, nmax){
 		var taulu = [];
 		for(var i=0;i<=nmax;i++){
 			var img = new Image();
+			var tunnistaHidasLatautuminen = setTimeout(function(){
+				hidasLataus=true;
+			},15000);
 			img.onload=function(){
 				ladatutTiedostot++;
+				clearTimeout(tunnistaHidasLatautuminen);
 			};
 			img.onerror=function(){
 				virheLadatessa=true;
@@ -530,6 +536,27 @@ $(function(){
 	var ukkoLiikkuuX = 0;
 	var siirtoY = 0;	
 	setInterval(paivita,50);
+
+	// Arvotaan lataustekstejä
+	latausSloganit = [
+		"Kaadetaan puita metsässä",
+		"Poimitaan kukkia niityltä",
+		"Etsitään kangastuksia aavikolta",
+		"Uidaan meressä",
+		"Etsitään jalokiviä luolasta",
+		"Rasvataan saranoita",
+		"Keksitään lataustekstejä",
+		"Ratsastetaan kamelilla",
+		"Poimitaan marjoja metsästä",
+		"Lasketaan rahoja",
+		"Sidotaan kengännauhoja"
+	];
+	latausSloganitArvottu=[];
+	for(i=0;i<5;i++){
+		var satunnainenSloganId = Math.floor(Math.random()*latausSloganit.length);
+		latausSloganitArvottu.push(latausSloganit[satunnainenSloganId]);
+		latausSloganit.splice(satunnainenSloganId,1);
+	}
 
 	function kirjoita(teksti,x,y,lihavoitu,fonttikoko,vari,fontti){
 
@@ -1292,82 +1319,48 @@ $(function(){
 			kirjoita("V I R H E   L A T A U K S E S S A",$("canvas").width()/2,256,true,12);
 			kirjoita(virheTiedosto,$("canvas").width()/2,384,true,12,"#808080");
 			ctx.textAlign="start";
+			document.title="Latausvirhe!";
 		}else{
 			if(ladatutTiedostot<kaikkiTiedostot){
-				ctx.fillStyle="#000";
+				ctx.fillStyle="#945557";
 				ctx.fillRect(0,0,960,576);
-				ctx.textAlign="center";
-				ctx.beginPath();
-				ctx.moveTo(0,512);
-				ctx.lineTo($("canvas").width(),512);
-				ctx.lineWidth = 3;
-				ctx.strokeStyle="#202020";
-				ctx.stroke();
 
-				ctx.moveTo(0,64);
-				ctx.lineTo($("canvas").width(),64);
-				ctx.lineWidth = 3;
-				ctx.strokeStyle="#202020";
+				ctx.beginPath();
+				ctx.moveTo(64,512-4);
+				ctx.lineTo($("canvas").width()-64,512-4);
+				ctx.lineWidth = 8;
+				ctx.strokeStyle="rgba(0,0,0,.5)";
 				ctx.stroke();
 
 				ctx.beginPath();
-				ctx.moveTo(0,512);
-				ctx.lineTo($("canvas").width()/kaikkiTiedostot*ladatutTiedostot,512);
-				ctx.lineWidth = 3;
-				ctx.strokeStyle="#808080";
+				ctx.moveTo(64,512-4);
+				ctx.lineTo(($("canvas").width()-64)/kaikkiTiedostot*ladatutTiedostot,512-4);
+				ctx.lineWidth = 8;
+				ctx.strokeStyle="#20FF40";
 				ctx.stroke();
 
-				kirjoita("L A D A T A A N   " + Math.round(100/kaikkiTiedostot*ladatutTiedostot)+"   %",$("canvas").width()/2,512+24,true,12,"#808080");
+				var latausprosentti=Math.round(100/kaikkiTiedostot*ladatutTiedostot);
+				if(hidasLataus){
+					ctx.beginPath();
+					ctx.fillStyle="#DC7612";
+					ctx.fillRect(0,0,960,96);
+					ctx.fill();
+					kirjoita("!",64,64,true,48,"#FFF","'Source Sans Pro'");
+					kirjoita("Lataaminen tuntuu vievän normaalia kauemmin!",96,48,true,24,"#FFF","'Source Sans Pro'");
+					kirjoita("Jos peli ei lataudu, tarkista verkkoyhteytesi. Päivitä sivu tarvittaessa.",96,64,true,16,"#FFF","'Source Sans Pro'");
+				}
+				kirjoita(latausSloganitArvottu[Math.floor(0.05*latausprosentti)],64,512+24,true,16,"#FFF","'Source Sans Pro'");
+				ctx.textAlign="end";
+				kirjoita(latausprosentti+" %",$("canvas").width()-64,512+24,true,16,"#FFF","'Source Sans Pro'");
 				ctx.textAlign="start";
 
-				/*kirjoita("O D O T T A E S S A S I   P E L I N   L A T A U T U M I S T A   V O I T   P E L A T A   P I N G - P O N G I A",$("canvas").width()/2,48,true,12,"#808080");
-				kirjoita("L A D A T A A N   " + Math.round(100/kaikkiTiedostot*ladatutTiedostot)+"   %",$("canvas").width()/2,512+24,true,12,"#808080");
-				ctx.textAlign="start";
-
-				ctx.beginPath();
-				ctx.moveTo(32,Math.round((y-48)/16)*16);
-				ctx.lineTo(32,Math.round((y+48)/16)*16);
-				ctx.lineWidth = 16;
-				ctx.strokeStyle="#FFF";
-				ctx.stroke();
-
-				ctx.beginPath();
-				ctx.moveTo($("canvas").width()-32,Math.round((pingPongVY-48)/2)*2);
-				ctx.lineTo($("canvas").width()-32,Math.round((pingPongVY+48)/2)*2);
-				ctx.lineWidth = 16;
-				ctx.strokeStyle="#FFF";
-				ctx.stroke();
-
-				ctx.beginPath();
-				ctx.rect(pingPongX,pingPongY,16,16);
-				ctx.fillStyle = "#FFF";
-				ctx.fill();
-
-				pingPongX += pingPongNX;
-				pingPongY += pingPongNY;
-				pingPongX = Math.max(pingPongX,32);
-				pingPongX = Math.min(pingPongX,$("canvas").width()-32);
-
-				if(pingPongX <= 32 || pingPongX >= $("canvas").width()-32){
-					pingPongX -= pingPongNX;
-					pingPongNX = -pingPongNX;
-				}
-				if(pingPongY <= 64 || pingPongY >= 512){
-					pingPongY -= pingPongNY;
-					pingPongNY = -pingPongNY;
-				}
-				if(pingPongX>$("canvas").width()/2){
-					pingPongVTY = pingPongY-48;
+				document.title="Ladataan "+latausprosentti+" %";
+			}else{
+				if(hengissa){
+					document.title="HR - "+pisteet+" pst.";
 				}else{
-					pingPongVTY = 256+Math.sin(pelaaNo)*100;
+					document.title="HuhtiRun";
 				}
-				if(pingPongVTY != pingPongVY){
-					if(pingPongVTY > pingPongVY){
-						pingPongVY += Math.abs(pingPongVY-pingPongVTY)/8;
-					}else{
-						pingPongVY -= Math.abs(pingPongVY-pingPongVTY)/8;
-					}
-				}*/
 			}
 		}
 	}

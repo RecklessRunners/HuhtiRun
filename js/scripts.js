@@ -35,17 +35,18 @@ $(function(){
 	var ctx = canvas.getContext("2d");
 
 	hidasLataus=false;
+	tunnistaHidasLatautuminen = setTimeout(function(){},1);
 
 	function lataaKuvat(nimi, nmax){
 		var taulu = [];
 		for(var i=0;i<=nmax;i++){
 			var img = new Image();
-			var tunnistaHidasLatautuminen = setTimeout(function(){
-				hidasLataus=true;
-			},15000);
 			img.onload=function(){
 				ladatutTiedostot++;
 				clearTimeout(tunnistaHidasLatautuminen);
+				tunnistaHidasLatautuminen = setTimeout(function(){
+					hidasLataus=true;
+				},5000);
 			};
 			img.onerror=function(){
 				virheLadatessa=true;
@@ -103,7 +104,7 @@ $(function(){
 	var palkki = lataaKuvat("palkki",0);
 
 	var placeholder = lataaKuvat("mitalit/placeholder",0);
-	var mitalit = lataaKuvat("mitalit/",4);
+	var mitalit = lataaKuvat("mitalit/",6);
 	var mitalinauha = lataaKuvat("mitalit/mitalinauha",0);
 
 	var kiilto = lataaKuvat("kiilto",0);
@@ -172,33 +173,38 @@ $(function(){
 	
 	var tavoitteet = [
 		{
+			nimi:"Pro!",
+			kuvaus:"Helppo. Kerää kaikki muut tavoitteet.",
+			vaatimus:function(){return kokonaisSuoritus;}
+		},
+		{
 			nimi:"Noviisi",
-			kuvaus:"Juokse 250 metriä yhden pelin aikana",
+			kuvaus:"Juokse 250 metriä yhden pelin aikana!",
 			vaatimus:function(){return 1/250*parhaatPisteet[0];}
 		},
 		{
 			nimi:"Urheilija",
-			kuvaus:"Juokse 500 metriä yhden pelin aikana",
+			kuvaus:"Juokse 500 metriä yhden pelin aikana!",
 			vaatimus:function(){return 1/500*parhaatPisteet[0];}
 		},
 		{
 			nimi:"Huippu-urheilija",
-			kuvaus:"Juokse 750 metriä yhden pelin aikana",
+			kuvaus:"Juokse 750 metriä yhden pelin aikana!",
 			vaatimus:function(){return 1/750*parhaatPisteet[0];}
 		},
 		{
 			nimi:"Addikti",
-			kuvaus:"Juokse 20 000 metriä koko aikana",
+			kuvaus:"Juokse 20 000 metriä koko aikana.",
 			vaatimus:function(){return 1/20000*matkaYht;}
 		},
 		{
 			nimi:"Kuolematon",
-			kuvaus:"Elvytä itsesi viidesti yhden pelin aikana",
+			kuvaus:"Elvytä itsesi viidesti yhden pelin aikana.",
 			vaatimus:function(){return 1/5*tavoiteData[2];}
 		},
 		{
 			nimi:"Rikas",
-			kuvaus:"Hanki 20 000 (HR) vähintään kerran",
+			kuvaus:"Hanki 20 000 (HR) vähintään kerran.",
 			vaatimus:function(){return 1/20000*tavoiteData[0];}
 		}
 	];
@@ -405,8 +411,6 @@ $(function(){
     var tieMinMax = [0, 960];
     
     var tauko = false;
-
-	var tehty = "✔ Suoritettu";
 
 	// 2D-taulukko [5x4], jossa on referenssit kuviin
 	function alustaMaasto(){
@@ -1048,11 +1052,11 @@ $(function(){
 					kirjoita(">",$("canvas").width()-64,256,true,48);
 
 					for(biomiI=0;biomiI<biomiTyypit.length;biomiI++){
-						var palloX = ($("canvas").width()/2)+(biomiI*16)-(biomiTyypit.length*16/2)+5;
+						var palloX = ($("canvas").width()/2)+(biomiI*16)-(biomiTyypit.length*16/2)+5.5;
 						if(biomiI==biomi){
-							kirjoita("●",palloX,416,true,10);
+							kirjoita("●",palloX,416,true,11);
 						}else{
-							kirjoita("○",palloX,416,true,10);
+							kirjoita("○",palloX,416,true,11);
 						}
 					}
 					kirjoita(biomiTyypit[biomi],$("canvas").width()/2,384,true,14,"#FFF","Source Sans Pro");
@@ -1130,7 +1134,9 @@ $(function(){
 				kirjoita(tavoitteet[tavoiteNo].kuvaus,320,224,false);
 				if(tavoitteet[tavoiteNo].vaatimus()>=1){
 					var mitaliSin = (Math.sin(pelaaNo/10)*10)-(Math.PI/2); // Mitali nauhoineen heiluu siniaallon mukaan
-					kirjoita(tehty,320,288,true,16,"#47A94B");
+					kirjoita("☑",320,288,false,32,"#47A94B");
+					kirjoita("Suoritettu",372,272,true,16,"#47A94B");
+					kirjoita("Onneksi olkoon!",372,292,false,16,"#47A94B");
 					ctx.drawImage(kiilto[0],96,128);
 					ctx.drawImage(mitalinauha[0],64+(mitaliSin+(mitaliSin/4)/2),-104);
 					ctx.drawImage(mitalit[tavoiteNo],128+mitaliSin/2,192);
@@ -1141,17 +1147,23 @@ $(function(){
 					/*ctx.drawImage(mitalinauha[0],-64,-32);
 					ctx.drawImage(mitalit[tavoiteNo],64,176);*/
 				}else{
-					kirjoita(Math.round(tavoitteet[tavoiteNo].vaatimus()*100) + " % suoritettu",320,288,true,16,"silver");
+					kirjoita("☐",320,288,false,32,"silver");
+					kirjoita("Jaksaa, jaksaa!",372,272,true,16,"silver");
+					kirjoita(Math.floor(tavoitteet[tavoiteNo].vaatimus()*100) + " % suoritettu",372,292,false,16,"silver");
 					ctx.drawImage(placeholder[0],128,192,128,128);
 				}
 				kirjoita("Tavoitteet",64,128,true,48,"#FFF","'Raleway'");
 
 				for(tavoiteI=0;tavoiteI<tavoitteet.length;tavoiteI++){
-					var palloX = ($("canvas").width()/2)+(tavoiteI*16)-(tavoitteet.length*16/2)+5;
+					var palloX = ($("canvas").width()/2)+(tavoiteI*16)-(tavoitteet.length*16/2)+5.5;
+					var palloVari = "silver";
+					if(tavoitteet[tavoiteI].vaatimus()>=1){
+						palloVari="#47A94B";
+					}
 					if(tavoiteI==tavoiteNo){
-						kirjoita("●",palloX,416,true,10);
+						kirjoita("●",palloX,416,true,11,palloVari);
 					}else{
-						kirjoita("○",palloX,416,true,10);
+						kirjoita("○",palloX,416,true,11,palloVari);
 					}
 				}	
 
@@ -1159,27 +1171,22 @@ $(function(){
 				ctx.textAlign="center";
 				kirjoita("<",64,256,true,48);
 				kirjoita(">",$("canvas").width()-64,256,true,48);
-				
-				ctx.textAlign="end";
-				kirjoita("TAVOITTEISTA ON",$("canvas").width()-64,96,true,12,"silver");
-				kirjoita("SUORITETTU "+Math.round(kokonaisSuoritus*100)+" %",$("canvas").width()-64,112,true,12);
-
 				ctx.textAlign="start";
 				kirjoita("← Takaisin",64,512);
 			}
 			if(tila==3){
 				kirjoita("Tilastot",64,128,true,48,"#FFF","'Raleway'");
 
-				kirjoita("YHTEENLASKETTU MATKA",64,176,true,12);
-				kirjoita(pad(matkaYht,8),64,208,true,32);
-				kirjoita("m",256,208,false,24);
+				kirjoita("YHTEENLASKETTU MATKA",64,176,true,12,"#FFF","'Raleway'");
+				kirjoita(pad(matkaYht,8),64,208,true,32,"#FFF","'Raleway'");
+				kirjoita("m",256,208,true,16,"#FFF","'Raleway'");
 
-				kirjoita("PELATUT PELIT",64,256,true,12);
-				kirjoita(pad(tavoiteData[3],8),64,288,true,32);
+				kirjoita("PELATUT PELIT",64,256,true,12,"#FFF","'Raleway'");
+				kirjoita(pad(tavoiteData[3],8),64,288,true,32,"#FFF","'Raleway'");
 
-				kirjoita("KESKIMÄÄRÄINEN MATKA/PELI",64,336,true,12);
-				kirjoita(pad(Math.round(matkaYht/tavoiteData[3]),8),64,368,true,32);
-				kirjoita("m",256,368,false,24);
+				kirjoita("KESKIMÄÄRÄINEN MATKA/PELI",64,336,true,12,"#FFF","'Raleway'");
+				kirjoita(pad(Math.round(matkaYht/tavoiteData[3]),8),64,368,true,32,"#FFF","'Raleway'");
+				kirjoita("m",256,368,true,16,"#FFF","'Raleway'");
 
 				kirjoita("PARHAAT PISTEET",384,176,true,12);
 

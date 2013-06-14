@@ -175,11 +175,6 @@ $(function(){
 	
 	var tavoitteet = [
 		{
-			nimi:"Mestari",
-			kuvaus:"Helppo. Kerää kaikki muut tavoitteet.",
-			vaatimus:function(){return kokonaisSuoritus;}
-		},
-		{
 			nimi:"Lenkkeilijä",
 			kuvaus:"Juokse 250 metriä yhden pelin aikana!",
 			vaatimus:function(){return 1/250*parhaatPisteet[0];}
@@ -208,6 +203,11 @@ $(function(){
 			nimi:"Rikas",
 			kuvaus:"Hanki 20 000 (HR) vähintään kerran.",
 			vaatimus:function(){return 1/20000*tavoiteData[0];}
+		},
+		{
+			nimi:"Mestari",
+			kuvaus:"Helppo. Kerää kaikki muut tavoitteet.",
+			vaatimus:function(){return kokonaisSuoritus;}
 		}
 	];
 	var tavoiteNo = 0; // Tavoitteen numero, jota katsotaan Tavoitteet-sivulla
@@ -1146,16 +1146,20 @@ $(function(){
 					kirjoita("Juokse ➧",$("canvas").width()-64,512,true,32,"#47A94B","'Source Sans Pro'");
 				ctx.textAlign="start";
 				veriSiirtyma=0;
-				kirjoita("← Takaisin",64,512,false);
+				kirjoita("← Paluu",64,512,false);
 			}
 			if(tila==2){
-				kirjoita(tavoitteet[tavoiteNo].nimi,320,192,true,20);
-				kirjoita(tavoitteet[tavoiteNo].kuvaus,320,224,false);
+				kirjoita(tavoitteet[tavoiteNo].nimi,320,192+24,true,24,"#FFF","'Raleway'");
+				kirjoita(tavoitteet[tavoiteNo].kuvaus,320,224+24,false,18,"#FFF","'Source Sans Pro'");
+				ctx.fillStyle="rgba(0,0,0,.15)";
+				ctx.fillRect(0,276,$("canvas").width(),48);
 				if(tavoitteet[tavoiteNo].vaatimus()>=1){
+					ctx.fillStyle="rgba(0,0,0,.15)";
+					ctx.fillRect(0,276,$("canvas").width(),48);
 					var mitaliSin = (Math.sin(pelaaNo/10)*10)-(Math.PI/2); // Mitali nauhoineen heiluu siniaallon mukaan
-					kirjoita("☑",320,288,false,32,"#47A94B");
-					kirjoita("Suoritettu",372,272,true,16,"#47A94B");
-					kirjoita("Onneksi olkoon!",372,292,false,16,"#47A94B");
+					kirjoita("☑",320,288+24,false,32,"#47A94B");
+					kirjoita("Suoritettu",372,272+24,true,18,"#47A94B","'Source Sans Pro'");
+					kirjoita("Onneksi olkoon!",372,292+24,false,18,"#47A94B","'Source Sans Pro'");
 					ctx.drawImage(kiilto[0],96,128);
 					ctx.drawImage(mitalinauha[0],64+(mitaliSin+(mitaliSin/4)/2),-104);
 					ctx.drawImage(mitalit[tavoiteNo],128+mitaliSin/2,192);
@@ -1166,9 +1170,11 @@ $(function(){
 					/*ctx.drawImage(mitalinauha[0],-64,-32);
 					ctx.drawImage(mitalit[tavoiteNo],64,176);*/
 				}else{
-					kirjoita("☐",320,288,false,32,"silver");
-					kirjoita("Jaksaa, jaksaa!",372,272,true,16,"silver");
-					kirjoita(Math.floor(tavoitteet[tavoiteNo].vaatimus()*100) + " % suoritettu",372,292,false,16,"silver");
+					ctx.fillStyle="rgba(0,0,0,.15)";
+					ctx.fillRect(0,276,$("canvas").width()/1*tavoitteet[tavoiteNo].vaatimus(),48);
+					kirjoita("☐",320,288+24,false,32,"silver");
+					kirjoita("Jaksaa, jaksaa!",372,272+24,true,18,"silver","'Source Sans Pro'");
+					kirjoita(Math.floor(tavoitteet[tavoiteNo].vaatimus()*100) + " % suoritettu",372,292+24,false,18,"silver","'Source Sans Pro'");
 					ctx.drawImage(placeholder[0],128,192,128,128);
 				}
 				kirjoita("Tavoitteet",64,128,true,48,"#FFF","'Raleway'");
@@ -1191,7 +1197,7 @@ $(function(){
 				kirjoita("<",64,256,true,48);
 				kirjoita(">",$("canvas").width()-64,256,true,48);
 				ctx.textAlign="start";
-				kirjoita("← Takaisin",64,512);
+				kirjoita("← Paluu",64,512);
 			}
 			if(tila==3){
 				kirjoita("Tilastot",64,128,true,48,"#FFF","'Raleway'");
@@ -1227,7 +1233,7 @@ $(function(){
 					kirjoita(parhaatPisteet[i],424,208+(32*i),false,32,sijoitusVarit[i],"'Source Sans Pro'");
 				}
 
-				kirjoita("← Takaisin",64,512,false);
+				kirjoita("← Paluu",64,512,false);
 				ctx.textAlign="end";
 					kirjoita("HUOM! ALLE 10 METRIN JUOKSUJA EI TILASTOIDA",$("canvas").width()-64,512,true,12);
 				ctx.textAlign="start";
@@ -1294,7 +1300,7 @@ $(function(){
 				kirjoita(versioId.substr(0,20) || "????????????????????",$("canvas").width()-64,512,false,16,"#FFF","Courier New");
 				ctx.textAlign="start";
 				
-				kirjoita("← Takaisin",64,512,false);
+				kirjoita("← Paluu",64,512,false);
 			}
 			if(tila==5){
 				kirjoita("Asetukset",64,128,true,48,"#FFF","'Raleway'");
@@ -1316,7 +1322,7 @@ $(function(){
 				kirjoita("Pelin ohjaaminen",64,256,false);
 				kirjoita("Hiiri/Kosketusnäyttö (toistaiseksi ainut vaihtoehto)",512,256,false);
 
-				kirjoita("← Takaisin",64,512,false);
+				kirjoita("← Paluu",64,512,false);
 			}
 		}
 		if(hengissa){

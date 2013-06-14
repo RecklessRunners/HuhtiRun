@@ -43,10 +43,11 @@ $(function(){
 			var img = new Image();
 			img.onload=function(){
 				ladatutTiedostot++;
+				// Jos yksikään kuva ei lataudu kymmenen sekunnin sisällä, ilmoita käyttäjälle hitaasta latautumisesta
 				clearTimeout(tunnistaHidasLatautuminen);
 				tunnistaHidasLatautuminen = setTimeout(function(){
 					hidasLataus=true;
-				},5000);
+				},10000);
 			};
 			img.onerror=function(){
 				virheLadatessa=true;
@@ -137,7 +138,8 @@ $(function(){
 	$.ajax({url:".git/refs/heads/master",success:function(resp){versioId=resp;console.log("Versio "+resp);}});
 
 	var suojakilpi = 2;
-	var suojakilpiTeho = 0.1;
+	var alkupotkaisu = 0;
+
 	var hengissa = false;
 	var ukkoToleranssi = 48;
 	var pelikerrat=0;
@@ -173,12 +175,12 @@ $(function(){
 	
 	var tavoitteet = [
 		{
-			nimi:"Pro!",
+			nimi:"Mestari",
 			kuvaus:"Helppo. Kerää kaikki muut tavoitteet.",
 			vaatimus:function(){return kokonaisSuoritus;}
 		},
 		{
-			nimi:"Noviisi",
+			nimi:"Lenkkeilijä",
 			kuvaus:"Juokse 250 metriä yhden pelin aikana!",
 			vaatimus:function(){return 1/250*parhaatPisteet[0];}
 		},
@@ -614,7 +616,11 @@ $(function(){
 		if(tavoiteX == ukkoX){
 			liikkuuY=true;
 		}else{
-			var posErotus = ((Math.max(ukkoX,tavoiteX)-Math.min(ukkoX,tavoiteX)))/5;
+			if(alkupotkaisu>0){
+				var posErotus = ((Math.max(ukkoX,tavoiteX)-Math.min(ukkoX,tavoiteX)))/1.25;
+			}else{
+				var posErotus = ((Math.max(ukkoX,tavoiteX)-Math.min(ukkoX,tavoiteX)))/5;
+			}
 
 			if(tavoiteX > ukkoX){
 				ukkoX+=posErotus;
@@ -790,7 +796,11 @@ $(function(){
 
 		// Maaston liikuttaminen
 		if(!tauko){
-			siirtoY+=pelaajaNopeus;
+			if(alkupotkaisu>0 && hengissa){
+				siirtoY+=pelaajaNopeus*3.75;
+			}else{
+				siirtoY+=pelaajaNopeus;
+			}
 		}
 
 		if (siirtoY >= 192){
@@ -803,6 +813,12 @@ $(function(){
 				bonuspisteet += 1;
 				if(suojakilpi>0){
 					suojakilpi-=1;
+				}
+				if(alkupotkaisu>3){
+					alkupotkaisu-=1;
+					suojakilpi=3;
+				}else{
+					alkupotkaisu=0;
 				}
 			}
 
@@ -974,8 +990,9 @@ $(function(){
 						soitaAani(loppuAani[0]);
 						pisteytetaan=false;
 						setTimeout(function(){
-							if(elvytettavissa){
+							if(elvytettavissa && !hengissa){
 								alustaMaasto();
+								alkupotkaisu=0;
 							}
 							elvytettavissa=false;
 							tummuus=0.5;
@@ -1032,11 +1049,11 @@ $(function(){
 						ctx.drawImage(kolikkoKuva[0],256,192+8,64,64);
 						kirjoita(rahat,$("canvas").width()/2,256,true,64,"#FFF","'Raleway'");
 					}
+					ctx.textAlign="end";
+						kirjoita("Elvytä ➧",$("canvas").width()-64,512,true,32,"#47A94B","'Source Sans Pro'");
 					ctx.textAlign="start";
-					kirjoita("Ohita",64,512,false);
-					kirjoita("Elvytä ➧",640,512,true,32);
-					kirjoita(100*Math.pow(2,pelikerrat),670,536,false);
-					ctx.drawImage(kolikkoKuva[0],640,520,24,24);
+					kirjoita(100*Math.pow(2,pelikerrat),$("canvas").width()-192+32,536,false);
+					ctx.drawImage(kolikkoKuva[0],$("canvas").width()-192,520,24,24);
 				}else{
 					// Piirrä alamenun vaihtoehdot
 					ctx.globalAlpha=0.75;
@@ -1105,22 +1122,24 @@ $(function(){
 				kirjoita("Halutessasi voit ostaa power-upeja ennen peliä",$("canvas").width()/2,144,true,16,"#FFF","'Source Sans Pro'");
 
 				ctx.drawImage(kiilto[0],$("canvas").width()/4-96,192+veriSiirtymaNyt/9);
-				kirjoita("Bonusta nopeammin",$("canvas").width()/4,192+veriSiirtymaNyt/9,true);
-				kirjoita("Bonusmittari täyttyy",$("canvas").width()/4,396+veriSiirtymaNyt/9);
-				kirjoita("lyhemmältä matkalta",$("canvas").width()/4,420+veriSiirtymaNyt/9);
-				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4,444+veriSiirtymaNyt/9,true,12,"gray");
+				kirjoita("x x x x x",$("canvas").width()/4,192+veriSiirtymaNyt/9,true);
+				kirjoita("x x x x x",$("canvas").width()/4,396+veriSiirtymaNyt/9);
+				kirjoita("x x x x x",$("canvas").width()/4,420+veriSiirtymaNyt/9);
+				kirjoita("x x x x x",$("canvas").width()/4,444+veriSiirtymaNyt/9,true,12,"gray");
 
 				ctx.drawImage(kiilto[0],$("canvas").width()/4*2-96,192+veriSiirtymaNyt/6);
 				kirjoita("Bonusta enemmän",$("canvas").width()/4*2,192+veriSiirtymaNyt/6,true);
+				kirjoita("TULOSSA MYÖHEMMIN",$("canvas").width()/4*2,192+veriSiirtymaNyt/3+18,true,12,"gray");
 				kirjoita("Saat enemmän pisteitä",$("canvas").width()/4*2,396+veriSiirtymaNyt/6);
 				kirjoita("bonusmittarin täyttyessä",$("canvas").width()/4*2,420+veriSiirtymaNyt/6);
 				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4*2,444+veriSiirtymaNyt/6,true,12,"gray");
 
 				ctx.drawImage(kiilto[0],$("canvas").width()/4*3-96,192+veriSiirtymaNyt/3);
 				kirjoita("Alkupotkaisu",$("canvas").width()/4*3,192+veriSiirtymaNyt/3,true);
+				kirjoita("150 (HR) / 25 m",$("canvas").width()/4*3,192+veriSiirtymaNyt/3+18,true,12,"gray");
 				kirjoita("Hanki itsellesi hieman",$("canvas").width()/4*3,396+veriSiirtymaNyt/3);
 				kirjoita("etumatkaa pelin alkaessa",$("canvas").width()/4*3,420+veriSiirtymaNyt/3);
-				kirjoita("0 METRIÄ",$("canvas").width()/4*3,444+veriSiirtymaNyt/3,true,12,"gray");
+				kirjoita(alkupotkaisu+" METRIÄ",$("canvas").width()/4*3,444+veriSiirtymaNyt/3,true,12,"gray");
 
 				ctx.textAlign="end";
 					ctx.drawImage(kiilto[0],$("canvas").width()-256,416);
@@ -1491,6 +1510,20 @@ $(function(){
 						suojakilpi+=3;
 						pelikerrat=0;
 						varise(1000);
+					}
+				}
+			}else{
+				if(y>192){
+					if(x >= $("canvas").width()/4-96 && x < $("canvas").width()/4+96){
+						alert("Tulossa myöhemmin!");
+					}
+					if(x >= $("canvas").width()/4*2-96 && x < $("canvas").width()/4*2+96){
+						alert("Tulossa myöhemmin!");
+					}
+					if(x >= $("canvas").width()/4*3-96 && x < $("canvas").width()/4*3+96){
+						if(osta(150,"Alkupotkaisu 25 m",true)){
+							alkupotkaisu+=25;
+						}
 					}
 				}
 			}

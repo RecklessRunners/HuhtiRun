@@ -104,7 +104,6 @@ $(function(){
 	var veri = lataaKuvat("veri",0);
 	var palkki = lataaKuvat("palkki",0);
 
-	var placeholder = lataaKuvat("mitalit/placeholder",0);
 	var mitalit = lataaKuvat("mitalit/",6);
 	var mitalinauha = lataaKuvat("mitalit/mitalinauha",0);
 
@@ -1039,7 +1038,7 @@ $(function(){
 			vihuSiirtyma=95;
 			
 			if(tila==0){
-				if((elvytettavissa || pisteytetaan) && pisteet > 9 && rahat >= 100 * Math.pow(2,pelikerrat)){
+				if((elvytettavissa || pisteytetaan) && pisteet > 9){
 					ctx.textAlign="center";
 					if(pisteytys>3.75){
 						kirjoita(Math.round(pisteytys),$("canvas").width()/2,256,true,64,"#FFF","'Raleway'");
@@ -1082,7 +1081,9 @@ $(function(){
 				if(!elvytettavissa){
 					if(omatKentat[biomi]){
 						ctx.textAlign="end";
+							ctx.globalAlpha=Math.sin(pelaaNo/2.5)/2+0.5;
 							ctx.drawImage(kiilto[0],$("canvas").width()-256,416);
+							ctx.globalAlpha=1;
 							kirjoita("Uusi peli ➧",$("canvas").width()-64,512,true,32,"#47A94B","'Source Sans Pro'");
 						ctx.textAlign="start";
 					}else{
@@ -1151,11 +1152,7 @@ $(function(){
 			if(tila==2){
 				kirjoita(tavoitteet[tavoiteNo].nimi,320,192+24,true,24,"#FFF","'Raleway'");
 				kirjoita(tavoitteet[tavoiteNo].kuvaus,320,224+24,false,18,"#FFF","'Source Sans Pro'");
-				ctx.fillStyle="rgba(0,0,0,.15)";
-				ctx.fillRect(0,276,$("canvas").width(),48);
 				if(tavoitteet[tavoiteNo].vaatimus()>=1){
-					ctx.fillStyle="rgba(0,0,0,.15)";
-					ctx.fillRect(0,276,$("canvas").width(),48);
 					var mitaliSin = (Math.sin(pelaaNo/10)*10)-(Math.PI/2); // Mitali nauhoineen heiluu siniaallon mukaan
 					kirjoita("☑",320,288+24,false,32,"#47A94B");
 					kirjoita("Suoritettu",372,272+24,true,18,"#47A94B","'Source Sans Pro'");
@@ -1170,12 +1167,19 @@ $(function(){
 					/*ctx.drawImage(mitalinauha[0],-64,-32);
 					ctx.drawImage(mitalit[tavoiteNo],64,176);*/
 				}else{
-					ctx.fillStyle="rgba(0,0,0,.15)";
-					ctx.fillRect(0,276,$("canvas").width()/1*tavoitteet[tavoiteNo].vaatimus(),48);
+					ctx.beginPath();
+					var aloitusPiste = 4.71238898;
+					ctx.arc(192,256,64,aloitusPiste,aloitusPiste+(360/1*tavoitteet[tavoiteNo].vaatimus())*(Math.PI/180),false);
+					ctx.lineWidth = 2;
+					ctx.strokeStyle = "gold";
+					ctx.stroke();
+					ctx.textAlign="center";
+						kirjoita(Math.floor(tavoitteet[tavoiteNo].vaatimus()*100),192,256+8,true,32,"gold","'Raleway'");
+						kirjoita("%",192,256+48,true,16,"gold");
+					ctx.textAlign="start";
 					kirjoita("☐",320,288+24,false,32,"silver");
 					kirjoita("Jaksaa, jaksaa!",372,272+24,true,18,"silver","'Source Sans Pro'");
 					kirjoita(Math.floor(tavoitteet[tavoiteNo].vaatimus()*100) + " % suoritettu",372,292+24,false,18,"silver","'Source Sans Pro'");
-					ctx.drawImage(placeholder[0],128,192,128,128);
 				}
 				kirjoita("Tavoitteet",64,128,true,48,"#FFF","'Raleway'");
 

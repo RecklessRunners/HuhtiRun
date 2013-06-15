@@ -160,7 +160,7 @@ $(function(){
 	
 	var tummuus = 1;
 	var biomiLaskuri=0;
-	var elvytettavissa = false;
+	var elvytysRuutu = false;
 	var kokonaisSuoritus = 0;
 	var parhaatPisteet = "[0,0,0,0,0,0,0,0,0,0]";
 	
@@ -283,6 +283,8 @@ $(function(){
 	var matkaYht = 0;
 	var rahat = 0;
 
+	var elvytysjuomat = 0;
+
 	var kolikot = [];
 
 	pisteytetaan = false;
@@ -295,7 +297,7 @@ $(function(){
 
 	// Nykyisen pelitallennuksen versionumero
 	// TÄRKEÄ! MUUTA AINA YHTÄ ISOMMAKSI, KUN PELITALLENNUSMUOTOON TULEE MUUTOKSIA!
-	pelitallennusVersio = 3;
+	pelitallennusVersio = 4;
 
 	// Tarkistetaan onko selaimeen tallennettu pelitietoja
 	if(! isNaN(localStorage.rahat)){
@@ -307,6 +309,7 @@ $(function(){
 		tavoiteData		= JSON.parse(localStorage.tavoiteData);
 		omatKentat		= JSON.parse(localStorage.omatKentat);
 		asetukset		= JSON.parse(localStorage.asetukset);
+		elvytysjuomat	= parseInt(localStorage.elvytysjuomat);
 		console.log("Pelitietojen lataaminen onnistui!");
 	}else{
 		// Luodaan uudet pelitiedot mikäli puuttuvat
@@ -317,6 +320,7 @@ $(function(){
 		localStorage.tavoiteData			= JSON.stringify(tavoiteData);
 		localStorage.omatKentat				= JSON.stringify(omatKentat);
 		localStorage.asetukset				= JSON.stringify(asetukset);
+		localStorage.elvytysjuomat			= elvytysjuomat;
 
 		localStorage.pelitallennusVersio	= pelitallennusVersio;
 		console.log("Uudet pelitiedot on nyt luotu!");
@@ -351,6 +355,11 @@ $(function(){
 				parhaatPisteet.push(0);
 				localStorage.parhaatPisteet=JSON.stringify(parhaatPisteet);
 				uusiVersio=3;
+			break;
+			case "3":
+				// Mahdollista elvytysjuomien käyttö
+				localStorage.elvytysjuomat = elvytysjuomat;
+				uusiVersio=4;
 			break;
 		}
 		localStorage.pelitallennusVersio=uusiVersio;
@@ -577,11 +586,8 @@ $(function(){
 			ctx.font = fonttikoko+"px "+fontti+",sans-serif";
 		}
 		ctx.fillText(teksti,x+1,y+1);
-		if(inaktiivinenMenu){
-			ctx.fillStyle = "#C0C0C0";
-		}else{
-			ctx.fillStyle = vari;
-		}
+
+		ctx.fillStyle = vari;
 		ctx.fillText(teksti,x,y);
 	}
 	
@@ -659,7 +665,7 @@ $(function(){
 			menuMusiikki[0].volume=Math.max(0,menuMusiikki[0].volume-0.02);
 		}else{
 			korkeaAani[0].volume=0;
-			if(!elvytettavissa){
+			if(!elvytysRuutu){
 				menuMusiikki[0].volume=Math.min(1,menuMusiikki[0].volume+0.02);
 			}else{
 				menuMusiikki[0].volume=Math.min(0.5,menuMusiikki[0].volume+0.02);
@@ -950,7 +956,7 @@ $(function(){
 		
 		// Kun vihu saa pelaajan kiinni, mene päävalikkoon
 		if(vihuSiirtyma<96){
-			if(elvytettavissa){
+			if(elvytysRuutu){
 				pelaajaNopeus=0;
 			}else{
 				pelaajaNopeus=1;
@@ -969,16 +975,18 @@ $(function(){
 				inaktiivinenMenu=true;
 				//kolikot=[];
 				if(pisteet > 9){
-					elvytettavissa=true;
+					elvytysRuutu=true;
 				}
 				setTimeout(function(){
 					inaktiivinenMenu=false;
 					tavoiteData[0]=Math.max(tavoiteData[0],rahat);
 					tavoiteData[2]=Math.max(tavoiteData[2],pelikerrat);
 					pisteytetaan=true;
-					pisteytysAani[0].currentTime=0;
-					soitaAani(pisteytysAani[0]);
-				},2000);
+					if(!hengissa){
+						pisteytysAani[0].currentTime=0;
+						soitaAani(pisteytysAani[0]);
+					}
+				},3000);
 			}else{
 				if(pisteytetaan){
 					if(pisteytys>3.75){
@@ -988,12 +996,14 @@ $(function(){
 						pisteytysAani[0].pause();
 						soitaAani(loppuAani[0]);
 						pisteytetaan=false;
+						inaktiivinenMenu=true;
 						setTimeout(function(){
-							if(elvytettavissa && !hengissa){
+							inaktiivinenMenu=false;
+							if(elvytysRuutu && !hengissa){
 								alustaMaasto();
 								alkupotkaisu=0;
 							}
-							elvytettavissa=false;
+							elvytysRuutu=false;
 							tummuus=0.5;
 							
 							if(pisteet>9){
@@ -1016,7 +1026,7 @@ $(function(){
 								localStorage.tavoiteData=JSON.stringify(tavoiteData);
 								localStorage.omatKentat=JSON.stringify(omatKentat);
 							}
-						},2000);
+						},3000);
 					}
 				}
 			}
@@ -1038,21 +1048,22 @@ $(function(){
 			vihuSiirtyma=95;
 			
 			if(tila==0){
-				if((elvytettavissa || pisteytetaan) && pisteet > 9){
+				if((elvytysRuutu || pisteytetaan) && pisteet > 9){
 					ctx.textAlign="center";
 					if(pisteytys>3.75){
 						kirjoita(Math.round(pisteytys),$("canvas").width()/2,256,true,64,"#FFF","'Raleway'");
 						ctx.drawImage(kolikkoKuva[0],416,256+16,24,24);
-						kirjoita(rahat,$("canvas").width()/2,288,true);
+						kirjoita(rahat+Math.round(pisteet-pisteytys),$("canvas").width()/2,288,true);
 					}else{
 						ctx.drawImage(kolikkoKuva[0],256,192+8,64,64);
-						kirjoita(rahat,$("canvas").width()/2,256,true,64,"#FFF","'Raleway'");
+						kirjoita(rahat+pisteet,$("canvas").width()/2,256,true,64,"#FFF","'Raleway'");
 					}
-					ctx.textAlign="end";
-						kirjoita("Elvytä ➧",$("canvas").width()-64,512,true,32,"#47A94B","'Source Sans Pro'");
-					ctx.textAlign="start";
-					kirjoita(100*Math.pow(2,pelikerrat),$("canvas").width()-192+32,536,false);
-					ctx.drawImage(kolikkoKuva[0],$("canvas").width()-192,520,24,24);
+					if(elvytysjuomat>0 && pisteytys>3.75){
+						ctx.textAlign="end";
+							kirjoita("Elvytä ➧",$("canvas").width()-64,512,true,32,"#47A94B","'Source Sans Pro'");
+						ctx.textAlign="start";
+						kirjoita(elvytysjuomat+" elvytyskertaa jäljellä",$("canvas").width()-192+8,536,true,12);
+					}
 				}else{
 					// Piirrä alamenun vaihtoehdot
 					ctx.globalAlpha=0.75;
@@ -1078,7 +1089,7 @@ $(function(){
 					kirjoita(biomiTyypit[biomi],$("canvas").width()/2,384,true,14,"#FFF","Source Sans Pro");
 					ctx.textAlign="start";
 				}
-				if(!elvytettavissa){
+				if(!elvytysRuutu){
 					if(omatKentat[biomi]){
 						ctx.textAlign="end";
 							ctx.globalAlpha=Math.sin(pelaaNo/2.5)/2+0.5;
@@ -1106,7 +1117,7 @@ $(function(){
 				ctx.textAlign="start";
 			}
 			if(tila==0 || tila==1){
-				if(!elvytettavissa){
+				if(!elvytysRuutu){
 					// Näytä rahatilanne vasemmassa yläkulmassa
 					ctx.drawImage(kolikkoKuva[0],24,24,24,24);
 					kirjoita(Math.round(tuhaterotin(rahat)),64,42,false,20,"#FFF","'Raleway'");
@@ -1123,24 +1134,34 @@ $(function(){
 				kirjoita("Halutessasi voit ostaa power-upeja ennen peliä",$("canvas").width()/2,144,true,16,"#FFF","'Source Sans Pro'");
 
 				ctx.drawImage(kiilto[0],$("canvas").width()/4-96,192+veriSiirtymaNyt/9);
-				kirjoita("x x x x x",$("canvas").width()/4,192+veriSiirtymaNyt/9,true);
-				kirjoita("x x x x x",$("canvas").width()/4,396+veriSiirtymaNyt/9);
-				kirjoita("x x x x x",$("canvas").width()/4,420+veriSiirtymaNyt/9);
-				kirjoita("x x x x x",$("canvas").width()/4,444+veriSiirtymaNyt/9,true,12,"gray");
+				kirjoita("Defibilaattori",$("canvas").width()/4,192+veriSiirtymaNyt/9,true,20,"#FFF","'Raleway'");
+				kirjoita((100*Math.pow(2,elvytysjuomat)-1)+" (HR)",$("canvas").width()/4,192+veriSiirtymaNyt/3+18,true,12,"silver");
+				kirjoita("Mahdollistaa elvytyksen",$("canvas").width()/4,396+veriSiirtymaNyt/9);
+				kirjoita("kuollessasi",$("canvas").width()/4,420+veriSiirtymaNyt/9);
+				if(elvytysjuomat==0){
+					var elvytysteksti = "EI ELVYTYSKERTOJA";
+				}
+				if(elvytysjuomat==1){
+					var elvytysteksti = elvytysjuomat+" ELVYTYSKERTA";
+				}
+				if(elvytysjuomat > 1){
+					var elvytysteksti = elvytysjuomat+" ELVYTYSKERTAA";
+				}
+				kirjoita(elvytysteksti,$("canvas").width()/4,444+veriSiirtymaNyt/9,true,12,"silver");
 
 				ctx.drawImage(kiilto[0],$("canvas").width()/4*2-96,192+veriSiirtymaNyt/6);
-				kirjoita("Bonusta enemmän",$("canvas").width()/4*2,192+veriSiirtymaNyt/6,true);
-				kirjoita("TULOSSA MYÖHEMMIN",$("canvas").width()/4*2,192+veriSiirtymaNyt/3+18,true,12,"gray");
+				kirjoita("Bonusta enemmän",$("canvas").width()/4*2,192+veriSiirtymaNyt/6,true,20,"#FFF","'Raleway'");
+				kirjoita("TULOSSA MYÖHEMMIN",$("canvas").width()/4*2,192+veriSiirtymaNyt/3+18,true,12,"silver");
 				kirjoita("Saat enemmän pisteitä",$("canvas").width()/4*2,396+veriSiirtymaNyt/6);
 				kirjoita("bonusmittarin täyttyessä",$("canvas").width()/4*2,420+veriSiirtymaNyt/6);
-				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4*2,444+veriSiirtymaNyt/6,true,12,"gray");
+				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4*2,444+veriSiirtymaNyt/6,true,12,"silver");
 
 				ctx.drawImage(kiilto[0],$("canvas").width()/4*3-96,192+veriSiirtymaNyt/3);
-				kirjoita("Alkupotkaisu",$("canvas").width()/4*3,192+veriSiirtymaNyt/3,true);
-				kirjoita("150 (HR) / 25 m",$("canvas").width()/4*3,192+veriSiirtymaNyt/3+18,true,12,"gray");
-				kirjoita("Hanki itsellesi hieman",$("canvas").width()/4*3,396+veriSiirtymaNyt/3);
+				kirjoita("Alkupotkaisu",$("canvas").width()/4*3,192+veriSiirtymaNyt/3,true,20,"#FFF","'Raleway'");
+				kirjoita("149 (HR)",$("canvas").width()/4*3,192+veriSiirtymaNyt/3+18,true,12,"silver");
+				kirjoita("Hanki itsellesi "+(25+alkupotkaisu)+" m",$("canvas").width()/4*3,396+veriSiirtymaNyt/3);
 				kirjoita("etumatkaa pelin alkaessa",$("canvas").width()/4*3,420+veriSiirtymaNyt/3);
-				kirjoita(alkupotkaisu+" METRIÄ",$("canvas").width()/4*3,444+veriSiirtymaNyt/3,true,12,"gray");
+				kirjoita(alkupotkaisu+" METRIÄ",$("canvas").width()/4*3,444+veriSiirtymaNyt/3,true,12,"silver");
 
 				ctx.textAlign="end";
 					ctx.drawImage(kiilto[0],$("canvas").width()-256,416);
@@ -1426,23 +1447,25 @@ $(function(){
 					}
 				}
 				if(y>146 && y<288){
-					if(x<128){
-						if(biomi>0){
-							biomi=Math.max(0,biomi-1);
-						}else{
-							biomi=biomiTyypit.length-1;
+					if(!elvytysRuutu){
+						if(x<128){
+							if(biomi>0){
+								biomi=Math.max(0,biomi-1);
+							}else{
+								biomi=biomiTyypit.length-1;
+							}
 						}
-					}
-					if(x>$("canvas").width()-128){
-						if(biomi<biomiTyypit.length-1){
-							biomi=Math.min(biomiTyypit.length-1,biomi+1);
-						}else{
-							biomi=0;
+						if(x>$("canvas").width()-128){
+							if(biomi<biomiTyypit.length-1){
+								biomi=Math.min(biomiTyypit.length-1,biomi+1);
+							}else{
+								biomi=0;
+							}
 						}
+						soitaAani(klikkiAani[0]);
+						alustaMaasto();
+						ukkoX=384;
 					}
-					soitaAani(klikkiAani[0]);
-					alustaMaasto();
-					ukkoX=384;
 				}
 				if(y>448){
 					if(x>=48 && x<160){ // Siirry Tavoitteet-sivulle
@@ -1468,19 +1491,17 @@ $(function(){
 						soitaAani(klikkiAani[0]);
 					}
 					if(x>=512){ 
-						if(elvytettavissa){ // Elvytä ja jatka peliä
-							if(! inaktiivinenMenu){
-								if(osta(100*Math.pow(2,pelikerrat),"Elvytys",false)){
-									veriSiirtyma=384;
-									vihuSiirtyma=256;
-									hengissa=true;
-									pelaajaNopeus=10;
-									tausta[0].volume=1;
-									suojakilpi+=3;
-									pelikerrat+=1;
-									tavoiteData[2]=Math.max(tavoiteData[2],pelikerrat);
-									varise(1000);
-								}
+						if(elvytysRuutu){ // Elvytä ja jatka peliä
+							if(pisteytys>3.75 && elvytysjuomat>0){
+								elvytysjuomat -= 1;
+								localStorage.elvytysjuomat = elvytysjuomat;
+								veriSiirtyma = 384;
+								vihuSiirtyma = 256;
+								hengissa = true;
+								suojakilpi += 3;
+								pelikerrat += 1;
+								tavoiteData[2] = Math.max(tavoiteData[2],pelikerrat);
+								varise(1000);
 							}
 						}else{ // Siirry pelin "aulaan" (Osta kenttä, jos ei ole vielä ostettu)
 							soitaAani(klikkiAani[0]);
@@ -1525,13 +1546,16 @@ $(function(){
 			}else{
 				if(y>192){
 					if(x >= $("canvas").width()/4-96 && x < $("canvas").width()/4+96){
-						alert("Tulossa myöhemmin!");
+						if(osta(100*Math.pow(2,elvytysjuomat)-1,"Defibilaattori",true)){
+							elvytysjuomat+=1;
+							localStorage.elvytysjuomat=elvytysjuomat;
+						}
 					}
 					if(x >= $("canvas").width()/4*2-96 && x < $("canvas").width()/4*2+96){
 						alert("Tulossa myöhemmin!");
 					}
 					if(x >= $("canvas").width()/4*3-96 && x < $("canvas").width()/4*3+96){
-						if(osta(150,"Alkupotkaisu 25 m",true)){
+						if(osta(149,"Alkupotkaisu 25 m",true)){
 							alkupotkaisu+=25;
 						}
 					}
@@ -1659,7 +1683,7 @@ $(function(){
 	}
 	
 	function piirraVihu(i,x,y){
-		if(hengissa || elvytettavissa){
+		if(hengissa || elvytysRuutu){
 			if(hengissa){
 				ctx.drawImage(vihu[i],x,y);
 			}else{

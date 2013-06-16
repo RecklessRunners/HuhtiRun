@@ -148,13 +148,10 @@ $(function(){
 	var maxBonuspisteet = 20;
 	var tieMuutos = 0;
 
-	var pingPongNX = -16;
-	var pingPongNY = -16;
-	var pingPongX = 256;
-	var pingPongY = 256;
-	var pingPongVY = 64;
-	var pingPongVTY = 128;
+	// Pelin ohjaamistavat
+	var ohjausTavat = ["Hiiri/kosketusnäyttö","Näppäimistö"];
 
+	// Ukon kääntyminen (tämä luku ei ole asteita, vaikka nimi niin antaakin ymmärtää)
 	var asteluku = 0;
 
 	var tutoriaali = [false,false,false,false];
@@ -293,13 +290,14 @@ $(function(){
 
 	asetukset = {
 		varina 		: true,
-		aani		: true
+		aani		: true,
+		ohjausTapa	: 0
 	};
 	asetukset = JSON.stringify(asetukset);
 
 	// Nykyisen pelitallennuksen versionumero
 	// TÄRKEÄ! MUUTA AINA YHTÄ ISOMMAKSI, KUN PELITALLENNUSMUOTOON TULEE MUUTOKSIA!
-	pelitallennusVersio = 4;
+	pelitallennusVersio = 5;
 
 	// Tarkistetaan onko selaimeen tallennettu pelitietoja
 	if(! isNaN(localStorage.rahat)){
@@ -344,9 +342,9 @@ $(function(){
 			break;
 			case "1":
 				// Mahdollista äänen päälle/pois laittaminen
-				asetukset["aani"]=1;
-				localStorage.asetukset=JSON.stringify(asetukset);
-				uusiVersio=2;
+				asetukset["aani"] = 1;
+				localStorage.asetukset = JSON.stringify(asetukset);
+				uusiVersio = 2;
 			break;
 			case "2":
 				// Lisää Hall Of Fame -listalle 5 uutta paikkaa
@@ -361,7 +359,13 @@ $(function(){
 			case "3":
 				// Mahdollista elvytysjuomien käyttö
 				localStorage.elvytysjuomat = elvytysjuomat;
-				uusiVersio=4;
+				uusiVersio =4 ;
+			break;
+			case "4":
+				// Mahdollista pelitavan muuttaminen
+				asetukset["ohjausTapa"] = 0;
+				localStorage.asetukset = JSON.stringify(asetukset);
+				uusiVersio =  5;
 			break;
 		}
 		localStorage.pelitallennusVersio=uusiVersio;
@@ -595,6 +599,15 @@ $(function(){
 	
 	//Hoitaa kaiken päivityksen 
 	function paivita(){
+
+		if(hengissa && !tauko){
+			if(asetukset.ohjausTapa=="1"){
+				tavoiteX += ukkoLiikkuuX;
+				tavoiteX = Math.max(-96,tavoiteX);
+				tavoiteX = Math.min($("canvas").width()-96,tavoiteX);
+			}
+		}
+
 		var veriSiirtymaV = Math.abs((Math.max(veriSiirtymaNyt,veriSiirtyma)-Math.min(veriSiirtymaNyt,veriSiirtyma))/2.5);
 		if(veriSiirtyma != veriSiirtymaNyt){
 			if(veriSiirtyma<veriSiirtymaNyt){
@@ -717,7 +730,8 @@ $(function(){
 						hyppy=false;
 					},500);
 				}
-			}else if(e.keyCode==27){
+			}
+			if(e.keyCode==27){
 				if(hengissa){
 					if(tauko){
 						tauko=false;
@@ -725,10 +739,29 @@ $(function(){
 						tauko=true;
 					}
 				}
-			}else if(e.keyCode==13){
+			}
+			if(e.keyCode==13){
 				if(tauko){
 					tauko=false;
 					vihuSiirtyma=95;
+				}
+			}
+			ukkoLiikkuuX=0;
+		}).keydown(function(e){
+			if(asetukset.ohjausTapa=="1"){
+				if(ukkoLiikkuuX==0){
+					if(e.keyCode==39){
+						if(!tauko && hengissa){
+							ukkoLiikkuuX=36; // Oikealle
+							console.log("oik");
+						}
+					}
+					if(e.keyCode==37){
+						if(!tauko && hengissa){
+							ukkoLiikkuuX=-36; // Vasemmalle
+							console.log("vas");
+						}
+					}
 				}
 			}
 		});
@@ -767,11 +800,6 @@ $(function(){
 					soitaAani(auts[0]);
 				}
 			}
-		}
-
-		if(hengissa){
-			ukkoX += ukkoLiikkuuX;
-			pisteet += Math.abs(ukkoLiikkuuX)/250;
 		}
 
 		// Tunnista tietyyppi (kuolee mikäli kompastuu puuhun, tippuu kuiluun ym.)
@@ -1348,7 +1376,7 @@ $(function(){
 				}
 
 				kirjoita("Pelin ohjaaminen",64,256,false);
-				kirjoita("Hiiri/Kosketusnäyttö (toistaiseksi ainut vaihtoehto)",512,256,false);
+				kirjoita(ohjausTavat[asetukset.ohjausTapa],512,256,false);
 
 				kirjoita("← Paluu",64,512,false);
 			}
@@ -1620,6 +1648,14 @@ $(function(){
 					localStorage.asetukset=JSON.stringify(asetukset);
 					location.reload();
 				}
+				if(y >= 256-16 && y < 256+16){
+					soitaAani(klikkiAani[0]);
+					asetukset.ohjausTapa += 1;
+					if(asetukset.ohjausTapa >= ohjausTavat.length){
+						asetukset.ohjausTapa = 0;
+					}
+					localStorage.asetukset=JSON.stringify(asetukset);
+				}
 			}
 		}
 		}
@@ -1644,21 +1680,23 @@ $(function(){
 		if(ladatutTiedostot<kaikkiTiedostot){
 
 		}else{
-			if(y<$("canvas").height()*.8){
-				if(hengissa && !tauko && suojakilpi<=2){
-					tavoiteX=x-96;
+			if(asetukset.ohjausTapa=="0"){
+				if(y<$("canvas").height()*.8){
+					if(hengissa && !tauko && suojakilpi<=2){
+						tavoiteX=x-96;
+					}else{
+						var puolivali = Math.floor(((tieMinMax[0]+tieMinMax[0])/2)/192)*192;
+						tavoiteX=puolivali;
+					}
 				}else{
-					var puolivali = Math.floor(((tieMinMax[0]+tieMinMax[0])/2)/192)*192;
-					tavoiteX=puolivali;
-				}
-			}else{
-				if(hengissa){
-					if(!hyppy){
-						soitaAani(hyppyAani[0]);
-						hyppy=true;
-						setTimeout(function(){
-							hyppy=false;
-						},500);
+					if(hengissa){
+						if(!hyppy){
+							soitaAani(hyppyAani[0]);
+							hyppy=true;
+							setTimeout(function(){
+								hyppy=false;
+							},500);
+						}
 					}
 				}
 			}

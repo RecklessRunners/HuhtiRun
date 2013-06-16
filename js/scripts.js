@@ -106,6 +106,8 @@ $(function(){
 
 	var mitalit = lataaKuvat("mitalit/",6);
 	var mitalinauha = lataaKuvat("mitalit/mitalinauha",0);
+	
+	var medikit = lataaKuvat("medikit",0);
 
 	var kiilto = lataaKuvat("kiilto",0);
 	var hyppyKuva = lataaKuvat("hyppy",0);
@@ -1134,10 +1136,11 @@ $(function(){
 				kirjoita("Halutessasi voit ostaa power-upeja ennen peliä",$("canvas").width()/2,144,true,16,"#FFF","'Source Sans Pro'");
 
 				ctx.drawImage(kiilto[0],$("canvas").width()/4-96,192+veriSiirtymaNyt/9);
-				kirjoita("Defibilaattori",$("canvas").width()/4,192+veriSiirtymaNyt/9,true,20,"#FFF","'Raleway'");
-				kirjoita((100*Math.pow(2,elvytysjuomat)-1)+" (HR)",$("canvas").width()/4,192+veriSiirtymaNyt/3+18,true,12,"silver");
-				kirjoita("Mahdollistaa elvytyksen",$("canvas").width()/4,396+veriSiirtymaNyt/9);
-				kirjoita("kuollessasi",$("canvas").width()/4,420+veriSiirtymaNyt/9);
+				ctx.drawImage(medikit[0],$("canvas").width()/4-96+32,192+veriSiirtymaNyt/9+48);
+				kirjoita("Elvytys",$("canvas").width()/4,192+veriSiirtymaNyt/9,true,20,"#FFF","'Raleway'");
+				kirjoita((100*Math.pow(2,elvytysjuomat)-1)+" (HR)",$("canvas").width()/4,192+veriSiirtymaNyt/9+18,true,12,"silver");
+				kirjoita("Mahdollistaa henkiin",$("canvas").width()/4,396+veriSiirtymaNyt/9);
+				kirjoita("heräämisen kuollessasi",$("canvas").width()/4,420+veriSiirtymaNyt/9);
 				if(elvytysjuomat==0){
 					var elvytysteksti = "EI ELVYTYSKERTOJA";
 				}
@@ -1151,7 +1154,7 @@ $(function(){
 
 				ctx.drawImage(kiilto[0],$("canvas").width()/4*2-96,192+veriSiirtymaNyt/6);
 				kirjoita("Bonusta enemmän",$("canvas").width()/4*2,192+veriSiirtymaNyt/6,true,20,"#FFF","'Raleway'");
-				kirjoita("TULOSSA MYÖHEMMIN",$("canvas").width()/4*2,192+veriSiirtymaNyt/3+18,true,12,"silver");
+				kirjoita("TULOSSA MYÖHEMMIN",$("canvas").width()/4*2,192+veriSiirtymaNyt/6+18,true,12,"silver");
 				kirjoita("Saat enemmän pisteitä",$("canvas").width()/4*2,396+veriSiirtymaNyt/6);
 				kirjoita("bonusmittarin täyttyessä",$("canvas").width()/4*2,420+veriSiirtymaNyt/6);
 				kirjoita("0/5 PÄIVITETTY",$("canvas").width()/4*2,444+veriSiirtymaNyt/6,true,12,"silver");
@@ -1546,7 +1549,7 @@ $(function(){
 			}else{
 				if(y>192){
 					if(x >= $("canvas").width()/4-96 && x < $("canvas").width()/4+96){
-						if(osta(100*Math.pow(2,elvytysjuomat)-1,"Defibilaattori",true)){
+						if(osta(100*Math.pow(2,elvytysjuomat)-1,"Elvytys",true)){
 							elvytysjuomat+=1;
 							localStorage.elvytysjuomat=elvytysjuomat;
 						}

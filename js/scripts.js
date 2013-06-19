@@ -59,6 +59,7 @@ $(function(){
 		}
 		return taulu;
 	}
+
 	function lataaAanet(nimi, nmax){
 		var taulu = [];
 		for(var i=0;i<=nmax;i++){
@@ -130,46 +131,46 @@ $(function(){
 	var loppuAani = lataaAanet("end",0);
 	var pisteytysAani = lataaAanet("coins",0);
 
-	var tila = 0;
-
-	var hiiriAlasX = 0;
-	var x,y = 0;
-
+	// Versionumerointi
 	var versioId = ""; // Muuttuu automaattisesti kommitin id:n mukaan
 	$.ajax({url:".git/refs/heads/master",success:function(resp){versioId=resp;console.log("Versio "+resp);}});
 
-	var suojakilpi = 2;
-	var alkupotkaisu = 0;
+	var tila = 0; // Missä valikossa ollaan
 
-	var hengissa = false;
-	var ukkoToleranssi = 48;
-	var pelikerrat=0;
+	var hiiriAlasX = 0; // X-sijainti, jossa hiiri painettiin alas
+	var x,y = 0; // Hiiren nykyinen posiitio
 
-	var maxBonuspisteet = 20;
-	var tieMuutos = 0;
+	suojakilpi = 2; // Kertoo kuinka monen "peliruudun" ajan peliukkelilla on suojakilpeä jäljellä
+	alkupotkaisu = 0; // Kertoo vastaavalla tavalla, mutta sen sijaan matkan jonka verran hahmolla on alkupotkaisua jäljellä
 
-	// Pelin ohjaamistavat
-	var ohjausTavat = ["Hiiri/kosketusnäyttö","Näppäimistö"];
+	hengissa = false; // Kertoo onko hahmo hengissä vai ei
 
-	// Ukon kääntyminen (tämä luku ei ole asteita, vaikka nimi niin antaakin ymmärtää)
-	var asteluku = 0;
+	ukkoToleranssi = 50; // Tällä voit säätää, kuinka paljon peliukkeli saa mennä tien ohi ennen kuin vahingoittuu (px)
 
-	var tutoriaali = [false,false,false,false];
-	var tutoriaaliSisalto = ["Hyppää kaatuneen puun yli","Juokse vähintään 50 metriä","Osta toinen kenttä","Elvytä itsesi"];
+	pelikerrat = 0; // Kertoo monesko elvytyskerta, nollautuu kun aloitetaan uusi peli
+
+	maxBonuspisteet = 20; // Bonusmittari tulee täyteen kun hahmo on juossut tämän verran metrejä vahingoittumatta
+
+	tieMuutos = 0; // ?
+
+	ohjausTavat = ["Hiiri/kosketusnäyttö","Näppäimistö"]; // Pelin ohjaamistavat
+
+	asteluku = 0; // Ukon kääntyminen (tämä luku ei ole asteita, vaikka nimi niin antaakin ymmärtää)
 	
-	var tummuus = 1;
-	var biomiLaskuri=0;
-	var elvytysRuutu = false;
-	var kokonaisSuoritus = 0;
-	var parhaatPisteet = "[0,0,0,0,0,0,0,0,0,0]";
-	
-	var pelaaNo = 0; // Ei-deskriptiivinen nimi
+	tummuus = 1; // Näytön tummuus, joka esimerkiksi luolakentässä on korkeampi
 
-	// Ostetut kentät
-	omatKentat = "[true,false,false,false,false]";
+	elvytysRuutu = false; // Onko hahmo elvytettävissä
+
+	kokonaisSuoritus = 0; // Kaikkien tavoitteiden suoritusprosenttien k.a.
+
+	parhaatPisteet = [0,0,0,0,0,0,0,0,0,0]; // High scoret
+	
+	pelaaNo = 0; // Tämä luku juoksee automaattisesti väliä 0-100. Mahdollistaa automatisoitujen siniaaltojen luomista.
+
+	omatKentat = [true,false,false,false,false]; // Ostetut kentät
 
 	// Tavoitteet
-	tavoiteData = "[0,0,0,0,0,0,0,0]"; // Sisältää tavoitteisiin liittyvää raakadataa
+	tavoiteData = [0,0,0,0,0,0,0,0]; // Sisältää tavoitteisiin liittyvää raakadataa
 	
 	var tavoitteet = [
 		{
@@ -208,25 +209,26 @@ $(function(){
 			vaatimus:function(){return kokonaisSuoritus;}
 		}
 	];
-	var tavoiteNo = 0; // Tavoitteen numero, jota katsotaan Tavoitteet-sivulla
+
+	tavoiteNo = 0; // Tavoitteen numero, jota katsotaan Tavoitteet-sivulla
 	
 	// Biomit
-	var biomi = 0;
-	var biomiTyypit = [
+	biomi = 0; // Nykyinen biomi (ts. kenttä)
+	biomiTyypit = [
 		"Aavikko",
 		"Niitty",
 		"Meri",
 		"Luola",
 		"Metsä"
 	];
-	var biomiKuvaukset = [
+	var biomiKuvaukset = [ // Pieni kuvaus kustakin biomista -- ei tällä hetkellä käytössä
 		"Juokse kuumassa auringossa\nvaroen tielle kaatuneita puita",
 		"Juokse niityllä kukkia\nihastellen sekä varoen tiellä\nolevia kiviä",
 		"Juokse laiturilla varoen\nlaiturilta tippumista",
 		"Luolassa on pimeää ja vaarallista, mutta toisaalta voit löytää sieltä arvokkaita jalokiviä",
 		"Lenkkeile luonnon helmassa lintujen laulua kunnellen"
 	];
-	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille
+	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille (esimerkiksi aavikolle arvotaan summamutikassa jokin ensimmäisen rivin taustakuvista)
 		[0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,3,4,4,4,5],
 		[1,2],
 		[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,11,12], // 2 % todennäköisyys olla muu kuin normaali meri
@@ -276,24 +278,27 @@ $(function(){
 		[5,5,5,5,6,7]
 	];
 
-	var inaktiivinenMenu = false;
-	var tavoiteX = 0;	
-	var hyppy = false;
-	var matkaYht = 0;
-	var rahat = 0;
+	inaktiivinenMenu = false; // Onko valikon painikkeet painettavissa
 
-	var elvytysjuomat = 0;
+	tavoiteX = 0; // X-koordinaatti, johon pelihahmo pyrkii pääsemään
 
-	var kolikot = [];
+	hyppy = false; // Hyppääkö peliukko (ts. onko peliukko ilmassa)
 
-	pisteytetaan = false;
+	matkaYht = 0; // Matka jonka pelihahmo koko elinaikanansa on taittanut
+
+	rahat = 0; // Koko omaisuus
+
+	elvytysjuomat = 0; // Montako kertaa hahmo kyetään elvyttämään
+
+	kolikot = []; // Ei käytössä
+
+	pisteytetaan = false; // Juoksevatko numerot elvytysruudussa
 
 	asetukset = {
 		varina 		: true,
 		aani		: true,
 		ohjausTapa	: 0
 	};
-	asetukset = JSON.stringify(asetukset);
 
 	// Nykyisen pelitallennuksen versionumero
 	// TÄRKEÄ! MUUTA AINA YHTÄ ISOMMAKSI, KUN PELITALLENNUSMUOTOON TULEE MUUTOKSIA!
@@ -840,7 +845,6 @@ $(function(){
 
 		if (siirtoY >= 192){
 			siirtoY=0;
-			biomiLaskuri+=1;
 			
 			if(hengissa && !tauko){
 				tieMuutos += 1;

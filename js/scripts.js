@@ -163,7 +163,7 @@ $(function(){
 
 	kokonaisSuoritus = 0; // Kaikkien tavoitteiden suoritusprosenttien k.a.
 
-	parhaatPisteet = [0,0,0,0,0,0,0,0,0,0]; // High scoret
+	parhaatPisteet = [0,0,0,0,0,0,0,0,0,0] ; // High scoret
 	
 	pelaaNo = 0; // Tämä luku juoksee automaattisesti väliä 0-100. Mahdollistaa automatisoitujen siniaaltojen luomista.
 
@@ -814,7 +814,7 @@ $(function(){
 		
 			if(maasto[ukonRuutu][1]==tieSuoraan[1] || maasto[ukonRuutu][1]==tieSuoraan[4] || maasto[ukonRuutu][1]==tieSuoraan[8]){
 				if(hyppy){
-					tutoriaali[0] = true;
+					//tutoriaali[0] = true;
 				}else{
 					if(!hengissa && siirtoY>144){
 						hyppy=true;

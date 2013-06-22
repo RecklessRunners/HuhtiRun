@@ -212,6 +212,30 @@ $(function(){
 
 	tavoiteNo = 0; // Tavoitteen numero, jota katsotaan Tavoitteet-sivulla
 	
+
+
+	inaktiivinenMenu = false; // Onko valikon painikkeet painettavissa
+
+	tavoiteX = 0; // X-koordinaatti, johon pelihahmo pyrkii pääsemään
+
+	hyppy = false; // Hyppääkö peliukko (ts. onko peliukko ilmassa)
+
+	matkaYht = 0; // Matka jonka pelihahmo koko elinaikanansa on taittanut
+
+	rahat = 0; // Koko omaisuus
+
+	elvytysjuomat = 0; // Montako kertaa hahmo kyetään elvyttämään
+
+	kolikot = []; // Ei käytössä
+
+	pisteytetaan = false; // Juoksevatko numerot elvytysruudussa
+
+	asetukset = {
+		varina 		: true,
+		aani		: true,
+		ohjausTapa	: 0
+	};
+
 	// Biomit
 	biomi = 0; // Nykyinen biomi (ts. kenttä)
 	biomiTyypit = [
@@ -278,31 +302,9 @@ $(function(){
 		[5,5,5,5,6,7]
 	];
 
-	inaktiivinenMenu = false; // Onko valikon painikkeet painettavissa
-
-	tavoiteX = 0; // X-koordinaatti, johon pelihahmo pyrkii pääsemään
-
-	hyppy = false; // Hyppääkö peliukko (ts. onko peliukko ilmassa)
-
-	matkaYht = 0; // Matka jonka pelihahmo koko elinaikanansa on taittanut
-
-	rahat = 0; // Koko omaisuus
-
-	elvytysjuomat = 0; // Montako kertaa hahmo kyetään elvyttämään
-
-	kolikot = []; // Ei käytössä
-
-	pisteytetaan = false; // Juoksevatko numerot elvytysruudussa
-
-	asetukset = {
-		varina 		: true,
-		aani		: true,
-		ohjausTapa	: 0
-	};
-
 	// Nykyisen pelitallennuksen versionumero
 	// TÄRKEÄ! MUUTA AINA YHTÄ ISOMMAKSI, KUN PELITALLENNUSMUOTOON TULEE MUUTOKSIA!
-	pelitallennusVersio = 5;
+	pelitallennusVersio = 6;
 
 	// Tarkistetaan onko selaimeen tallennettu pelitietoja
 	if(! isNaN(localStorage.rahat)){
@@ -315,6 +317,7 @@ $(function(){
 		omatKentat		= JSON.parse(localStorage.omatKentat);
 		asetukset		= JSON.parse(localStorage.asetukset);
 		elvytysjuomat	= parseInt(localStorage.elvytysjuomat);
+		biomi			= parseInt(localStorage.valittuKentta);
 		console.log("Pelitietojen lataaminen onnistui!");
 	}else{
 		// Luodaan uudet pelitiedot mikäli puuttuvat
@@ -326,6 +329,7 @@ $(function(){
 		localStorage.omatKentat				= JSON.stringify(omatKentat);
 		localStorage.asetukset				= JSON.stringify(asetukset);
 		localStorage.elvytysjuomat			= elvytysjuomat;
+		localStorage.valittuKentta			= biomi;
 
 		localStorage.pelitallennusVersio	= pelitallennusVersio;
 		console.log("Uudet pelitiedot on nyt luotu!");
@@ -343,7 +347,7 @@ $(function(){
 				// Mahdollista useampien pisteiden tallennus
 				parhaatPisteet=[localStorage.parhaatPisteet,0,0,0,0];
 				localStorage.parhaatPisteet=JSON.stringify(parhaatPisteet);
-				uusiVersio=1;
+				uusiVersio = 1;
 			break;
 			case "1":
 				// Mahdollista äänen päälle/pois laittaminen
@@ -359,18 +363,24 @@ $(function(){
 				parhaatPisteet.push(0);
 				parhaatPisteet.push(0);
 				localStorage.parhaatPisteet=JSON.stringify(parhaatPisteet);
-				uusiVersio=3;
+				uusiVersio = 3;
 			break;
 			case "3":
 				// Mahdollista elvytysjuomien käyttö
-				localStorage.elvytysjuomat = elvytysjuomat;
-				uusiVersio =4 ;
+				localStorage.elvytysjuomat = 0;
+				uusiVersio = 4 ;
 			break;
 			case "4":
 				// Mahdollista pelitavan muuttaminen
 				asetukset["ohjausTapa"] = 0;
 				localStorage.asetukset = JSON.stringify(asetukset);
 				uusiVersio =  5;
+			break;
+			case "5":
+				// Valittu biomi tallentuu, jotta se on valmiina seuraavalla pelin käynnistyskerralla
+				biomi=0;
+				localStorage.valittuKentta = biomi;
+				uusiVersio = 6;
 			break;
 		}
 		localStorage.pelitallennusVersio=uusiVersio;
@@ -675,11 +685,11 @@ $(function(){
 
 		// Pienennä musiikin äänenvoimakkuutta, kun vihollinen on lähempänä, menuissa, ym.
 		if(tauko){
-			aanenVoimakkuus=0.1;
+			aanenVoimakkuus=0;
 		}else{
 			aanenVoimakkuus=Math.min(1,1/176*(vihuSiirtyma-80));
 		}
-		if(hengissa){
+		if(hengissa && !tauko){
 			korkeaAani[0].volume=Math.max(0,.6-aanenVoimakkuus);
 			tausta[0].volume=aanenVoimakkuus;
 			menuMusiikki[0].volume=Math.max(0,menuMusiikki[0].volume-0.02);
@@ -745,12 +755,6 @@ $(function(){
 					}
 				}
 			}
-			if(e.keyCode==13){
-				if(tauko){
-					tauko=false;
-					vihuSiirtyma=95;
-				}
-			}
 			ukkoLiikkuuX=0;
 		}).keydown(function(e){
 			if(asetukset.ohjausTapa=="1"){
@@ -796,6 +800,9 @@ $(function(){
         
         //Ukko ja tie. 
 		if((ukkoX<(tieMinMax[0]-ukkoToleranssi) || ukkoX > tieMinMax[1]+ukkoToleranssi-120) && !tauko){
+			var puolivali = Math.floor((0.5*(tieMinMax[0] + tieMinMax[1]))/192)*192;
+			ukkoX=puolivali;
+			tavoiteX=puolivali;
 			if(suojakilpi <= 0 && !hyppy){
 				vihuSiirtyma -= 64 + Math.round(Math.random()*48);
 				suojakilpi+=2;
@@ -981,8 +988,9 @@ $(function(){
 		if(tauko){
 			tummuus=0.5;
 			ctx.textAlign="center";
-			kirjoita("Tauko",$("canvas").width()/2,192,true,32,"#FFF","'Raleway'");
-			kirjoita("Olet nyt tauolla",$("canvas").width()/2,224,true,16,"#FFF","'Raleway'");
+				kirjoita("Tauolla",$("canvas").width()/2,192,true,48,"#FFF","'Raleway'");
+				kirjoita("Jatka peliä",$("canvas").width()/2,256,true,24,"#C0C0C0","'Source Sans Pro'");
+				kirjoita("Siirry valikkoon",$("canvas").width()/2,256+48,true,24,"#C0C0C0","'Source Sans Pro'");
 			ctx.textAlign="start";
 		}
 
@@ -1087,7 +1095,11 @@ $(function(){
 					if(pisteytys>3.75){
 						kirjoita(Math.round(pisteytys),$("canvas").width()/2,256,true,64,"#FFF","'Raleway'");
 						ctx.drawImage(kolikkoKuva[0],416,256+16,24,24);
-						kirjoita(rahat+Math.round(pisteet-pisteytys),$("canvas").width()/2,288,true);
+						tarkkuusLisa=0;
+						if(pisteytetaan){
+							tarkkuusLisa=4;
+						}
+						kirjoita(rahat+Math.round(pisteet-pisteytys)+tarkkuusLisa,$("canvas").width()/2,288,true);
 					}else{
 						ctx.drawImage(kolikkoKuva[0],256,192+8,64,64);
 						kirjoita(rahat+pisteet,$("canvas").width()/2,256,true,64,"#FFF","'Raleway'");
@@ -1393,7 +1405,8 @@ $(function(){
 			ctx.fillStyle="#FFF";
 			ctx.fillRect(oikeaReuna-13,13,12,24);
 			ctx.fillRect(oikeaReuna-31,13,12,24);
-		}else{
+		}
+		if(!hengissa || tauko){
 			ctx.globalAlpha=0.5;
 			kirjoita(versioId.substring(0,5),8,$("canvas").height()-8,false,10,"#FFF","Courier New");
 			ctx.globalAlpha=1;
@@ -1461,7 +1474,11 @@ $(function(){
 			}
 		}
 	}
-
+	$(window).blur(function(){
+		if(hengissa){
+			tauko=true;
+		}
+	});
 	$("canvas").mousedown(function(e){
 		e.preventDefault();
 		x = Math.floor(e.pageX-$("canvas").offset().left);
@@ -1469,13 +1486,28 @@ $(function(){
 		hiiriAlasX=x;
 		var randomiNopeus = 10 + Math.round(Math.random()*10);
 		if(hengissa){
-			klikkiPos=[x,y];
-			varise(100);
-			if(x>$("canvas").width()-48 && y<64){
-				if(tauko){
-					tauko=false;
-				}else{
-					tauko=true;
+			if(!tauko){
+				klikkiPos=[x,y];
+				varise(100);
+				if(x>$("canvas").width()-48 && y<64){
+					if(tauko){
+						tauko=false;
+					}else{
+						tauko=true;
+					}
+				}
+			}else{
+				//yoloyolo
+				if(x>384 && x<$("canvas").width()-384){
+					if(y>=256-24 && y<256+24){
+						tauko=false;
+					}
+					if(y>=256+24 && y<256+48){
+						if(confirm("Haluatko lopettaa pelin ja siirtyä valikkoon?")){
+							tauko=false;
+							vihuSiirtyma=95;
+						}
+					}
 				}
 			}
 		}else{
@@ -1506,6 +1538,7 @@ $(function(){
 							soitaAani(klikkiAani[0]);
 							alustaMaasto();
 							ukkoX=384;
+							localStorage.valittuKentta = biomi;
 						}
 					}
 					if(y>448){

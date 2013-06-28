@@ -64,12 +64,12 @@ $(function(){
 		var taulu = [];
 		for(var i=0;i<=nmax;i++){
 			var snd = new Audio();
-			/*snd.canplaythrough=function(){
+			snd.oncanplaythrough=function(){
 				ladatutTiedostot++;
-			};*/
+			};
 			snd.src="snd/"+nimi+i+".wav";
 			snd.load();
-			//kaikkiTiedostot++;
+			kaikkiTiedostot++;
 			taulu.push(snd);
 		}
 		return taulu;
@@ -117,17 +117,16 @@ $(function(){
 	var kimalle = lataaKuvat("mitalit/kimalle",0);
 	
 	// Äänet ja musiikki
+	var ambientti = lataaAanet("ambient",0);
+	var menuMusiikki = lataaAanet("lobby",0);
 	var hyppyAani = lataaAanet("jump",0);
-	var dramaattinen = lataaAanet("over",0);
 	var tausta = lataaAanet("bg",0);
+	var dramaattinen = lataaAanet("over",0);
 	var auts = lataaAanet("ouch",0);
 	var korkeaAani = lataaAanet("angels",0);
 	var maksuAani = lataaAanet("coin",0);
-	var klikkiAani = lataaAanet("select",0);
-	var skratsaus = lataaAanet("scratch",0);
+	var klikkiAani = lataaAanet("select",0);;
 	var huuto = lataaAanet("scream",0);
-	var kilina = lataaAanet("gain",0);
-	var menuMusiikki = lataaAanet("lobby",0);
 	var loppuAani = lataaAanet("end",0);
 	var pisteytysAani = lataaAanet("coins",0);
 
@@ -135,9 +134,11 @@ $(function(){
 	var versioId = ""; // Muuttuu automaattisesti kommitin id:n mukaan
 	$.ajax({url:".git/refs/heads/master",success:function(resp){versioId=resp;console.log("Versio "+resp);}});
 
-	var tila = 0; // Missä valikossa ollaan
+	latauspalkkiX = 0;	
 
-	var hiiriAlasX = 0; // X-sijainti, jossa hiiri painettiin alas
+	tila = 0; // Missä valikossa ollaan
+
+	hiiriAlasX = 0; // X-sijainti, jossa hiiri painettiin alas
 	var x,y = 0; // Hiiren nykyinen posiitio
 
 	suojakilpi = 2; // Kertoo kuinka monen "peliruudun" ajan peliukkelilla on suojakilpeä jäljellä
@@ -415,6 +416,9 @@ $(function(){
 	korkeaAani[0].volume=0;
 	soitaAani(korkeaAani[0]);
 
+	ambientti[0].loop=true;
+	soitaAani(ambientti[0]);
+
 	var klikkiPos = [0,0];
 	
 	var iUkko=0;
@@ -683,7 +687,7 @@ $(function(){
 			liikkuuY=false;
 		}
 
-		// Pienennä musiikin äänenvoimakkuutta, kun vihollinen on lähempänä, menuissa, ym.
+		// Pienennä musiikin äänenvoimakkuutta, kun vihollinen on lähempänä, ollaan menuissa, ym.
 		if(tauko){
 			aanenVoimakkuus=0;
 		}else{
@@ -696,7 +700,10 @@ $(function(){
 		}else{
 			korkeaAani[0].volume=0;
 			if(!elvytysRuutu){
-				menuMusiikki[0].volume=Math.min(1,menuMusiikki[0].volume+0.02);
+				if(ladatutTiedostot >= kaikkiTiedostot){
+					menuMusiikki[0].volume=Math.min(1,menuMusiikki[0].volume+0.02);
+					ambientti[0].volume=Math.max(0,ambientti[0].volume-0.02);
+				}
 			}else{
 				menuMusiikki[0].volume=Math.min(0.5,menuMusiikki[0].volume+0.02);
 			}
@@ -1101,7 +1108,8 @@ $(function(){
 						}
 						kirjoita(rahat+Math.round(pisteet-pisteytys)+tarkkuusLisa,$("canvas").width()/2,288,true);
 					}else{
-						ctx.drawImage(kolikkoKuva[0],256,192+8,64,64);
+						var kaikkiRahat = rahat + pisteet;
+						ctx.drawImage(kolikkoKuva[0],416-(32*(kaikkiRahat+"").length),192+16,64,64);
 						kirjoita(rahat+pisteet,$("canvas").width()/2,256,true,64,"#FFF","'Raleway'");
 					}
 					if(elvytysjuomat>0 && pisteytys>3.75){
@@ -1329,6 +1337,7 @@ $(function(){
 					],
 					"Musiikki & äänet" : [
 						"Freesound.org -sivuston käyttäjät:",
+						"reactorplayer",
 						"blacklizard77",
 						"Dj Chronos",
 						"notchfilter",
@@ -1428,7 +1437,7 @@ $(function(){
 		}else{
 			// Latausruutu
 			if(ladatutTiedostot<kaikkiTiedostot){
-				ctx.fillStyle="#945557";
+				ctx.fillStyle="#4D7B28";
 				ctx.fillRect(0,0,960,576);
 
 				ctx.beginPath();
@@ -1438,11 +1447,14 @@ $(function(){
 				ctx.strokeStyle="rgba(0,0,0,.5)";
 				ctx.stroke();
 
+				var latauspalkkiTavoiteX = ($("canvas").width() - 512) / kaikkiTiedostot * ladatutTiedostot;
+				latauspalkkiX += (latauspalkkiTavoiteX - latauspalkkiX) / 10;
+
 				ctx.beginPath();
 				ctx.moveTo(256,384);
-				ctx.lineTo(($("canvas").width()-512)/kaikkiTiedostot*ladatutTiedostot+256,384);
+				ctx.lineTo(latauspalkkiX+256,384);
 				ctx.lineWidth = 16;
-				ctx.strokeStyle="#20FF40";
+				ctx.strokeStyle="gold";
 				ctx.stroke();
 
 				ctx.textAlign="center";
@@ -1461,7 +1473,7 @@ $(function(){
 					kirjoita("Jos peli ei lataudu, tarkista verkkoyhteytesi. Päivitä sivu tarvittaessa.",96,64,true,16,"#FFF","'Source Sans Pro'");
 				}
 				ctx.textAlign="center";
-					kirjoita(latausSloganitArvottu[Math.floor(0.05*latausprosentti)],$("canvas").width()/2,384+32,true,16,"#FFF","'Source Sans Pro'");
+					kirjoita(latausSloganitArvottu[Math.floor(0.05*latausprosentti)],$("canvas").width()/2,384+36,true,16,"#FFF","'Source Sans Pro'");
 				ctx.textAlign="start";
 
 				document.title="Ladataan "+latausprosentti+" %";
@@ -1726,10 +1738,10 @@ $(function(){
 		}else{
 			if(asetukset.ohjausTapa=="0"){
 				if(y<$("canvas").height()*.8){
-					if(hengissa && !tauko && suojakilpi<=2){
+					if(hengissa && !tauko && suojakilpi <= 0){
 						tavoiteX=x-96;
 					}else{
-						var puolivali = Math.floor(((tieMinMax[0]+tieMinMax[0])/2)/192)*192;
+						var puolivali = Math.floor(((tieMinMax[0]+tieMinMax[1])/2)/192)*192;
 						tavoiteX=puolivali;
 					}
 				}else{

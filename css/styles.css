@@ -3,6 +3,7 @@
 body,html{
 	margin:0;
 	padding:0;
+	height:100%;
 }
 body{
 	font:Verdana,sans-serif,serif;
@@ -19,11 +20,21 @@ a{
 	color:#0080FF;
 	text-decoration:none;
 }
+#center{
+	position:relative;
+	display:block;
+	top:50%;
+}
+#canvasContainer{
+	line-height:0;
+}
 canvas{
 	height:100%;
 	margin:0;
 	padding:0;
 	border-radius:8px;
+	vertical-align:middle;
+	margin-top:-288px;
 }
 #bottomBar{
 	position:fixed;

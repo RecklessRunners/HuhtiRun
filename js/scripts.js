@@ -248,8 +248,8 @@ $(function(){
 		ohjausTapa	: 0
 	};
 
-	// Biomit
-	biomi = 0; // Nykyinen biomi (ts. kenttä)
+	// Biomit eli kentät
+	biomi = 0; // Nykyinen biomi
 	biomiTyypit = [
 		"Aavikko",
 		"Niitty",
@@ -257,12 +257,12 @@ $(function(){
 		"Luola",
 		"Metsä"
 	];
-	var biomiKuvaukset = [ // Pieni kuvaus kustakin biomista -- ei tällä hetkellä käytössä
-		"Juokse kuumassa auringossa\nvaroen tielle kaatuneita puita",
-		"Juokse niityllä kukkia\nihastellen sekä varoen tiellä\nolevia kiviä",
-		"Juokse laiturilla varoen\nlaiturilta tippumista",
-		"Luolassa on pimeää ja vaarallista, mutta toisaalta voit löytää sieltä arvokkaita jalokiviä",
-		"Lenkkeile luonnon helmassa lintujen laulua kunnellen"
+	var biomiVarit = [ // Alapalkissa käytettävä väri
+		"d38f46",
+		"1d5911",
+		"0c7ee2",
+		"292a2d",
+		"286a22"
 	];
 	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille (esimerkiksi aavikolle arvotaan summamutikassa jokin ensimmäisen rivin taustakuvista)
 		[0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,3,4,4,4,5],
@@ -1165,14 +1165,20 @@ $(function(){
 
 			tummuus=Math.max(0.25,tummuus-0.001);
 			
-			var grd = ctx.createLinearGradient(0,veriSiirtymaNyt,0,canvas.height);
-			grd.addColorStop(0,"rgba(0,0,0,0.5)");
-			grd.addColorStop(0.01,"rgba(0,0,0,0.25)");
-			grd.addColorStop(0.5,"rgba(0,0,0,0.5)");
-			grd.addColorStop(1,"rgba(0,0,0,0.25)");
-			
-			ctx.fillStyle=grd;
+			ctx.fillStyle="#800000";
 			ctx.fillRect(0,veriSiirtymaNyt,960,576);
+			
+			if(tila==0 || elvytysRuutu){
+				ctx.fillStyle="#"+biomiVarit[biomi];
+			}else{
+				ctx.fillStyle="rgba(0,0,0,0.25)";
+			}
+			ctx.fillRect(0,canvas.height-128,960,576);
+			
+			if(tummuus>0 && tila==0){
+				ctx.fillStyle="rgba(0,0,0,"+Math.min(tummuus,.7)+")";
+				ctx.fillRect(0,canvas.height-128,960,128);
+			}
 			
 			// Aseta vihu pelaajan alle
 			vihuSiirtyma=95;
@@ -1184,6 +1190,7 @@ $(function(){
 			ctx.textAlign="start";
 				
 			if(tila==0){
+				tauko=false;
 				if((elvytysRuutu || pisteytetaan) && pisteet > 9){
 					ctx.textAlign="center";
 					if(pisteytys>3.75){
@@ -1244,8 +1251,8 @@ $(function(){
 
 					// Piirrä kentänvalitsimet
 					ctx.textAlign="center";
-					kirjoita("<",64,256,true,48);
-					kirjoita(">",canvas.width-64,256,true,48);
+					kirjoita("<",64,256,true,48,"#E0E0E0","'Source Sans Pro'");
+					kirjoita(">",canvas.width-64,256,true,48,"#E0E0E0","'Source Sans Pro'");
 
 					for(biomiI=0;biomiI<biomiTyypit.length;biomiI++){
 						var palloX = (canvas.width/2)+(biomiI*16)-(biomiTyypit.length*16/2)+5.5;
@@ -1259,22 +1266,22 @@ $(function(){
 					ctx.textAlign="start";
 				}
 				if(!elvytysRuutu){
-					var grd = ctx.createRadialGradient(canvas.width/2,canvas.height-64,0,canvas.width/2,canvas.height-64,192);
+					var grd = ctx.createRadialGradient(canvas.width/2,canvas.height-64,0,canvas.width/2,canvas.height-64,128);
 					
-					grd.addColorStop(0,"rgba(127,175,27,0.2)");
-					grd.addColorStop(0.5,"rgba(127,175,27,0.2)");
-					grd.addColorStop(1,"transparent");
+					grd.addColorStop(0,"rgba(255,255,255,0.2)");
+					grd.addColorStop(0.5,"rgba(255,255,255,0.2)");
+					grd.addColorStop(1,"rgba(255,255,255,0)");
 					
 					ctx.fillStyle = grd;
 					
-					for(i=0;i<12;i++){
+					for(i=0;i<6;i++){
 						ctx.beginPath();
 						ctx.moveTo(canvas.width/2,canvas.height-64);
 											
-						var pos = getAngle(canvas.width/2, canvas.height-64, 30*i+(pelaaNo*2)-7.5,192);
+						var pos = getAngle(canvas.width/2, canvas.height-64, 60*i+(pelaaNo*2)-15,128);
 						ctx.lineTo(pos.x, pos.y);
 					
-						var pos = getAngle(canvas.width/2, canvas.height-64, 30*i+(pelaaNo*2)+7.5,192);
+						var pos = getAngle(canvas.width/2, canvas.height-64, 60*i+(pelaaNo*2)+15,128);
 						ctx.lineTo(pos.x, pos.y);
 						
 						ctx.lineTo(canvas.width/2,canvas.height-64);
@@ -1338,10 +1345,10 @@ $(function(){
 				kirjoita(alkupotkaisu+" METRIÄ",canvas.width/4*3,444+veriSiirtymaNyt/3,true,12,"silver");
 
 				ctx.textAlign="end";
-					kirjoita("Juokse ➧",canvas.width-64,512,true,32,"#47A94B","'Source Sans Pro'");
+					kirjoita("Aloita peli »",canvas.width-64,512,true,24,"#47A94B","'Source Sans Pro'");
 				ctx.textAlign="start";
 				veriSiirtyma=0;
-				kirjoita("← Paluu",64,512,false);
+				kirjoita("« Paluu",64,512,true,24,"rgba(255,255,255,0.5)","'Source Sans Pro'");
 			}
 			if(tila==2){
 				kirjoita(tavoitteet[tavoiteNo].nimi,320,192+24,true,24,"#FFF","'Raleway'");
@@ -1427,10 +1434,10 @@ $(function(){
 
 				// Piirrä tavoitteen valitsimet
 				ctx.textAlign="center";
-				kirjoita("<",64,256,true,48);
-				kirjoita(">",canvas.width-64,256,true,48);
+					kirjoita("<",64,256,true,48,"#E0E0E0","'Source Sans Pro'");
+					kirjoita(">",canvas.width-64,256,true,48,"#E0E0E0","'Source Sans Pro'");
 				ctx.textAlign="start";
-				kirjoita("← Paluu",64,512);
+				kirjoita("« Paluu",64,512,true,24,"rgba(255,255,255,0.5)","'Source Sans Pro'");
 			}
 			if(tila==3){
 				kirjoita("Tilastot",64,128-veriSiirtymaNyt,true,48,"#FFF","'Raleway'");
@@ -1487,7 +1494,7 @@ $(function(){
 					kirjoita(parhaatMatkat[i],424,336+(32*i),false,32,sijoitusVarit[i],"'Source Sans Pro'");
 				}
 
-				kirjoita("← Paluu",64,512,false);
+				kirjoita("« Paluu",64,512,true,24,"rgba(255,255,255,0.5)","'Source Sans Pro'");
 				ctx.textAlign="end";
 					kirjoita("HUOM! ALLE 10 METRIN JUOKSUJA EI TILASTOIDA",canvas.width-64,512,true,12);
 				ctx.textAlign="start";
@@ -1557,7 +1564,7 @@ $(function(){
 				kirjoita(versioId.substr(0,20) || "????????????????????",canvas.width-64,512,false,16,"#FFF","Courier New");
 				ctx.textAlign="start";
 				
-				kirjoita("← Paluu",64,512,false);
+				kirjoita("« Paluu",64,512,true,24,"rgba(255,255,255,0.5)","'Source Sans Pro'");
 			}
 			if(tila==5){
 				kirjoita("Asetukset",64,128-veriSiirtymaNyt,true,48,"#FFF","'Raleway'");
@@ -1580,7 +1587,7 @@ $(function(){
 				kirjoita("Pelin ohjaaminen",64,256,false);
 				kirjoita(ohjausTavat[asetukset.ohjausTapa],512,256,false);
 
-				kirjoita("← Paluu",64,512,false);
+				kirjoita("« Paluu",64,512,true,24,"rgba(255,255,255,0.5)","'Source Sans Pro'");
 			}
 		}
 		if(hengissa){

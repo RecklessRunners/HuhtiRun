@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html manifest="offline.appcache">
+ 	<head>
+		<title>HuhtiRun</title>
+		<meta charset="UTF-8" />
+		<link rel="icon" type="image/png" href="img/favicon.png">
+
+		<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Fondamento|Raleway:800,500|Playfair+Display:700italic" rel="stylesheet" />
+		<link href="inc/PetjaUI/main.css" rel="stylesheet" />
+		<link href="inc/PetjaUI/elusive-iconfont/css/elusive-webfont.css" rel="stylesheet" />
+		<link href="css/styles.css" rel="stylesheet" />
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="inc/PetjaUI/main.js"></script>
+		<script src="js/scripts.js"></script>
+	</head>
+	<body>
+		<div id="modalContainer" class="blue hidden">
+			<div class="modal" id="likeModal">
+				<h2 style="color:#3B5998;"><small><b class="icon-facebook"></b></small>&ensp;Tykkää meistä!</h2>
+				<iframe id="likeBox" src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2FHuhtiRun&amp;width=384&amp;height=258&amp;show_faces=true&amp;colorscheme=light&amp;stream=false&amp;show_border=false&amp;header=false" scrolling="no" allowTransparency="true"></iframe>
+				<div class="buttonDock">
+					<span class="but fb-blue closeModal"><b class="icon-remove"></b>&emsp;Sulje</span>
+				</div>
+			</div>
+		</div>
+		<canvas width="960" height="576" style="height:100%;">
+			<p>
+				<a href="pages/unsupported.html">Selaimesi ei tue peliä</a>
+			</p>
+		</canvas>
+	</body>
+</html>

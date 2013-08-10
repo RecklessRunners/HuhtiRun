@@ -1,0 +1,49 @@
+@import url("http://fonts.googleapis.com/css?family=Oxygen:400,700");
+
+body,html{
+	margin:0;
+	padding:0;
+}
+body{
+	font:Verdana,sans-serif,serif;
+	background-color:#000;
+	text-align:center;
+	color:#FFF;
+	font-family: 'Oxygen', sans-serif;
+	overflow: hidden; 
+	-ms-content-zooming: none;
+	-moz-content-zooming: none;
+	-webkit-content-zooming: none;
+}
+a{
+	color:#0080FF;
+	text-decoration:none;
+}
+canvas{
+	height:100%;
+	margin:0;
+	padding:0;
+	border-radius:8px;
+}
+#bottomBar{
+	position:fixed;
+	bottom:8px;
+	left:0;
+	width:100%;
+	text-align:center;
+	text-shadow:1px 1px 0 rgba(0,0,0,.5),0 0 2px #000;
+	background-color:rgba(0,0,0,.5);
+	padding:4px;
+	opacity:.5;
+}
+#bottomBar:hover{
+	opacity:1;
+}
+#likeModal{
+	text-align:left;
+}
+#likeBox{
+	border:none;
+	height:150px;
+	width:384px;
+}

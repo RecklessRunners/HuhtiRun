@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Selainta ei tueta</title>
+		<meta charset="UTF-8" />
+		<link href="http://fonts.googleapis.com/css?family=Oxygen:400,700" rel="stylesheet" />
+		<style>
+			body{
+				font-family:'Oxygen',sans-serif;
+				font-size:20px;
+				background-color:#E04113;
+				color:#FFF;
+				text-align:center;
+				text-shadow:1px 1px 0 rgba(0,0,0,.5),0 0 8px rgba(0,0,0,.2);
+			}
+			a{
+				color:#0080FF;
+				text-decoration:none;
+			}
+			h1{
+				font-size:300%;
+				margin:16px;
+			}
+			h2{
+				font-weight:normal;
+			}
+			p{
+				max-width:900px;
+				margin-left:auto;
+				margin-right:auto;
+			}
+			.info{
+				background-image: -moz-radial-gradient(center center, circle closest-side, rgba(255,255,255,.25), transparent 100%);
+				background-image: -ms-radial-gradient(center center, circle closest-side, rgba(255,255,255,.25), transparent 100%);
+				background-image: -webkit-radial-gradient(center center, circle closest-side, rgba(255,255,255,.25), transparent 100%);
+				background-image: -o-radial-gradient(center center, circle closest-side, rgba(255,255,255,.25), transparent 100%);
+				background-image: radial-gradient(center center, circle closest-side, rgba(255,255,255,.25), transparent 100%);
+				padding:16px;
+				height:100%;
+			}
+			.tuettu,.eiTuettu{
+				width:64px;
+				height:64px;
+				padding:0 8px;
+			}
+			.eiTuettu{
+				opacity:0.25;
+				background-image:url(../img/selaimet/unsupported.png);
+				background-position:center center;
+				background-repeat:no-repeat;
+			}
+			hr{
+				border:0;
+				height:1px;
+				background-color:#000;
+				background-color:rgba(0,0,0,0.2);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="info">
+			<h1>Olemme pahoillamme</h1>
+			<p>
+				HuhtiRun ei ole vielä valitettavasti tuettu selaimessasi. Pyrimme saamaan pelin toimimaan myös sinun selaimessasi piakkoin. Odotteluaikana käytä pelaamiseen tukemiamme selaimia.
+			</p>
+			<hr />
+			<h2>Selaintuki</h2>
+			<p>
+				<img class="tuettu" src="../img/selaimet/firefox.png" alt="Firefox" />
+				<img class="eiTuettu" src="../img/selaimet/chrome.png" alt="Chrome" />
+				<img class="eiTuettu" src="../img/selaimet/ie.png" alt="IE" />
+				<img class="eiTuettu" src="../img/selaimet/safari.png" alt="Safari" />
+				<img class="eiTuettu" src="../img/selaimet/opera.png" alt="Opera" />
+			</p>
+			<p>
+				Peli toimii testatusti tällä hetkellä ainoastaan <a href="http://firefox.com/">Mozilla Firefox</a> -selaimen työpöytä- ja mobiili&shy;versioissa.
+			</p>
+			<hr />
+			<p>
+				<b>Terveisin,</b><br />
+				HuhtiRun-kehitystiimi
+			</p>
+		</div>
+	</body>
+</html>

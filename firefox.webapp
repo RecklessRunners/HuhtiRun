@@ -1,0 +1,14 @@
+{
+	"name": "HuhtiRun",
+	"description": "Temple Run -pelistä Huhdin koulun tietotekniikan valinnaisaineeksi valinneiden 9-luokkalaisten tekemä jäljennös",
+	"launch_path": "/index.html",
+	"icons": {
+		"128": "/img/icon-128.png"
+	},
+	"developer": {
+		"name": "Huhdin koulu",
+		"url": "http://huhdinkoulu.fi/"
+	},
+	"default_locale": "fi",
+	"orientation": ["landscape"]
+}

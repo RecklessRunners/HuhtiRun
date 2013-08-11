@@ -36,6 +36,9 @@ canvas{
 	vertical-align:middle;
 	margin-top:-288px;
 }
+#modalContainer{
+	z-index:9999;
+}
 #bottomBar{
 	position:fixed;
 	bottom:8px;

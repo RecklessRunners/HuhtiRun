@@ -88,11 +88,13 @@ $(function(){
 	var tieSuoraan = lataaKuvat("maasto/tiesuoraan",11);
 	var tieVasemmalle = lataaKuvat("maasto/kaannosv",7);
 	var tieOikealle = lataaKuvat("maasto/kaannoso",8);
-	var taustaKuva = lataaKuvat("maasto/tausta",20);
+	var taustaKuva = lataaKuvat("maasto/tausta",19);
 	var tieVaakaan = lataaKuvat("maasto/tievaaka",6);
 	var tieOikeaYlos = lataaKuvat("maasto/kaannosoy",5);
 	var tieVasenYlos = lataaKuvat("maasto/kaannosvy",5);
 	var kyltti = lataaKuvat("maasto/kyltti",0);
+	
+	var lentavaObjekti = lataaKuvat("maasto/objekti",0);
 
 	var varjo = lataaKuvat("varjo",0);
 	var kolikkoKuva = lataaKuvat("kolikko",0);
@@ -236,6 +238,11 @@ $(function(){
 	
 	x,y = 0;
 	
+	lentavatObjektit = [
+		//[kuva,x,y,liikkumisnopeus,asento,pyoriminen],
+		//[lentavaObjekti[0],192,-192,1,0,0]
+	];
+	
 	tutoriaaliData = [
 		false, // Hyppääminen
 		false // Kentän ostaminen
@@ -276,7 +283,7 @@ $(function(){
 		[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,11,12], // 2 % todennäköisyys olla muu kuin normaali meri
 		[7,8],
 		[9,9,9,10],
-		[13,14,15,15,15,15,15,15,15,15,16,16,16,16,16,16,16,17,17,17,17,17,17,17,17,18,19,20]
+		[13,14,15,15,15,15,15,15,15,15,15,15,16,16,16,16,16,16,16,16,16,17,17,17,17,17,17,17,17,17,17,18,19]
 	];
 	var biomiTieSuoraanKuvat = [
 		[0,0,0,0,0,0,1,4],
@@ -483,6 +490,8 @@ $(function(){
     var tieMinMax = [0, 960];
     
     var tauko = false;
+    
+    
 
 	// 2D-taulukko [5x4], jossa on referenssit kuviin
 	function alustaMaasto(){
@@ -672,7 +681,7 @@ $(function(){
 	}
 	
 	//Hoitaa kaiken päivityksen 
-	function paivita(){			
+	function paivita(){		
 		maxBonuspisteet = Math.round(10 + (10 * bonusKerroin));
 
 		if(hengissa && !tauko){
@@ -795,6 +804,26 @@ $(function(){
 		piirraVarjo();
 		piirraUkko(iUkko,ukkoX,ukkoY);
 		piirraHyppyNappi();
+		
+		// Piirretään lentävät objektit
+		if(biomi==5){
+			$.each(lentavatObjektit,function(i,v){
+				if(v != undefined){
+					v[2] += v[3];
+					v[4] += v[5];
+					ctx.save();
+					ctx.translate(v[1]+96,v[2]+96);
+					ctx.rotate(v[4]);
+					ctx.drawImage(v[0],0,0);
+					//ctx.rotate(-v[4]);
+					//ctx.translate(-(v[1]+96),-(v[2]+96));
+					ctx.restore();
+					if(v[2]>canvas.height+192){
+						lentavatObjektit.splice(i,1)
+					}
+				}
+			});
+		}
 		
 		// Pelaajan ohjauskomennot
 		$("html").keyup(function(e){
@@ -931,8 +960,17 @@ $(function(){
 					alkupotkaisu=0;
 				}
 			}
+			
+			// Luodaan lentäviä objekteja
+			if(Math.random()<0.75){
+				if(biomi==5){
+					if(lentavatObjektit.length<4){
+						lentavatObjektit.push([lentavaObjekti[0],Math.random()*canvas.width-96,-384,1.5+Math.random(),Math.PI*2*Math.random(),(Math.random()*2-1)*(Math.PI/50)]);
+					}
+				}
+			}
 
-			// Kopioidaan ylemmät rivit alempaan
+			// Kopioidaan ylemmät rivilentavatt alempaan
 			for (var j=maasto[0].length-1; j>0; j--){
 				for (var i=0; i < maasto.length; i++){
 					//console.log("J I : " + j +" " +i  );
@@ -1911,6 +1949,7 @@ $(function(){
 					if(x>=512){ 
 						veriSiirtyma=canvas.height;
 						if(! inaktiivinenMenu){ // Aloita uusi peli
+							lentavatObjektit = [];
 							striikki=0;
 							tila=0;
 							soitaAani(klikkiAani[0]);

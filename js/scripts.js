@@ -809,8 +809,14 @@ $(function(){
 		if(biomi==5){
 			$.each(lentavatObjektit,function(i,v){
 				if(v != undefined){
-					v[2] += v[3];
-					v[4] += v[5];
+					if(!tauko){
+						if(alkupotkaisu>0 && hengissa){
+							v[2] += v[3]*3.75;
+						}else{
+							v[2] += v[3];
+						}
+						v[4] += v[5];
+					}
 					ctx.save();
 					ctx.translate(v[1]+96,v[2]+96);
 					ctx.rotate(v[4]);
@@ -962,10 +968,17 @@ $(function(){
 			}
 			
 			// Luodaan lentäviä objekteja
-			if(Math.random()<0.75){
+			if(Math.random()<0.075){
 				if(biomi==5){
-					if(lentavatObjektit.length<4){
-						lentavatObjektit.push([lentavaObjekti[0],Math.random()*canvas.width-96,-384,1.5+Math.random(),Math.PI*2*Math.random(),(Math.random()*2-1)*(Math.PI/50)]);
+					if(lentavatObjektit.length<3){
+						lentavatObjektit.push([
+							lentavaObjekti[0], // Kuvatiedosto
+							Math.random()*canvas.width-96, // Satunnainen aloitus X-piste
+							-384, // Aloitus Y-piste
+							(1.5+Math.random())/10*pelaajaNopeus, // Satunnainen, adaptiivinen nopeus
+							Math.PI*2*Math.random(), // Pyörimisen aloituspiste
+							(Math.random()*2-1)*(Math.PI/100) // Pyörimisen nopeus, anti-adaptiivinen
+						]);
 					}
 				}
 			}

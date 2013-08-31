@@ -84,14 +84,14 @@ $(function(){
 	var ukko = lataaKuvat("ukko/", 2);
 	var vihu = lataaKuvat("vihu/", 3);
 
-	var tieRisteys = lataaKuvat("maasto/risteys",4);
-	var tieSuoraan = lataaKuvat("maasto/tiesuoraan",10);
-	var tieVasemmalle = lataaKuvat("maasto/kaannosv",6);
-	var tieOikealle = lataaKuvat("maasto/kaannoso",7);
-	var taustaKuva = lataaKuvat("maasto/tausta",12);
-	var tieVaakaan = lataaKuvat("maasto/tievaaka",5);
-	var tieOikeaYlos = lataaKuvat("maasto/kaannosoy",4);
-	var tieVasenYlos = lataaKuvat("maasto/kaannosvy",4);
+	var tieRisteys = lataaKuvat("maasto/risteys",5);
+	var tieSuoraan = lataaKuvat("maasto/tiesuoraan",11);
+	var tieVasemmalle = lataaKuvat("maasto/kaannosv",7);
+	var tieOikealle = lataaKuvat("maasto/kaannoso",8);
+	var taustaKuva = lataaKuvat("maasto/tausta",20);
+	var tieVaakaan = lataaKuvat("maasto/tievaaka",6);
+	var tieOikeaYlos = lataaKuvat("maasto/kaannosoy",5);
+	var tieVasenYlos = lataaKuvat("maasto/kaannosvy",5);
 	var kyltti = lataaKuvat("maasto/kyltti",0);
 
 	var varjo = lataaKuvat("varjo",0);
@@ -259,63 +259,72 @@ $(function(){
 		"Niitty",
 		"Meri",
 		"Luola",
-		"Metsä"
+		"Metsä",
+		"Avaruus"
 	];
 	var biomiVarit = [ // Alapalkissa käytettävä väri
 		"d38f46",
 		"1d5911",
 		"0c7ee2",
 		"292a2d",
-		"286a22"
+		"286a22",
+		"0e0d2b"
 	];
 	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille (esimerkiksi aavikolle arvotaan summamutikassa jokin ensimmäisen rivin taustakuvista)
 		[0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,3,4,4,4,5],
 		[1,2],
 		[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,11,12], // 2 % todennäköisyys olla muu kuin normaali meri
 		[7,8],
-		[9,9,9,10]
+		[9,9,9,10],
+		[13,14,15,15,15,15,15,15,15,15,16,16,16,16,16,16,16,17,17,17,17,17,17,17,17,18,19,20]
 	];
 	var biomiTieSuoraanKuvat = [
 		[0,0,0,0,0,0,1,4],
 		[2,2,2,2,2,2,3,5],
 		[6],
 		[7,7,7,8],
-		[9,10]
+		[9,10],
+		[11]
 	];
 	var biomiTieVaakaanKuvat = [
 		[0],
 		[1],
 		[2],
 		[3,3,3,4],
-		[5]
+		[5],
+		[6]
 	];
 	var biomiTieVYKuvat = [
 		[1],
 		[0],
 		[2],
 		[3],
-		[4]
+		[4],
+		[5]
 	];
 	var biomiTieOYKuvat = [
 		[0],
 		[1],
 		[2],
 		[3],
-		[4]
+		[4],
+		[5]
 	];
 	var biomiTieVasKuvat = [
 		[0],
 		[1],
 		[2],
 		[3],
-		[4,4,4,4,5,6]
+		[4,4,4,4,5,6],
+		[7]
 	];
 	var biomiTieOikKuvat = [
 		[2],
 		[0,1],
 		[3],
 		[4],
-		[5,5,5,5,6,7]
+		[5,5,5,5,6,7],
+		[8]
 	];
 
 	// Nykyisen pelitallennuksen versionumero

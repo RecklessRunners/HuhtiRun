@@ -16,11 +16,19 @@
 	</head>
 	<body>
 		<div id="modalContainer" class="blue hidden">
-			<div class="modal" id="likeModal">
+			<div class="modal hidden" id="likeModal">
 				<h2 style="color:#3B5998;"><small><b class="icon-facebook"></b></small>&ensp;Tykkää meistä!</h2>
 				<iframe id="likeBox" src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2FHuhtiRun&amp;width=384&amp;height=258&amp;show_faces=true&amp;colorscheme=light&amp;stream=false&amp;show_border=false&amp;header=false" scrolling="no" allowTransparency="true"></iframe>
 				<div class="buttonDock">
 					<span class="but fb-blue closeModal"><b class="icon-remove"></b>&emsp;Sulje</span>
+				</div>
+			</div>
+			<div class="modal hidden" id="noMoneyModal">
+				<h2 style="color:#C00000;"><small><b class="icon-exclamation-sign"></b></small>&ensp;Rahasi eivät riitä!</h2>
+				<p>Ostaaksesi kohteen <b><span id="lisaaRahaaTuote"></span></b>, tarvitset <b><span id="lisaaRahaaArvo">0</span> <img src="img/kolikko0.png" alt="(HR)" style="height:24px;margin-bottom:-6px;" /> lisää</b>. Pelaa peliä tienataksesi nämä rahat.
+				</p>
+				<div class="buttonDock">
+					<span class="but red closeModal"><b class="icon-remove"></b>&emsp;Sulje</span>
 				</div>
 			</div>
 		</div>

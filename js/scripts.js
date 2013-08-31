@@ -1370,7 +1370,7 @@ $(function(){
 							kirjoita("Uusi peli",canvas.width/2,veriSiirtymaNyt-20,true,18,"#FFF","'Source Sans Pro'");
 						}else{
 							kirjoita("Osta kenttä",canvas.width/2,veriSiirtymaNyt-20,true,18,"#FFF","'Source Sans Pro'");
-							kirjoita(100*Math.pow(2,biomi),canvas.width/2+16,veriSiirtymaNyt-64+22,false,14,"#FFF","'Source Sans Pro'");
+							kirjoita(300*biomi-1,canvas.width/2+16,veriSiirtymaNyt-64+22,false,14,"#FFF","'Source Sans Pro'");
 						}
 					}else{
 						kirjoita("Ladataan "+Math.round(100/kaikkiTiedostot*ladatutTiedostot)+"%",canvas.width/2,veriSiirtymaNyt-20,true,18,"#FFF","'Source Sans Pro'");
@@ -1880,7 +1880,7 @@ $(function(){
 								if(omatKentat[biomi]){
 									tila=1;
 								}else{
-									if(osta(100*Math.pow(2,biomi),biomiTyypit[biomi]+"-kenttä",true)){
+									if(osta(300*biomi-1,biomiTyypit[biomi],true)){
 										omatKentat[biomi]=true;
 										localStorage.omatKentat=JSON.stringify(omatKentat);
 										tila=1;
@@ -2153,7 +2153,9 @@ $(function(){
 			}
 		}else{
 			soitaAani(dramaattinen[0]);
-			alert("Tarvitset "+Math.floor(hinta-rahat)+" (HR) lisää ostaaksesi tämän.");
+			openModal("noMoney");
+			$("#lisaaRahaaArvo").html(hinta-rahat);
+			$("#lisaaRahaaTuote").html(asia);
 			return false;
 		}
 	}

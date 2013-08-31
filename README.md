@@ -1,9 +1,11 @@
 # HuhtiRun
 
-**HuhtiRun** on vapaan lähdekoodin jäljitelmä suositusta Temple Run -pelistä.
+**HuhtiRun** on vapaan lähdekoodin (= *open source*) jäljitelmä suositusta Temple Run -pelistä.
 
-Peli oli alunperin Huhdin koulun 9-luokkalaisten tietotekniikan valinnaisaineeksi valinneiden yhteinen peliprojekti, mutta pelin kehitystä on jatkettu myös ulkopuolisten voimin koulun ulkopuolella jo useamman kuukauden ajan. Nykyään peliä kehittää tiimi nimeltä *The Reckless Runners*.
+## Pelin idea
+HuhtiRunissa juostaan pakoon hullaantunutta apinaa keräten matkalla pisteitä ja bonuksia. Pelin tavoitteena on juosta kuolematta mahdollisimman pitkälle. Pelissä on monia erilaisia kenttiä, joita voi ostaa pelin sisäisellä valuutalla.
 
-HuhtiRunissa juostaan pakoon hullaantunutta apinaa keräten matkalla pisteitä ja bonuksia. Pelin tavoitteena on juosta kuolematta mahdollisimman pitkälle.
+## Kehitystiimi
+Pelin on kehittänyt tiimi nimeltänsä *The Reckless Runners*. Tiimi koostuu osasta urjalalaisen Huhdin koulun lukuvuoden 2012 - 2013 9. lk oppilaista. Yhdeksännen luokan jälkeen on oppilaiden tiet eronneet toisistaan ja peliä kehitetään etänä.
 
-Pelin kehittämiseen liittyviä ohjeita löydät [wikistämme](/wiki).
+Toivomme saavamme lisää kehittäjiä peliin. Sinun ei tarvitse olla edellisen koulumme oppilas tai ylipäätään tuntea meitä. Pelin kehittämiseen liittyviä ohjeita löydät [wikistämme](/wiki).

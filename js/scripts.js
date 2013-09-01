@@ -825,7 +825,7 @@ $(function(){
 					}
 					ctx.save();
 					ctx.translate(v[1]+96,v[2]+96);
-					ctx.rotate(v[4]);
+					ctx.rotate(v[6]);
 					ctx.drawImage(v[0],0,0);
 					//ctx.rotate(-v[4]);
 					//ctx.translate(-(v[1]+96),-(v[2]+96));
@@ -1013,11 +1013,11 @@ $(function(){
 								lentavaObjekti[4], // Kuvatiedosto
 								Math.random()*canvas.width-96, // Satunnainen aloitus X-piste
 								-384, // Aloitus Y-piste
-								-((1.5+Math.random())*pelaajaNopeus*2.5), // Satunnainen liikkumisnopeus (X)
-								(1.5+Math.random())*pelaajaNopeus*2.5,  // Satunnainen liikkumisnopeus (Y)
+								-((1.5+Math.random())*pelaajaNopeus*2), // Satunnainen liikkumisnopeus (X)
+								(1.5+Math.random())*pelaajaNopeus*2,  // Satunnainen liikkumisnopeus (Y)
 								true, // Adaptiivinen nopeus (eli objekti menee suhteessa nopeampaa silloin kun hahmokin menee)
-								0, // Pyörimisen aloituspiste
-								-Math.random()*(Math.PI/250), // Pyörimisen nopeus (0 = ei pyöri)
+								Math.PI/4, // Pyörimisen aloituspiste
+								Math.PI/200, // Pyörimisen nopeus (0 = ei pyöri)
 								false // Adaptiivinen pyörimisnopeus (eli objekti pyörii sitä nopeammin mitä nopeammin hahmo liikkuu)
 							]);
 						break;

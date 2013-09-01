@@ -88,13 +88,13 @@ $(function(){
 	var tieSuoraan = lataaKuvat("maasto/tiesuoraan",11);
 	var tieVasemmalle = lataaKuvat("maasto/kaannosv",7);
 	var tieOikealle = lataaKuvat("maasto/kaannoso",8);
-	var taustaKuva = lataaKuvat("maasto/tausta",19);
+	var taustaKuva = lataaKuvat("maasto/tausta",18);
 	var tieVaakaan = lataaKuvat("maasto/tievaaka",6);
 	var tieOikeaYlos = lataaKuvat("maasto/kaannosoy",5);
 	var tieVasenYlos = lataaKuvat("maasto/kaannosvy",5);
 	var kyltti = lataaKuvat("maasto/kyltti",0);
 	
-	var lentavaObjekti = lataaKuvat("maasto/objekti",3);
+	var lentavaObjekti = lataaKuvat("maasto/objekti",4);
 
 	var varjo = lataaKuvat("varjo",0);
 	var kolikkoKuva = lataaKuvat("kolikko",0);
@@ -283,7 +283,7 @@ $(function(){
 		[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,11,12], // 2 % todennäköisyys olla muu kuin normaali meri
 		[7,8],
 		[9,9,9,10],
-		[13,14,15,15,15,15,15,15,15,15,15,15,16,16,16,16,16,16,16,16,16,17,17,17,17,17,17,17,17,17,17,18,19]
+		[13,14,15,15,15,15,15,15,15,15,15,15,16,16,16,16,16,16,16,16,16,17,17,17,17,17,17,17,17,17,17,18]
 	];
 	var biomiTieSuoraanKuvat = [
 		[0,0,0,0,0,0,1,4],
@@ -970,7 +970,7 @@ $(function(){
 			// Luodaan lentäviä objekteja
 			if(Math.random()<0.15){
 				if(biomi==5){
-					var objektiNro = Math.floor(Math.random()*2);
+					var objektiNro = Math.floor(Math.random()*3);
 					switch(objektiNro){
 						case 0:
 							if(lentavatObjektit.length<3){
@@ -983,6 +983,7 @@ $(function(){
 									(Math.random()*2-1)*(Math.PI/100) // Pyörimisen nopeus, anti-adaptiivinen
 								]);
 							}
+						break;
 						case 1:
 							for(i=0;i<3;i++){
 								lentavatObjektit.push([
@@ -994,6 +995,17 @@ $(function(){
 									(Math.random()*2-1)*(Math.PI/50) // Pyörimisen nopeus, anti-adaptiivinen
 								]);
 							}
+						break;
+						case 2:
+							lentavatObjektit.push([
+								lentavaObjekti[4], // Kuvatiedosto
+								Math.random()*canvas.width-96, // Satunnainen aloitus X-piste
+								-384, // Aloitus Y-piste
+								(1.5+Math.random())*pelaajaNopeus*5, // Satunnainen, adaptiivinen nopeus
+								0, // Pyörimisen aloituspiste
+								-Math.random()*(Math.PI/250) // Pyörimisen nopeus, anti-adaptiivinen
+							]);
+						break;
 					}
 				}
 			}

@@ -239,8 +239,7 @@ $(function(){
 	x,y = 0;
 	
 	lentavatObjektit = [
-		//[kuva,x,y,liikkumisnopeus,asento,pyoriminen],
-		//[lentavaObjekti[0],192,-192,1,0,0]
+		// [kuva,x,y,liikkumisnopeusX,liikkumisnopeusY,adaptiivinenLiike,asento,pyoriminen,adaptiivinenPyoriminen]
 	];
 	
 	tutoriaaliData = [
@@ -808,14 +807,21 @@ $(function(){
 		// Piirretään lentävät objektit
 		if(biomi==5){
 			$.each(lentavatObjektit,function(i,v){
+				// [kuva,x,y,liikkumisnopeusX,liikkumisnopeusY,adaptiivinenLiike,asento,pyoriminen,adaptiivinenPyoriminen]
 				if(v != undefined){
 					if(!tauko){
-						if(alkupotkaisu>0 && hengissa){
-							v[2] += v[3]*3.75;
-						}else{
-							v[2] += v[3];
+						var adaptiivisuus = 10;
+						if(v[5]){
+							adaptiivisuus = pelaajaNopeus;
 						}
-						v[4] += v[5];
+						if(alkupotkaisu > 0 && hengissa){
+							v[1] += v[3] * 3.75 / 10 * adaptiivisuus;
+							v[2] += v[4] * 3.75 / 10 * adaptiivisuus;
+						}else{
+							v[1] += v[3] / 10 * adaptiivisuus;
+							v[2] += v[4] / 10 * adaptiivisuus;
+						}
+						v[6] += v[7];
 					}
 					ctx.save();
 					ctx.translate(v[1]+96,v[2]+96);
@@ -978,9 +984,12 @@ $(function(){
 									lentavaObjekti[0], // Kuvatiedosto
 									Math.random()*canvas.width-96, // Satunnainen aloitus X-piste
 									-384, // Aloitus Y-piste
-									(1.5+Math.random())/10*pelaajaNopeus, // Satunnainen, adaptiivinen nopeus
+									0, // Satunnainen liikkumisnopeus (X)
+									(1.5+Math.random())/10*pelaajaNopeus,  // Satunnainen liikkumisnopeus (Y)
+									true, // Adaptiivinen nopeus (eli objekti menee suhteessa nopeampaa silloin kun hahmokin menee)
 									Math.PI*2*Math.random(), // Pyörimisen aloituspiste
-									(Math.random()*2-1)*(Math.PI/100) // Pyörimisen nopeus, anti-adaptiivinen
+									(Math.random()*2-1)*(Math.PI/100), // Pyörimisen nopeus (0 = ei pyöri)
+									false // Adaptiivinen pyörimisnopeus (eli objekti pyörii sitä nopeammin mitä nopeammin hahmo liikkuu)
 								]);
 							}
 						break;
@@ -990,9 +999,12 @@ $(function(){
 									lentavaObjekti[Math.floor(Math.random()*3)+1], // Kuvatiedosto
 									Math.random()*canvas.width-96, // Satunnainen aloitus X-piste
 									-384, // Aloitus Y-piste
-									(3+Math.random()*2)/10*pelaajaNopeus, // Satunnainen, adaptiivinen nopeus
+									0, // Satunnainen liikkumisnopeus (X)
+									(3+Math.random()*2)/10*pelaajaNopeus,  // Satunnainen liikkumisnopeus (Y)
+									true, // Adaptiivinen nopeus (eli objekti menee suhteessa nopeampaa silloin kun hahmokin menee)
 									Math.PI*2*Math.random(), // Pyörimisen aloituspiste
-									(Math.random()*2-1)*(Math.PI/50) // Pyörimisen nopeus, anti-adaptiivinen
+									(Math.random()*2-1)*(Math.PI/50), // Pyörimisen nopeus (0 = ei pyöri)
+									false // Adaptiivinen pyörimisnopeus (eli objekti pyörii sitä nopeammin mitä nopeammin hahmo liikkuu)
 								]);
 							}
 						break;
@@ -1001,9 +1013,12 @@ $(function(){
 								lentavaObjekti[4], // Kuvatiedosto
 								Math.random()*canvas.width-96, // Satunnainen aloitus X-piste
 								-384, // Aloitus Y-piste
-								(1.5+Math.random())*pelaajaNopeus*5, // Satunnainen, adaptiivinen nopeus
+								-((1.5+Math.random())*pelaajaNopeus*2.5), // Satunnainen liikkumisnopeus (X)
+								(1.5+Math.random())*pelaajaNopeus*2.5,  // Satunnainen liikkumisnopeus (Y)
+								true, // Adaptiivinen nopeus (eli objekti menee suhteessa nopeampaa silloin kun hahmokin menee)
 								0, // Pyörimisen aloituspiste
-								-Math.random()*(Math.PI/250) // Pyörimisen nopeus, anti-adaptiivinen
+								-Math.random()*(Math.PI/250), // Pyörimisen nopeus (0 = ei pyöri)
+								false // Adaptiivinen pyörimisnopeus (eli objekti pyörii sitä nopeammin mitä nopeammin hahmo liikkuu)
 							]);
 						break;
 					}

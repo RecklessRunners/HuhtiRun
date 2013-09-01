@@ -94,7 +94,7 @@ $(function(){
 	var tieVasenYlos = lataaKuvat("maasto/kaannosvy",5);
 	var kyltti = lataaKuvat("maasto/kyltti",0);
 	
-	var lentavaObjekti = lataaKuvat("maasto/objekti",0);
+	var lentavaObjekti = lataaKuvat("maasto/objekti",3);
 
 	var varjo = lataaKuvat("varjo",0);
 	var kolikkoKuva = lataaKuvat("kolikko",0);
@@ -968,17 +968,32 @@ $(function(){
 			}
 			
 			// Luodaan lentäviä objekteja
-			if(Math.random()<0.075){
+			if(Math.random()<0.15){
 				if(biomi==5){
-					if(lentavatObjektit.length<3){
-						lentavatObjektit.push([
-							lentavaObjekti[0], // Kuvatiedosto
-							Math.random()*canvas.width-96, // Satunnainen aloitus X-piste
-							-384, // Aloitus Y-piste
-							(1.5+Math.random())/10*pelaajaNopeus, // Satunnainen, adaptiivinen nopeus
-							Math.PI*2*Math.random(), // Pyörimisen aloituspiste
-							(Math.random()*2-1)*(Math.PI/100) // Pyörimisen nopeus, anti-adaptiivinen
-						]);
+					var objektiNro = Math.floor(Math.random()*2);
+					switch(objektiNro){
+						case 0:
+							if(lentavatObjektit.length<3){
+								lentavatObjektit.push([
+									lentavaObjekti[0], // Kuvatiedosto
+									Math.random()*canvas.width-96, // Satunnainen aloitus X-piste
+									-384, // Aloitus Y-piste
+									(1.5+Math.random())/10*pelaajaNopeus, // Satunnainen, adaptiivinen nopeus
+									Math.PI*2*Math.random(), // Pyörimisen aloituspiste
+									(Math.random()*2-1)*(Math.PI/100) // Pyörimisen nopeus, anti-adaptiivinen
+								]);
+							}
+						case 1:
+							for(i=0;i<3;i++){
+								lentavatObjektit.push([
+									lentavaObjekti[Math.floor(Math.random()*3)+1], // Kuvatiedosto
+									Math.random()*canvas.width-96, // Satunnainen aloitus X-piste
+									-384, // Aloitus Y-piste
+									(3+Math.random()*2)/10*pelaajaNopeus, // Satunnainen, adaptiivinen nopeus
+									Math.PI*2*Math.random(), // Pyörimisen aloituspiste
+									(Math.random()*2-1)*(Math.PI/50) // Pyörimisen nopeus, anti-adaptiivinen
+								]);
+							}
 					}
 				}
 			}

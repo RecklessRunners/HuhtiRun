@@ -279,10 +279,10 @@ $(function(){
 	var biomiKuvat = [ // Taustakuvan numerot, kullekin biomille (esimerkiksi aavikolle arvotaan summamutikassa jokin ensimmäisen rivin taustakuvista)
 		[0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,3,4,4,4,5],
 		[1,2],
-		[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,11,12], // 2 % todennäköisyys olla muu kuin normaali meri
+		[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,11,12], // 
 		[7,8],
 		[9,9,9,10],
-		[13,13,13,13,13,14,15,15,15,15,15,15,15,15,15,15,16,16,16,16,16,16,16,16,16,17,17,17,17,17,17,17,17,17,17,18,18,18,18,18,18,18,18,18,18]
+		[13,13,13,13,13,14,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,15,18,18,18,18]
 	];
 	var biomiTieSuoraanKuvat = [
 		[0,0,0,0,0,0,1,4],
@@ -718,7 +718,7 @@ $(function(){
 			var posErotus;
 		
 			if(alkupotkaisu>0){
-				posErotus = Math.abs(ukkoX-tavoiteX)/1.25;
+				posErotus = Math.abs(ukkoX-tavoiteX)/1.2;
 			}else{
 				posErotus = Math.abs(ukkoX-tavoiteX)/5;
 			}
@@ -815,8 +815,8 @@ $(function(){
 							adaptiivisuus = pelaajaNopeus;
 						}
 						if(alkupotkaisu > 0 && hengissa){
-							v[1] += v[3] * 3.75 / 10 * adaptiivisuus;
-							v[2] += v[4] * 3.75 / 10 * adaptiivisuus;
+							v[1] += v[3] * 5 / 10 * adaptiivisuus;
+							v[2] += v[4] * 5 / 10 * adaptiivisuus;
 						}else{
 							v[1] += v[3] / 10 * adaptiivisuus;
 							v[2] += v[4] / 10 * adaptiivisuus;
@@ -947,7 +947,7 @@ $(function(){
 		var striikkiJako = 1;
 		if(!tauko){
 			if(alkupotkaisu>0 && hengissa){
-				siirtoY+=pelaajaNopeus*3.75/striikkiJako;
+				siirtoY+=pelaajaNopeus*5/striikkiJako;
 			}else{
 				siirtoY+=pelaajaNopeus/striikkiJako;
 			}
@@ -994,7 +994,7 @@ $(function(){
 							}
 						break;
 						case 1:
-							for(i=0;i<3;i++){
+							for(i=0;i<5;i++){ // Luodaan 5 kappaletta
 								lentavatObjektit.push([
 									lentavaObjekti[Math.floor(Math.random()*3)+1], // Kuvatiedosto
 									Math.random()*canvas.width-96, // Satunnainen aloitus X-piste
@@ -1173,7 +1173,7 @@ $(function(){
 			ctx.textAlign="start";
 		}
 
-		pelaajaNopeus=10+Math.round(0.01*pisteet); // Peli vaikenee, mitä pitemmälle pääsee
+		pelaajaNopeus = 10 + Math.round(0.0075*pisteet); // Peli nopeutuu, mitä pitemmälle siinä päästään
 		
 		// Kun vihu saa pelaajan kiinni, mene päävalikkoon
 		if(vihuSiirtyma<96){
@@ -1509,7 +1509,7 @@ $(function(){
 				kirjoita("0/5 PÄIVITETTY",canvas.width/4*2,444+veriSiirtymaNyt/6,true,12,"silver");
 
 				kirjoita("Alkupotkaisu",canvas.width/4*3,192+veriSiirtymaNyt/3,true,20,"#FFF","'Raleway'");
-				kirjoita("149 (HR)",canvas.width/4*3,192+veriSiirtymaNyt/3+18,true,12,"silver");
+				kirjoita(Math.floor(199+50*(alkupotkaisu/25))+" (HR)",canvas.width/4*3,192+veriSiirtymaNyt/3+18,true,12,"silver");
 				kirjoita("Hanki itsellesi "+(25+alkupotkaisu)+" m",canvas.width/4*3,396+veriSiirtymaNyt/3);
 				kirjoita("etumatkaa pelin alkaessa",canvas.width/4*3,420+veriSiirtymaNyt/3);
 				kirjoita(alkupotkaisu+" METRIÄ",canvas.width/4*3,444+veriSiirtymaNyt/3,true,12,"silver");
@@ -2034,7 +2034,7 @@ $(function(){
 							alert("Tulossa myöhemmin!");
 						}
 						if(x >= canvas.width/4*3-96 && x < canvas.width/4*3+96){
-							if(osta(149,"Alkupotkaisu 25 m",true)){
+							if(osta(199+50*(alkupotkaisu/25),"Alkupotkaisu 25 m",true)){
 								alkupotkaisu+=25;
 							}
 						}

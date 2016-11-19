@@ -1679,9 +1679,6 @@ $(function(){
 				var tekijat = {
 					"HuhtiRun -pelin tekijät":[""],
 					"Ohjelmointi" : [
-						"Santeri Ahtola",
-						"Manu Kuisma",
-						"",
 						"Petja Touru",
 						"Markku Leino"
 					],
@@ -1705,9 +1702,6 @@ $(function(){
 						"Timbre",
 						"flowerdove2168",
 						"+ muutamia Public Domain -ääniä"
-					],
-					"Sponsorit" : [
-						"Tero Loikainen ;)"
 					],
 					"Kiitos pelaamisesta!" : [
 						"Tekijätiimimme kiittää sinua."

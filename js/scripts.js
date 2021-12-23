@@ -559,12 +559,14 @@ $(function(){
 		// Täytä välit tiellä
 		if(ylos>ind){ // Risteys oikea
         	maasto[ylos][0] = tieOikeaYlos[biomiTieOYKuvat[biomi][Math.floor(Math.random()*biomiTieOYKuvat[biomi].length)]];
+			maastomuoto[ylos][0] = 1;
 			for (var i=0; i<ylos; i++){
 				maasto[i][0] = tieVaakaan[biomiTieVaakaanKuvat[biomi][Math.floor(Math.random()*biomiTieVaakaanKuvat[biomi].length)]];
 				maastomuoto[i][0] = 1;
 			}
 		}else{ // Risteys vasen
 			maasto[ylos][0] = tieVasenYlos[biomiTieVYKuvat[biomi][Math.floor(Math.random()*biomiTieVYKuvat[biomi].length)]];
+			maastomuoto[ylos][0] = 1;
 			for (var i=4; i>ylos; i--){
 				maasto[i][0] = tieVaakaan[biomiTieVaakaanKuvat[biomi][Math.floor(Math.random()*biomiTieVaakaanKuvat[biomi].length)]];
 				maastomuoto[i][0] = 1;

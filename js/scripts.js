@@ -940,7 +940,7 @@ $(function(){
 		// Vaakaan menevät tiet
 		// xxxxxxxxxxxxxxxxxxxxxxxx
 		if(!hyppy && suojakilpi<=0){
-			if(maasto[Math.round(ukkoX/192)][1]==tieVaakaan[4]){
+			if(maasto[Math.round(ukkoX/192)][1]==tieVaakaan[4] && siirtoX>144){
 				vihuSiirtyma=95;
 			}
 		}

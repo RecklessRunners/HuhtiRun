@@ -1,37 +1,47 @@
 <!DOCTYPE html>
-<html manifest="offline.appcache">
+<html lang="fi">
  	<head>
 		<title>HuhtiRun</title>
 		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/png" href="img/favicon.png">
+		<link rel="manifest" href="manifest.webmanifest">
+		<meta name="theme-color" content="#000000" />
 
-		<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Fondamento|Raleway:800,500|Playfair+Display:700italic" rel="stylesheet" />
-		<link href="inc/PetjaUI/main.css" rel="stylesheet" />
-		<link href="inc/PetjaUI/elusive-iconfont/css/elusive-webfont.css" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Fondamento|Raleway:800,500|Playfair+Display:700italic" rel="stylesheet" />
 		<link href="css/styles.css" rel="stylesheet" />
 
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script src="inc/PetjaUI/main.js"></script>
 		<script src="js/scripts.js"></script>
+		<script>
+			if("serviceWorker" in navigator){
+				window.addEventListener("load", function(){
+					navigator.serviceWorker.register("sw.js").catch(function(e){ console.warn("Service workerin rekisteröinti epäonnistui", e); });
+				});
+			}
+		</script>
 	</head>
 	<body>
-		<div id="modalContainer" class="blue hidden">
-			<div class="modal hidden" id="likeModal">
-				<h2 style="color:#3B5998;"><small><b class="icon-facebook"></b></small>&ensp;Tykkää meistä!</h2>
-				<iframe id="likeBox" src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2FHuhtiRun&amp;width=384&amp;height=258&amp;show_faces=true&amp;colorscheme=light&amp;stream=false&amp;show_border=false&amp;header=false" scrolling="no" allowTransparency="true"></iframe>
-				<div class="buttonDock">
-					<span class="but fb-blue closeModal"><b class="icon-remove"></b>&emsp;Sulje</span>
-				</div>
-			</div>
-			<div class="modal hidden" id="noMoneyModal">
-				<h2 style="color:#C00000;"><small><b class="icon-exclamation-sign"></b></small>&ensp;Rahasi eivät riitä!</h2>
-				<p>Ostaaksesi kohteen <b><span id="lisaaRahaaTuote"></span></b>, tarvitset <b><span id="lisaaRahaaArvo">0</span> <img src="img/kolikko0.png" alt="(HR)" style="height:24px;margin-bottom:-6px;" /> lisää</b>. Pelaa peliä tienataksesi nämä rahat.
-				</p>
-				<div class="buttonDock">
-					<span class="but red closeModal"><b class="icon-remove"></b>&emsp;Sulje</span>
-				</div>
-			</div>
-		</div>
+		<dialog id="noMoneyModal" class="modal">
+			<h2 style="color:#C00000;">&#9888;&ensp;Rahasi eivät riitä!</h2>
+			<p>Ostaaksesi kohteen <b><span id="lisaaRahaaTuote"></span></b>, tarvitset <b><span id="lisaaRahaaArvo">0</span> <img src="img/kolikko0.png" alt="(HR)" style="height:24px;margin-bottom:-6px;" /> lisää</b>. Pelaa peliä tienataksesi nämä rahat.
+			</p>
+			<form method="dialog" class="buttonDock">
+				<button class="but red">&#10005;&emsp;Sulje</button>
+			</form>
+		</dialog>
+		<dialog id="infoModal" class="modal">
+			<p id="infoModalTeksti"></p>
+			<form method="dialog" class="buttonDock">
+				<button class="but">OK</button>
+			</form>
+		</dialog>
+		<dialog id="confirmModal" class="modal">
+			<p id="confirmModalTeksti"></p>
+			<form method="dialog" class="buttonDock">
+				<button class="but" value="ei">Ei</button>
+				<button class="but red" value="kylla">Kyllä</button>
+			</form>
+		</dialog>
 		<div id="center">
 			<div id="canvasContainer">
 				<canvas width="960" height="576" style="height:100%;">

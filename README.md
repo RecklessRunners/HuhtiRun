@@ -9,3 +9,14 @@ HuhtiRunissa juostaan pakoon hullaantunutta apinaa keräten matkalla pisteitä j
 Pelin on kehittänyt tiimi nimeltänsä *The Reckless Runners*. Tiimi koostuu osasta urjalalaisen Huhdin koulun lukuvuoden 2012 - 2013 9. lk oppilaista. Yhdeksännen luokan jälkeen on oppilaiden tiet eronneet toisistaan ja peliä kehitetään etänä.
 
 Toivomme saavamme lisää kehittäjiä peliin. Sinun ei tarvitse olla edellisen koulumme oppilas tai ylipäätään tuntea meitä. Pelin kehittämiseen liittyviä ohjeita löydät [wikistämme](/wiki).
+
+## Kehittäminen
+Peli on pelkkää HTML:ää, CSS:ää ja JavaScriptiä, eikä sen ajamiseen tarvita käännösvaihetta. Tarvitset vain [Node.js](https://nodejs.org/):n.
+
+```
+npm start      # käynnistää kehityspalvelimen osoitteeseen http://localhost:8765
+npm install    # asentaa kehitystyökalut (ESLint)
+npm run lint   # tarkistaa koodin
+```
+
+Peli toimii nykyaikaisissa selaimissa (Chrome, Firefox, Edge, Safari). Se on asennettava web-sovellus (`manifest.webmanifest`) ja toimii offline-tilassa `sw.js`-service workerin ansiosta. Jos muutat tiedostoja, joita service worker tarjoaa välimuistista, kasvata `VERSIO`-vakiota `sw.js`:ssä.

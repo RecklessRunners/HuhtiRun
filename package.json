@@ -1,0 +1,14 @@
+{
+	"name": "huhtirun",
+	"version": "1.0.0",
+	"private": true,
+	"description": "HuhtiRun - Temple Run -jäljitelmä",
+	"license": "SEE LICENSE IN LICENSE",
+	"scripts": {
+		"start": "npx --yes http-server -p 8765 -c-1 .",
+		"lint": "eslint js sw.js"
+	},
+	"devDependencies": {
+		"eslint": "^9.0.0"
+	}
+}

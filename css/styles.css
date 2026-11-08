@@ -1,4 +1,4 @@
-@import url("http://fonts.googleapis.com/css?family=Oxygen:400,700");
+@import url("https://fonts.googleapis.com/css?family=Oxygen:400,700");
 
 body,html{
 	margin:0;
@@ -12,9 +12,7 @@ body{
 	color:#FFF;
 	font-family: 'Oxygen', sans-serif;
 	overflow: hidden; 
-	-ms-content-zooming: none;
-	-moz-content-zooming: none;
-	-webkit-content-zooming: none;
+	touch-action: none;
 }
 a{
 	color:#0080FF;
@@ -36,8 +34,37 @@ canvas{
 	vertical-align:middle;
 	margin-top:-288px;
 }
-#modalContainer{
-	z-index:9999;
+.modal{
+	border:none;
+	border-radius:8px;
+	padding:16px 24px;
+	max-width:420px;
+	background:#fff;
+	color:#222;
+	text-align:left;
+	box-shadow:0 8px 32px rgba(0,0,0,.5);
+}
+.modal::backdrop{
+	background:rgba(0,0,0,.6);
+}
+.modal h2{
+	margin-top:0;
+}
+.buttonDock{
+	margin:16px 0 0;
+	text-align:right;
+}
+.but{
+	border:none;
+	border-radius:4px;
+	padding:8px 16px;
+	font:inherit;
+	color:#fff;
+	cursor:pointer;
+	background:#555;
+}
+.but.red{
+	background:#C00000;
 }
 #bottomBar{
 	position:fixed;
@@ -52,12 +79,4 @@ canvas{
 }
 #bottomBar:hover{
 	opacity:1;
-}
-#likeModal{
-	text-align:left;
-}
-#likeBox{
-	border:none;
-	height:150px;
-	width:384px;
 }

@@ -1,4 +1,5 @@
 import { s } from "./state.js";
+import { CONTROL_MOUSE } from "./constants/ids.js";
 
 // Nykyisen pelitallennuksen versionumero
 // TÄRKEÄ! MUUTA AINA YHTÄ ISOMMAKSI, KUN PELITALLENNUSMUOTOON TULEE MUUTOKSIA!
@@ -79,7 +80,7 @@ export function lataaTallennus(){
 			break;
 			case "4":
 				// Mahdollista pelitavan muuttaminen
-				s.asetukset["ohjausTapa"] = 0;
+				s.asetukset["ohjausTapa"] = CONTROL_MOUSE;
 				localStorage.asetukset = JSON.stringify(s.asetukset);
 				uusiVersio =  5;
 			break;

@@ -5,18 +5,21 @@ import { osta } from "../shop.js";
 import { s, canvas, ctx } from "../state.js";
 import { alustaMaasto } from "../terrain.js";
 import { kirjoita } from "../util.js";
+import { ENEMY_START_DISTANCE, KICKSTART_BASE_PRICE, KICKSTART_PRICE_STEP, KICKSTART_STEP, PLAYER_BASE_SPEED, REVIVE_BASE_PRICE, SHIELD_ON_RUN_START, VIBRATE_CLICK, VIBRATE_LONG } from "../constants/gameplay.js";
+import { SCREEN_MENU } from "../constants/ids.js";
+import { BACK_ZONE_LEFT, BACK_ZONE_RIGHT, FONT_BODY, FONT_CAPTION, FONT_LIST, FONT_SUBTITLE, FONT_TITLE, FOOTER_Y, MEDKIT_OFFSET_X, MEDKIT_OFFSET_Y, MENU_ZONE_TOP, PAGE_MARGIN, PAGE_SUBTITLE_Y, PAGE_TITLE_Y, SHOP_DESC_Y1, SHOP_DESC_Y2, SHOP_ITEM_HALF_WIDTH, SHOP_ITEM_Y, SHOP_PRICE_OFFSET, SHOP_SLIDE_BONUS, SHOP_SLIDE_KICKSTART, SHOP_SLIDE_REVIVE, SHOP_SLOTS, SHOP_SLOT_BONUS, SHOP_SLOT_KICKSTART, SHOP_SLOT_REVIVE, SHOP_STATUS_Y, SHOP_ZONE_TOP, START_ZONE_LEFT } from "../constants/ui.js";
 
 // Kenttävalinta (tila 1)
 export function piirraKenttavalinta(){
-	kirjoita("Valmiina . . .",64,128-s.veriSiirtymaNyt,true,48,"#FFF","'Raleway'");
-	kirjoita("Halutessasi voit ostaa power-upeja ennen peliä",64,152-s.veriSiirtymaNyt/2,true,16,"#FFF","'Source Sans Pro'");
+	kirjoita("Valmiina . . .",PAGE_MARGIN,PAGE_TITLE_Y-s.veriSiirtymaNyt,true,FONT_TITLE,"#FFF","'Raleway'");
+	kirjoita("Halutessasi voit ostaa power-upeja ennen peliä",PAGE_MARGIN,PAGE_SUBTITLE_Y-s.veriSiirtymaNyt/2,true,FONT_BODY,"#FFF","'Source Sans Pro'");
 	
 	ctx.textAlign="center";
-	ctx.drawImage(medikit[0],canvas.width/4-96+32,192+s.veriSiirtymaNyt/9+48);
-	kirjoita("Elvytys",canvas.width/4,192+s.veriSiirtymaNyt/9,true,20,"#FFF","'Raleway'");
-	kirjoita((100*Math.pow(2,s.elvytysjuomat)-1)+" (HR)",canvas.width/4,192+s.veriSiirtymaNyt/9+18,true,12,"silver");
-	kirjoita("Mahdollistaa henkiin",canvas.width/4,396+s.veriSiirtymaNyt/9);
-	kirjoita("heräämisen kuollessasi",canvas.width/4,420+s.veriSiirtymaNyt/9);
+	ctx.drawImage(medikit[0],canvas.width/SHOP_SLOTS*SHOP_SLOT_REVIVE-MEDKIT_OFFSET_X,SHOP_ITEM_Y+s.veriSiirtymaNyt/SHOP_SLIDE_REVIVE+MEDKIT_OFFSET_Y);
+	kirjoita("Elvytys",canvas.width/SHOP_SLOTS*SHOP_SLOT_REVIVE,SHOP_ITEM_Y+s.veriSiirtymaNyt/SHOP_SLIDE_REVIVE,true,FONT_LIST,"#FFF","'Raleway'");
+	kirjoita((REVIVE_BASE_PRICE*Math.pow(2,s.elvytysjuomat)-1)+" (HR)",canvas.width/SHOP_SLOTS*SHOP_SLOT_REVIVE,SHOP_ITEM_Y+s.veriSiirtymaNyt/SHOP_SLIDE_REVIVE+SHOP_PRICE_OFFSET,true,FONT_CAPTION,"silver");
+	kirjoita("Mahdollistaa henkiin",canvas.width/SHOP_SLOTS*SHOP_SLOT_REVIVE,SHOP_DESC_Y1+s.veriSiirtymaNyt/SHOP_SLIDE_REVIVE);
+	kirjoita("heräämisen kuollessasi",canvas.width/SHOP_SLOTS*SHOP_SLOT_REVIVE,SHOP_DESC_Y2+s.veriSiirtymaNyt/SHOP_SLIDE_REVIVE);
 	let elvytysteksti;
 	if(s.elvytysjuomat==0){
 		elvytysteksti = "EI ELVYTYSKERTOJA";
@@ -27,71 +30,71 @@ export function piirraKenttavalinta(){
 	if(s.elvytysjuomat > 1){
 		elvytysteksti = s.elvytysjuomat+" ELVYTYSKERTAA";
 	}
-	kirjoita(elvytysteksti,canvas.width/4,444+s.veriSiirtymaNyt/9,true,12,"silver");
+	kirjoita(elvytysteksti,canvas.width/SHOP_SLOTS*SHOP_SLOT_REVIVE,SHOP_STATUS_Y+s.veriSiirtymaNyt/SHOP_SLIDE_REVIVE,true,FONT_CAPTION,"silver");
 
-	kirjoita("Bonusta enemmän",canvas.width/4*2,192+s.veriSiirtymaNyt/6,true,20,"#FFF","'Raleway'");
-	kirjoita("TULOSSA MYÖHEMMIN",canvas.width/4*2,192+s.veriSiirtymaNyt/6+18,true,12,"silver");
-	kirjoita("Saat enemmän pisteitä",canvas.width/4*2,396+s.veriSiirtymaNyt/6);
-	kirjoita("bonusmittarin täyttyessä",canvas.width/4*2,420+s.veriSiirtymaNyt/6);
-	kirjoita("0/5 PÄIVITETTY",canvas.width/4*2,444+s.veriSiirtymaNyt/6,true,12,"silver");
+	kirjoita("Bonusta enemmän",canvas.width/SHOP_SLOTS*SHOP_SLOT_BONUS,SHOP_ITEM_Y+s.veriSiirtymaNyt/SHOP_SLIDE_BONUS,true,FONT_LIST,"#FFF","'Raleway'");
+	kirjoita("TULOSSA MYÖHEMMIN",canvas.width/SHOP_SLOTS*SHOP_SLOT_BONUS,SHOP_ITEM_Y+s.veriSiirtymaNyt/SHOP_SLIDE_BONUS+SHOP_PRICE_OFFSET,true,FONT_CAPTION,"silver");
+	kirjoita("Saat enemmän pisteitä",canvas.width/SHOP_SLOTS*SHOP_SLOT_BONUS,SHOP_DESC_Y1+s.veriSiirtymaNyt/SHOP_SLIDE_BONUS);
+	kirjoita("bonusmittarin täyttyessä",canvas.width/SHOP_SLOTS*SHOP_SLOT_BONUS,SHOP_DESC_Y2+s.veriSiirtymaNyt/SHOP_SLIDE_BONUS);
+	kirjoita("0/5 PÄIVITETTY",canvas.width/SHOP_SLOTS*SHOP_SLOT_BONUS,SHOP_STATUS_Y+s.veriSiirtymaNyt/SHOP_SLIDE_BONUS,true,FONT_CAPTION,"silver");
 
-	kirjoita("Alkupotkaisu",canvas.width/4*3,192+s.veriSiirtymaNyt/3,true,20,"#FFF","'Raleway'");
-	kirjoita(Math.floor(199+50*(s.alkupotkaisu/25))+" (HR)",canvas.width/4*3,192+s.veriSiirtymaNyt/3+18,true,12,"silver");
-	kirjoita("Hanki itsellesi "+(25+s.alkupotkaisu)+" m",canvas.width/4*3,396+s.veriSiirtymaNyt/3);
-	kirjoita("etumatkaa pelin alkaessa",canvas.width/4*3,420+s.veriSiirtymaNyt/3);
-	kirjoita(s.alkupotkaisu+" METRIÄ",canvas.width/4*3,444+s.veriSiirtymaNyt/3,true,12,"silver");
+	kirjoita("Alkupotkaisu",canvas.width/SHOP_SLOTS*SHOP_SLOT_KICKSTART,SHOP_ITEM_Y+s.veriSiirtymaNyt/SHOP_SLIDE_KICKSTART,true,FONT_LIST,"#FFF","'Raleway'");
+	kirjoita(Math.floor(KICKSTART_BASE_PRICE+KICKSTART_PRICE_STEP*(s.alkupotkaisu/KICKSTART_STEP))+" (HR)",canvas.width/SHOP_SLOTS*SHOP_SLOT_KICKSTART,SHOP_ITEM_Y+s.veriSiirtymaNyt/SHOP_SLIDE_KICKSTART+SHOP_PRICE_OFFSET,true,FONT_CAPTION,"silver");
+	kirjoita("Hanki itsellesi "+(KICKSTART_STEP+s.alkupotkaisu)+" m",canvas.width/SHOP_SLOTS*SHOP_SLOT_KICKSTART,SHOP_DESC_Y1+s.veriSiirtymaNyt/SHOP_SLIDE_KICKSTART);
+	kirjoita("etumatkaa pelin alkaessa",canvas.width/SHOP_SLOTS*SHOP_SLOT_KICKSTART,SHOP_DESC_Y2+s.veriSiirtymaNyt/SHOP_SLIDE_KICKSTART);
+	kirjoita(s.alkupotkaisu+" METRIÄ",canvas.width/SHOP_SLOTS*SHOP_SLOT_KICKSTART,SHOP_STATUS_Y+s.veriSiirtymaNyt/SHOP_SLIDE_KICKSTART,true,FONT_CAPTION,"silver");
 
 	ctx.textAlign="end";
-		kirjoita("Aloita peli »",canvas.width-64,512,true,24,"#47A94B","'Source Sans Pro'");
+		kirjoita("Aloita peli »",canvas.width-PAGE_MARGIN,FOOTER_Y,true,FONT_SUBTITLE,"#47A94B","'Source Sans Pro'");
 	ctx.textAlign="start";
 	s.veriSiirtyma=0;
-	kirjoita("« Paluu",64,512,true,24,"rgba(255,255,255,0.5)","'Source Sans Pro'");
+	kirjoita("« Paluu",PAGE_MARGIN,FOOTER_Y,true,FONT_SUBTITLE,"rgba(255,255,255,0.5)","'Source Sans Pro'");
 }
 
 // Klikkaus kenttävalinnassa ja kaupassa (tila 1)
 export function kasitteleKentanKlikkaus(){
-	varise(100);
-	if(s.y>448){
-		if(s.x>=48 && s.x<256){ // Siirry takaisin
-			s.tila=0;
+	varise(VIBRATE_CLICK);
+	if(s.y>MENU_ZONE_TOP){
+		if(s.x>=BACK_ZONE_LEFT && s.x<BACK_ZONE_RIGHT){ // Siirry takaisin
+			s.tila=SCREEN_MENU;
 			s.veriSiirtyma=canvas.height;
 			soitaAani(klikkiAani[0]);
 		}
-		if(s.x>=512){ 
+		if(s.x>=START_ZONE_LEFT){ 
 			s.veriSiirtyma=canvas.height;
 			if(! s.inaktiivinenMenu){ // Aloita uusi peli
 				s.lentavatObjektit = [];
 				s.striikki=0;
-				s.tila=0;
+				s.tila=SCREEN_MENU;
 				soitaAani(klikkiAani[0]);
 				alustaMaasto();
-				s.vihuSiirtyma=512;
-				s.pelaajaNopeus=10;
+				s.vihuSiirtyma=ENEMY_START_DISTANCE;
+				s.pelaajaNopeus=PLAYER_BASE_SPEED;
 				soitaAani(huuto[0]);
 				s.hengissa=true;
 				s.pisteet=0;
 				s.matka=0;
 				s.bonuspisteet=0;
 				tausta[0].volume=1;
-				s.suojakilpi+=3;
+				s.suojakilpi+=SHIELD_ON_RUN_START;
 				s.pelikerrat=0;
-				varise(1000);
+				varise(VIBRATE_LONG);
 			}
 		}
 	}else{
-		if(s.y>192){
-			if(s.x >= canvas.width/4-96 && s.x < canvas.width/4+96){
-				if(osta(100*Math.pow(2,s.elvytysjuomat)-1,"Elvytys",true)){
+		if(s.y>SHOP_ZONE_TOP){
+			if(s.x >= canvas.width/SHOP_SLOTS*SHOP_SLOT_REVIVE-SHOP_ITEM_HALF_WIDTH && s.x < canvas.width/SHOP_SLOTS*SHOP_SLOT_REVIVE+SHOP_ITEM_HALF_WIDTH){
+				if(osta(REVIVE_BASE_PRICE*Math.pow(2,s.elvytysjuomat)-1,"Elvytys",true)){
 					s.elvytysjuomat+=1;
 					localStorage.elvytysjuomat=s.elvytysjuomat;
 				}
 			}
-			if(s.x >= canvas.width/4*2-96 && s.x < canvas.width/4*2+96){
+			if(s.x >= canvas.width/SHOP_SLOTS*SHOP_SLOT_BONUS-SHOP_ITEM_HALF_WIDTH && s.x < canvas.width/SHOP_SLOTS*SHOP_SLOT_BONUS+SHOP_ITEM_HALF_WIDTH){
 				naytaIlmoitus("Tulossa myöhemmin!");
 			}
-			if(s.x >= canvas.width/4*3-96 && s.x < canvas.width/4*3+96){
-				if(osta(199+50*(s.alkupotkaisu/25),"Alkupotkaisu 25 m",true)){
-					s.alkupotkaisu+=25;
+			if(s.x >= canvas.width/SHOP_SLOTS*SHOP_SLOT_KICKSTART-SHOP_ITEM_HALF_WIDTH && s.x < canvas.width/SHOP_SLOTS*SHOP_SLOT_KICKSTART+SHOP_ITEM_HALF_WIDTH){
+				if(osta(KICKSTART_BASE_PRICE+KICKSTART_PRICE_STEP*(s.alkupotkaisu/KICKSTART_STEP),"Alkupotkaisu 25 m",true)){
+					s.alkupotkaisu+=KICKSTART_STEP;
 				}
 			}
 		}

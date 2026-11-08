@@ -1,4 +1,7 @@
 import { s } from "./state.js";
+import { formatThousands } from "./util.js";
+import { GOAL_ADDICT_TOTAL_DISTANCE, GOAL_ATHLETE_DISTANCE, GOAL_ELITE_DISTANCE, GOAL_IMMORTAL_REVIVES, GOAL_RICH_MONEY, GOAL_RUNNER_DISTANCE, LOADING_SLOGAN_COUNT } from "./constants/gameplay.js";
+import { GOAL_DATA_MAX_MONEY, GOAL_DATA_MAX_REVIVES } from "./constants/ids.js";
 
 // Pelin staattinen data: kentät eli biomit, tutoriaali, latausviestit ja tekijälista
 
@@ -99,7 +102,7 @@ export const latausSloganit = [
 	"Sidotaan kengännauhoja"
 ];
 export const latausSloganitArvottu = [];
-for(let i=0;i<5;i++){
+for(let i=0;i<LOADING_SLOGAN_COUNT;i++){
 	const satunnainenSloganId = Math.floor(Math.random()*latausSloganit.length);
 	latausSloganitArvottu.push(latausSloganit[satunnainenSloganId]);
 	latausSloganit.splice(satunnainenSloganId,1);
@@ -142,33 +145,33 @@ export const tekijat = {
 export const tavoitteet = [
 	{
 		nimi:"Lenkkeilijä",
-		kuvaus:"Juokse 250 metriä yhden pelin aikana!",
-		vaatimus:function(){return 1/250*s.parhaatMatkat[0];}
+		kuvaus:"Juokse "+formatThousands(GOAL_RUNNER_DISTANCE)+" metriä yhden pelin aikana!",
+		vaatimus:function(){return 1/GOAL_RUNNER_DISTANCE*s.parhaatMatkat[0];}
 	},
 	{
 		nimi:"Urheilija",
-		kuvaus:"Juokse 500 metriä yhden pelin aikana!",
-		vaatimus:function(){return 1/500*s.parhaatMatkat[0];}
+		kuvaus:"Juokse "+formatThousands(GOAL_ATHLETE_DISTANCE)+" metriä yhden pelin aikana!",
+		vaatimus:function(){return 1/GOAL_ATHLETE_DISTANCE*s.parhaatMatkat[0];}
 	},
 	{
 		nimi:"Huippu-urheilija",
-		kuvaus:"Juokse 750 metriä yhden pelin aikana!",
-		vaatimus:function(){return 1/750*s.parhaatMatkat[0];}
+		kuvaus:"Juokse "+formatThousands(GOAL_ELITE_DISTANCE)+" metriä yhden pelin aikana!",
+		vaatimus:function(){return 1/GOAL_ELITE_DISTANCE*s.parhaatMatkat[0];}
 	},
 	{
 		nimi:"Addikti",
-		kuvaus:"Juokse 20 000 metriä koko aikana.",
-		vaatimus:function(){return 1/20000*s.matkaYht;}
+		kuvaus:"Juokse "+formatThousands(GOAL_ADDICT_TOTAL_DISTANCE)+" metriä koko aikana.",
+		vaatimus:function(){return 1/GOAL_ADDICT_TOTAL_DISTANCE*s.matkaYht;}
 	},
 	{
 		nimi:"Kuolematon",
 		kuvaus:"Elvytä itsesi viidesti yhden pelin aikana.",
-		vaatimus:function(){return 1/5*s.tavoiteData[2];}
+		vaatimus:function(){return 1/GOAL_IMMORTAL_REVIVES*s.tavoiteData[GOAL_DATA_MAX_REVIVES];}
 	},
 	{
 		nimi:"Rikas",
-		kuvaus:"Hanki 20 000 (HR) vähintään kerran.",
-		vaatimus:function(){return 1/20000*s.tavoiteData[0];}
+		kuvaus:"Hanki "+formatThousands(GOAL_RICH_MONEY)+" (HR) vähintään kerran.",
+		vaatimus:function(){return 1/GOAL_RICH_MONEY*s.tavoiteData[GOAL_DATA_MAX_MONEY];}
 	},
 	{
 		nimi:"Mestari",

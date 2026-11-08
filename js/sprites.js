@@ -1,18 +1,20 @@
 import { hyppyKuva, ukko, varjo, vihu } from "./assets.js";
-import { s, canvas, ctx, ukkoY } from "./state.js";
+import { s, canvas, ctx } from "./state.js";
+import { SHIELD_BLINK_LIMIT, SHIELD_FADED_ALPHA } from "./constants/gameplay.js";
+import { HALF_TILE, JUMP_BUTTON_BOTTOM_OFFSET, JUMP_BUTTON_PRESSED_HEIGHT, JUMP_BUTTON_PRESSED_OFFSET, JUMP_BUTTON_SIZE, JUMP_BUTTON_X, JUMP_SPRITE_GROW, JUMP_SPRITE_SIZE, PLAYER_Y, SHADOW_OFFSET_X, SHADOW_OFFSET_Y } from "./constants/geometry.js";
 
 export function piirraVarjo(){
 	if(s.hyppy && s.hengissa){
-		ctx.drawImage(varjo[0],s.ukkoX+48,ukkoY+96);
+		ctx.drawImage(varjo[0],s.ukkoX+SHADOW_OFFSET_X,PLAYER_Y+SHADOW_OFFSET_Y);
 	}
 }
 
 export function piirraHyppyNappi(){
 	if(s.hengissa){
 		if(s.hyppy){
-			ctx.drawImage(hyppyKuva[0],64,canvas.height-64,64,32);
+			ctx.drawImage(hyppyKuva[0],JUMP_BUTTON_X,canvas.height-JUMP_BUTTON_PRESSED_OFFSET,JUMP_BUTTON_SIZE,JUMP_BUTTON_PRESSED_HEIGHT);
 		}else{
-			ctx.drawImage(hyppyKuva[0],64,canvas.height-96);
+			ctx.drawImage(hyppyKuva[0],JUMP_BUTTON_X,canvas.height-JUMP_BUTTON_BOTTOM_OFFSET);
 		}
 	}
 }
@@ -26,7 +28,7 @@ export function piirraVihu(i,piirtoX,piirtoY){
 		ctx.save();
 		ctx.translate(translaatio.x,translaatio.y);
 		ctx.rotate(s.vihuAsteluku);
-		ctx.drawImage(vihu[i],-96,-96);
+		ctx.drawImage(vihu[i],-HALF_TILE,-HALF_TILE);
 		ctx.restore();
 	}
 }
@@ -34,10 +36,10 @@ export function piirraVihu(i,piirtoX,piirtoY){
 export function piirraUkko(i,piirtoX,piirtoY){
 	if(s.hengissa){
 		if(s.suojakilpi>0){
-			if(s.suojakilpi<=5 && s.pelaaNo % 1){
+			if(s.suojakilpi<=SHIELD_BLINK_LIMIT && s.pelaaNo % 1){
 				ctx.globalAlpha=1;
 			}else{
-				ctx.globalAlpha=0.25;
+				ctx.globalAlpha=SHIELD_FADED_ALPHA;
 			}
 		}
 		const translaatio = {
@@ -48,9 +50,9 @@ export function piirraUkko(i,piirtoX,piirtoY){
 		ctx.translate(translaatio.x,translaatio.y);
 		ctx.rotate(s.asteluku);
 		if(s.hyppy){
-			ctx.drawImage(ukko[i],-96-24,-96-24,240,240);
+			ctx.drawImage(ukko[i],-HALF_TILE-JUMP_SPRITE_GROW,-HALF_TILE-JUMP_SPRITE_GROW,JUMP_SPRITE_SIZE,JUMP_SPRITE_SIZE);
 		}else{
-			ctx.drawImage(ukko[i],-96,-96);
+			ctx.drawImage(ukko[i],-HALF_TILE,-HALF_TILE);
 		}
 		ctx.restore();
 	}

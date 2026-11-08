@@ -1,20 +1,26 @@
 import { taustaKuva, tieOikeaYlos, tieOikealle, tieRisteys, tieSuoraan, tieVaakaan, tieVasemmalle, tieVasenYlos } from "./assets.js";
 import { biomiKuvat, biomiTieOYKuvat, biomiTieOikKuvat, biomiTieSuoraanKuvat, biomiTieVYKuvat, biomiTieVaakaanKuvat, biomiTieVasKuvat, biomiVarit } from "./data.js";
 import { s, ctx } from "./state.js";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, LAST_COLUMN, ROAD_START_COLUMN, TERRAIN_COLUMNS, TERRAIN_ROWS, TILE_SIZE } from "./constants/geometry.js";
+
+// Terrain column indices [0..TERRAIN_COLUMNS-1] as a fresh array (callers splice it)
+function columnIndices(){
+	return Array.from({length: TERRAIN_COLUMNS}, function(_, i){ return i; });
+}
 
 // 2D-taulukko [5x4], jossa on referenssit kuviin
 export function alustaMaasto(){
-	s.maasto = new Array(5);
+	s.maasto = new Array(TERRAIN_COLUMNS);
 	s.maastomuoto = new Array(s.maasto.length); //Tarvitaan lopetusehtoon
-	s.tie = 2; //Missä on ylimmänrivin tie matkalla ylöspäin.
+	s.tie = ROAD_START_COLUMN; //Missä on ylimmänrivin tie matkalla ylöspäin.
 	for (let i=0; i<s.maasto.length; i++){ // X-suuntaan
-		s.maasto[i] = new Array(4);
+		s.maasto[i] = new Array(TERRAIN_ROWS);
 		s.maastomuoto[i] = new Array( s.maasto[i].length );
 		// Generoi maasto eli lataa kuvat:
 		// Tehdään suora tie:
 
 		for(let j=0; j<s.maasto[i].length; j++){ // Y-suuntaan
-			if(i == 2){
+			if(i == ROAD_START_COLUMN){
 				// Keskelle tie.
 				s.maasto[i][j] = tieSuoraan[biomiTieSuoraanKuvat[s.biomi][0]]; //Satunnainen tie.
 	        	s.maastomuoto[i][j] = 1; //TIE
@@ -29,7 +35,7 @@ export function alustaMaasto(){
 
 export function jatkaTieOikeaan(ind){
 		//Arvotaan, kuinka kauas mennään oikeaan, eli arvotaan indeksi, jossa käännytään ylös
-		s.ylos = Math.floor( Math.random()*(5-1-ind) ) + ind +1 ;
+		s.ylos = Math.floor( Math.random()*(TERRAIN_COLUMNS-1-ind) ) + ind +1 ;
 
 		s.maasto[ind][0] = tieOikealle[biomiTieOikKuvat[s.biomi][Math.floor(Math.random()*biomiTieOikKuvat[s.biomi].length)]];
 		s.maastomuoto[ind][0] = 1;
@@ -42,7 +48,7 @@ export function jatkaTieOikeaan(ind){
 		s.maastomuoto[s.ylos][0]=1; 
 
 		//Täytetään muut taustalla
-		const iTausta = [0, 1, 2, 3, 4];
+		const iTausta = columnIndices();
 		iTausta.splice(ind, s.ylos-ind+1);
 		for (let i in iTausta ){
 		  s.maasto[iTausta[i]][0] = taustaKuva[biomiKuvat[s.biomi][Math.floor(Math.random()*biomiKuvat[s.biomi].length)]];
@@ -53,16 +59,16 @@ export function jatkaTieOikeaan(ind){
 
 export function jatkaTieRisteykseen(ind){
 	// Täytetään maastografiikka
-	for (let i=0; i<5; i++){
+	for (let i=0; i<TERRAIN_COLUMNS; i++){
 		s.maasto[i][0] = taustaKuva[biomiKuvat[s.biomi][Math.floor(Math.random()*biomiKuvat[s.biomi].length)]];
 	}
 
 		// Arvo, kuinka kauas mennään oikeaan/vasempaan, eli arvotaan indeksi, jossa käännytään ylös
-		s.ylos = Math.floor(Math.random()*5);
+		s.ylos = Math.floor(Math.random()*TERRAIN_COLUMNS);
 
 	// Estä uuden indeksin olemasta sama kuin nykyinen
 	while(s.ylos == ind){ 
-		s.ylos = Math.floor(Math.random()*5);
+		s.ylos = Math.floor(Math.random()*TERRAIN_COLUMNS);
 	}
 
 	// Täytä välit tiellä
@@ -76,7 +82,7 @@ export function jatkaTieRisteykseen(ind){
 	}else{ // Risteys vasen
 		s.maasto[s.ylos][0] = tieVasenYlos[biomiTieVYKuvat[s.biomi][Math.floor(Math.random()*biomiTieVYKuvat[s.biomi].length)]];
 		s.maastomuoto[s.ylos][0] = 1;
-		for (let i=4; i>s.ylos; i--){
+		for (let i=LAST_COLUMN; i>s.ylos; i--){
 			s.maasto[i][0] = tieVaakaan[biomiTieVaakaanKuvat[s.biomi][Math.floor(Math.random()*biomiTieVaakaanKuvat[s.biomi].length)]];
 			s.maastomuoto[i][0] = 1;
 		}
@@ -104,7 +110,7 @@ export function jatkaTieVasempaan(ind){
 
 
 		//Täytetään muut taustalla
-		const iTausta = [0, 1, 2, 3, 4];
+		const iTausta = columnIndices();
 		iTausta.splice(s.ylos, ind-s.ylos+1);
 		for (let i in iTausta ){
 		  s.maasto[iTausta[i]][0] = taustaKuva[biomiKuvat[s.biomi][Math.floor(Math.random()*biomiKuvat[s.biomi].length)]];
@@ -118,7 +124,7 @@ export function jatkaTieYlos(ind){
 	s.maasto[ind][0] = tieSuoraan[biomiTieSuoraanKuvat[s.biomi][Math.floor(Math.random()*biomiTieSuoraanKuvat[s.biomi].length)]];
 	s.maastomuoto[ind][0]=1;
 
-	const iTausta = [0, 1, 2, 3, 4];
+	const iTausta = columnIndices();
 	iTausta.splice(ind,1);
 	for(const i in iTausta){
 		s.maasto[iTausta[i]][0] = taustaKuva[biomiKuvat[s.biomi][Math.floor(Math.random()*biomiKuvat[s.biomi].length)]];
@@ -131,12 +137,12 @@ export function jatkaTieYlos(ind){
 
 export function piirraMaasto(siirtoY){
 	ctx.fillStyle="#"+biomiVarit[s.biomi];
-	ctx.fillRect(0,0,960,576);
+	ctx.fillRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
 	
 	for (let i=0; i<s.maasto.length; i++){
 		for (let j=0; j<s.maasto[i].length; j++){
 			try{
-				ctx.drawImage(s.maasto[i][j], i*192, (j-1)*192 + siirtoY);
+				ctx.drawImage(s.maasto[i][j], i*TILE_SIZE, (j-1)*TILE_SIZE + siirtoY);
 			}catch(e){
 				// Do nothing
 			}

@@ -26,6 +26,7 @@ Peli on jaettu ES-moduuleihin (`js/`). Kaikki moduulien välillä jaettu muuttuv
 | `assets.js` | kuvien ja äänten lataus |
 | `audio.js`, `save.js`, `shop.js`, `terrain.js`, `sprites.js` | ääni, tallennus, kauppa, maasto, hahmojen piirto |
 | `data.js` | staattinen data: kentät, tavoitteet, tekijät, latausviestit |
+| `constants/*.js` | kaikki nimetyt vakiot (englanniksi): `geometry` (kanvas, ruudut, spritet), `gameplay` (pelin säätöarvot, hinnat, todennäköisyydet), `audio`, `ui` (asettelu, fonttikoot, klikkausalueet) ja `ids` (ruudut, kentät, ohjaustavat) |
 | `modals.js`, `util.js` | `<dialog>`-ikkunat ja apufunktiot |
 
 ## Kehittäminen
@@ -37,4 +38,4 @@ npm install    # asentaa kehitystyökalut (ESLint)
 npm run lint   # tarkistaa koodin
 ```
 
-Peli toimii nykyaikaisissa selaimissa (Chrome, Firefox, Edge, Safari). Se on asennettava web-sovellus (`manifest.webmanifest`) ja toimii offline-tilassa `sw.js`-service workerin ansiosta. Kun lisäät tai poistat JavaScript-moduuleja, päivitä `ESILADATTAVAT`-lista ja kasvata `VERSIO`-vakiota `sw.js`:ssä.
+Peli toimii nykyaikaisissa selaimissa (Chrome, Firefox, Edge, Safari). Se on asennettava web-sovellus (`manifest.webmanifest`) ja toimii offline-tilassa `sw.js`-service workerin ansiosta. Kun lisäät tai poistat JavaScript-moduuleja (myös `constants/`-kansiossa), päivitä `ESILADATTAVAT`-lista ja kasvata `VERSIO`-vakiota `sw.js`:ssä.

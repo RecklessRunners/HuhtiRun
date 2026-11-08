@@ -8,6 +8,9 @@ import { kasitteleTekijoidenKlikkaus } from "./screens/tekijat.js";
 import { kasitteleTilastojenKlikkaus } from "./screens/tilastot.js";
 import { kasitteleValikonKlikkaus } from "./screens/valikko.js";
 import { s, canvas } from "./state.js";
+import { BONUS_POINTS, JUMP_DURATION, JUMP_ZONE_START, KEYBOARD_MOVE_STEP } from "./constants/gameplay.js";
+import { HALF_TILE, TILE_SIZE } from "./constants/geometry.js";
+import { CONTROL_KEYBOARD, CONTROL_MOUSE, SCREEN_CREDITS, SCREEN_GOALS, SCREEN_LEVELS, SCREEN_MENU, SCREEN_SETTINGS, SCREEN_STATS } from "./constants/ids.js";
 
 export function alustaSyote(){
 	// Pelaajan ohjauskomennot (sidotaan vain kerran, ei joka päivityksellä)
@@ -18,7 +21,7 @@ export function alustaSyote(){
 				s.hyppy=true;
 				setTimeout(function(){
 					s.hyppy=false;
-				},500);
+				},JUMP_DURATION);
 			}
 		}
 		if(e.key=="Escape"){
@@ -32,17 +35,17 @@ export function alustaSyote(){
 		}
 		s.ukkoLiikkuuX=0;
 	});
-	document.addEventListener("keydown", function(e){	if(s.asetukset.ohjausTapa=="1"){
+	document.addEventListener("keydown", function(e){	if(s.asetukset.ohjausTapa == CONTROL_KEYBOARD){
 			if(s.ukkoLiikkuuX==0){
 				if(e.key=="ArrowRight"){
 					if(!s.tauko && s.hengissa){
-						s.ukkoLiikkuuX=36; // Oikealle
+						s.ukkoLiikkuuX=KEYBOARD_MOVE_STEP; // Oikealle
 						console.log("oik");
 					}
 				}
 				if(e.key=="ArrowLeft"){
 					if(!s.tauko && s.hengissa){
-						s.ukkoLiikkuuX=-36; // Vasemmalle
+						s.ukkoLiikkuuX=-KEYBOARD_MOVE_STEP; // Vasemmalle
 						console.log("vas");
 					}
 				}
@@ -71,17 +74,17 @@ export function alustaSyote(){
 			kasittelePelinKlikkaus();
 		}else{
 			if(lataus.ladatut >= lataus.kaikki){
-				if(s.tila==0){
+				if(s.tila==SCREEN_MENU){
 					kasitteleValikonKlikkaus();
-			}else if(s.tila==1){
+			}else if(s.tila==SCREEN_LEVELS){
 				kasitteleKentanKlikkaus();
-			}else if(s.tila==2){ // Tavoitemenu
+			}else if(s.tila==SCREEN_GOALS){ // Tavoitemenu
 				kasitteleTavoitteidenKlikkaus();
-			}else if(s.tila==3){ // Tilastomenu
+			}else if(s.tila==SCREEN_STATS){ // Tilastomenu
 				kasitteleTilastojenKlikkaus();
-			}else if(s.tila==4){ // Tietoja-menu
+			}else if(s.tila==SCREEN_CREDITS){ // Tietoja-menu
 				kasitteleTekijoidenKlikkaus();
-			}else if(s.tila==5){ // Asetukset-menu
+			}else if(s.tila==SCREEN_SETTINGS){ // Asetukset-menu
 				kasitteleAsetustenKlikkaus();
 			}
 		}
@@ -103,7 +106,7 @@ export function alustaSyote(){
 			}
 			soitaAani(klikkiAani[0]);
 			alustaMaasto();
-			ukkoX=384;
+			ukkoX=START_LANE_X;
 		}*/
 	});
 	canvas.addEventListener("pointermove", function(e){
@@ -114,12 +117,12 @@ export function alustaSyote(){
 		if(lataus.ladatut<lataus.kaikki){
 
 		}else{
-			if(s.asetukset.ohjausTapa=="0"){
-				if(s.y<canvas.height*.8){
+			if(s.asetukset.ohjausTapa == CONTROL_MOUSE){
+				if(s.y<canvas.height*JUMP_ZONE_START){
 					if(s.hengissa && !s.tauko && s.suojakilpi <= 0){
-						s.tavoiteX=s.x-96;
+						s.tavoiteX=s.x-HALF_TILE;
 					}else{
-						const puolivali = Math.floor(((s.tieMinMax[0]+s.tieMinMax[1])/2)/192)*192;
+						const puolivali = Math.floor(((s.tieMinMax[0]+s.tieMinMax[1])/2)/TILE_SIZE)*TILE_SIZE;
 						s.tavoiteX=puolivali;
 					}
 				}else{
@@ -129,7 +132,7 @@ export function alustaSyote(){
 							s.hyppy=true;
 							setTimeout(function(){
 								s.hyppy=false;
-							},500);
+							},JUMP_DURATION);
 						}
 					}
 				}
@@ -137,7 +140,7 @@ export function alustaSyote(){
 		}
 	}
 	canvas.addEventListener("dblclick", function(){	if(s.hengissa && s.bonuspisteet >= s.maxBonuspisteet){
-			s.pisteet+=20;
+			s.pisteet+=BONUS_POINTS;
 			s.bonuspisteet=0;
 			soitaAani(maksuAani[0]);
 		}

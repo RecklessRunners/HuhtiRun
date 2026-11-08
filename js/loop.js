@@ -1,8 +1,7 @@
+import { MAX_CATCHUP_STEPS, UPDATE_INTERVAL } from "./constants/gameplay.js";
 // Pelisilmukka: logiikka etenee kiinteällä 50 ms askeleella (kuten ennen setIntervalin kanssa),
 // mutta piirto ajoitetaan selaimen kuvataajuuteen requestAnimationFramella.
 // Kun välilehti on taustalla, requestAnimationFrame pysähtyy, joten peli ei juokse "tyhjää".
-const PAIVITYS_VALI = 50;
-const MAX_ASKELIA_KERRALLA = 5; // Estää "kiinniottokierteen" pitkän tauon jälkeen
 let edellinenAika = null;
 let kertyma = 0;
 let paivitaAskel = null;
@@ -14,12 +13,12 @@ function pelisilmukka(aika){
 	kertyma += aika - edellinenAika;
 	edellinenAika = aika;
 	let askelia = 0;
-	while(kertyma >= PAIVITYS_VALI && askelia < MAX_ASKELIA_KERRALLA){
+	while(kertyma >= UPDATE_INTERVAL && askelia < MAX_CATCHUP_STEPS){
 		paivitaAskel();
-		kertyma -= PAIVITYS_VALI;
+		kertyma -= UPDATE_INTERVAL;
 		askelia++;
 	}
-	if(askelia == MAX_ASKELIA_KERRALLA){
+	if(askelia == MAX_CATCHUP_STEPS){
 		kertyma = 0;
 	}
 }

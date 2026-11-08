@@ -1,3 +1,4 @@
+import { SLOW_LOAD_TIMEOUT } from "./constants/gameplay.js";
 // Kuvien ja äänten lataus. Latauksen tila on yhdessä oliossa, jota muut moduulit voivat lukea.
 export const lataus = {
 	kaikki: 0,            // Ladattavien tiedostojen määrä
@@ -18,7 +19,7 @@ function lataaKuvat(nimi, nmax){
 			clearTimeout(lataus.hidasAjastin);
 			lataus.hidasAjastin = setTimeout(function(){
 				lataus.hidas=true;
-			},10000);
+			},SLOW_LOAD_TIMEOUT);
 		};
 		img.onerror=function(){
 			lataus.virhe=true;

@@ -2,12 +2,33 @@
 
 // Service worker: mahdollistaa pelin pelaamisen ilman verkkoyhteyttä.
 // Kasvata VERSIO, kun haluat pakottaa välimuistin tyhjennyksen.
-const VERSIO = "huhtirun-v1";
+const VERSIO = "huhtirun-v3";
 const ESILADATTAVAT = [
 	"./",
 	"index.html",
 	"css/styles.css",
-	"js/scripts.js",
+	"js/main.js",
+	"js/assets.js",
+	"js/audio.js",
+	"js/data.js",
+	"js/game.js",
+	"js/input.js",
+	"js/loop.js",
+	"js/modals.js",
+	"js/save.js",
+	"js/shop.js",
+	"js/sprites.js",
+	"js/state.js",
+	"js/terrain.js",
+	"js/util.js",
+	"js/screens/asetukset.js",
+	"js/screens/hud.js",
+	"js/screens/kentat.js",
+	"js/screens/kuolema.js",
+	"js/screens/tavoitteet.js",
+	"js/screens/tekijat.js",
+	"js/screens/tilastot.js",
+	"js/screens/valikko.js",
 	"manifest.webmanifest",
 	"img/favicon.png",
 	"img/icon-192.png"

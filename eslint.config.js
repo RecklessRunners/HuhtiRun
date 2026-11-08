@@ -12,7 +12,7 @@ const serviceWorker = {
 module.exports = [
 	{
 		files: ["js/**/*.js"],
-		languageOptions: { ecmaVersion: 2022, sourceType: "script", globals: selain },
+		languageOptions: { ecmaVersion: 2022, sourceType: "module", globals: selain },
 		rules: { "no-undef": "error", "no-var": "error" }
 	},
 	{

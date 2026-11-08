@@ -2,6 +2,8 @@
 
 **HuhtiRun** on vapaan lähdekoodin (= *open source*) jäljitelmä suositusta Temple Run -pelistä.
 
+**Pelaa:** https://recklessrunners.github.io/HuhtiRun/
+
 ## Pelin idea
 HuhtiRunissa juostaan pakoon hullaantunutta apinaa keräten matkalla pisteitä ja bonuksia. Pelin tavoitteena on juosta kuolematta mahdollisimman pitkälle. Pelissä on monia erilaisia kenttiä, joita voi ostaa pelin sisäisellä valuutalla.
 

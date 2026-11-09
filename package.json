@@ -9,10 +9,13 @@
 		"dev": "vite",
 		"build": "vite build",
 		"preview": "vite preview",
-		"lint": "eslint js public/sw.js"
+		"lint": "eslint js public/sw.js",
+		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
 		"eslint": "^9.0.0",
+		"typescript": "^6.0.3",
+		"typescript-eslint": "^8.72.1",
 		"vite": "^8.3.7"
 	}
 }

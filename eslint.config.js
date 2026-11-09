@@ -16,7 +16,7 @@ module.exports = [
 		rules: { "no-undef": "error", "no-var": "error" }
 	},
 	{
-		files: ["sw.js"],
+		files: ["public/sw.js"],
 		languageOptions: { ecmaVersion: 2022, sourceType: "script", globals: serviceWorker },
 		rules: { "no-undef": "error", "no-var": "error" }
 	}

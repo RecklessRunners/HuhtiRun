@@ -2,42 +2,16 @@
 
 // Service worker: mahdollistaa pelin pelaamisen ilman verkkoyhteyttä.
 // Kasvata VERSIO, kun haluat pakottaa välimuistin tyhjennyksen.
-const VERSIO = "huhtirun-v4";
+const VERSIO = "huhtirun-v5";
 const ESILADATTAVAT = [
 	"./",
 	"index.html",
-	"css/styles.css",
-	"js/main.js",
-	"js/assets.js",
-	"js/audio.js",
-	"js/data.js",
-	"js/game.js",
-	"js/input.js",
-	"js/loop.js",
-	"js/modals.js",
-	"js/save.js",
-	"js/shop.js",
-	"js/sprites.js",
-	"js/state.js",
-	"js/terrain.js",
-	"js/util.js",
-	"js/constants/audio.js",
-	"js/constants/gameplay.js",
-	"js/constants/geometry.js",
-	"js/constants/ids.js",
-	"js/constants/ui.js",
-	"js/screens/asetukset.js",
-	"js/screens/hud.js",
-	"js/screens/kentat.js",
-	"js/screens/kuolema.js",
-	"js/screens/tavoitteet.js",
-	"js/screens/tekijat.js",
-	"js/screens/tilastot.js",
-	"js/screens/valikko.js",
 	"manifest.webmanifest",
 	"img/favicon.png",
 	"img/icon-192.png"
 ];
+// Vite nimeää koodi- ja tyylitiedostot sisällön mukaan (assets/*-hash.js), joten ne tallentuvat
+// välimuistiin ajon aikana verkkoEnsin-käsittelijässä eikä niitä voi listata tähän.
 
 self.addEventListener("install", function(e){
 	e.waitUntil(

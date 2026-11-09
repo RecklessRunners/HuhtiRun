@@ -30,12 +30,14 @@ Peli on jaettu ES-moduuleihin (`js/`). Kaikki moduulien välillä jaettu muuttuv
 | `modals.js`, `util.js` | `<dialog>`-ikkunat ja apufunktiot |
 
 ## Kehittäminen
-Peli on pelkkää HTML:ää, CSS:ää ja JavaScriptiä, eikä sen ajamiseen tarvita käännösvaihetta. Tarvitset vain [Node.js](https://nodejs.org/):n.
+Peli on pelkkää HTML:ää, CSS:ää ja JavaScriptiä, ja sitä rakennetaan [Vitellä](https://vite.dev/). Tarvitset [Node.js](https://nodejs.org/):n.
 
 ```
+npm install    # asentaa kehitystyökalut (Vite, ESLint)
 npm start      # käynnistää kehityspalvelimen osoitteeseen http://localhost:8765
-npm install    # asentaa kehitystyökalut (ESLint)
+npm run build  # tuottaa julkaisuversion kansioon dist/
+npm run preview # esikatselee julkaisuversion
 npm run lint   # tarkistaa koodin
 ```
 
-Peli toimii nykyaikaisissa selaimissa (Chrome, Firefox, Edge, Safari). Se on asennettava web-sovellus (`manifest.webmanifest`) ja toimii offline-tilassa `sw.js`-service workerin ansiosta. Kun lisäät tai poistat JavaScript-moduuleja (myös `constants/`-kansiossa), päivitä `ESILADATTAVAT`-lista ja kasvata `VERSIO`-vakiota `sw.js`:ssä.
+Peli toimii nykyaikaisissa selaimissa (Chrome, Firefox, Edge, Safari). Se on asennettava web-sovellus (`manifest.webmanifest`) ja toimii offline-tilassa `sw.js`-service workerin ansiosta. Staattiset tiedostot (`img/`, `snd/`, `pages/`, `sw.js`, `manifest.webmanifest`) ovat kansiossa `public/`. Koodi ja tyylit paketoidaan Viten toimesta, joten `sw.js`:n `ESILADATTAVAT`-listaan kuuluvat vain kuvat ja kuoren tiedostot; kasvata `VERSIO`-vakiota, kun haluat tyhjentää välimuistin.

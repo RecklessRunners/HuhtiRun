@@ -7,7 +7,7 @@
 	"scripts": {
 		"start": "vite",
 		"dev": "vite",
-		"build": "vite build",
+		"build": "tsc --noEmit && vite build",
 		"preview": "vite preview",
 		"lint": "eslint js public/sw.js",
 		"typecheck": "tsc --noEmit"

@@ -1,10 +1,10 @@
-import { kimalle, klikkiAani, mitalinauha, mitalit } from "../assets.js";
-import { soitaAani } from "../audio.js";
-import { tavoitteet } from "../data.js";
-import { s, canvas, ctx } from "../state.js";
-import { getAngle, kirjoita } from "../util.js";
-import { SCREEN_MENU } from "../constants/ids.js";
-import { ARROW_MARGIN, ARROW_Y, DOT_CENTER_ADJUST, DOT_SPACING, FONT_BODY, FONT_DOT, FONT_HEADING, FONT_LABEL, FONT_SUBTITLE, FONT_TITLE, FOOTER_Y, GOAL_CHECK_Y, GOAL_DESC_Y, GOAL_DOT_ROW_Y, GOAL_GLOW_RADIUS, GOAL_GLOW_RANGE, GOAL_NAME_Y, GOAL_RING_RADIUS, GOAL_RING_RANGE, GOAL_RING_X, GOAL_RING_Y, GOAL_STATUS_X, GOAL_STATUS_Y, GOAL_STATUS_Y2, GOAL_TEXT_X, MEDAL_IMAGE_SIZE, MEDAL_IMAGE_X, MEDAL_IMAGE_Y, MENU_ZONE_TOP, NAV_ZONES, PAGE_MARGIN, PAGE_SUBTITLE_Y, PAGE_TITLE_Y, RAY_COUNT, RAY_HALF_WIDTH, RAY_SPACING, RIBBON_X, RIBBON_Y, RING_LINE_WIDTH, RING_START_ANGLE, RING_TEXT_OFFSET, RING_UNIT_OFFSET, SPARKLE_SIZE_MIN, SPARKLE_SIZE_RANGE, SPARKLE_THRESHOLD } from "../constants/ui.js";
+import { kimalle, klikkiAani, mitalinauha, mitalit } from "../assets";
+import { soitaAani } from "../audio";
+import { tavoitteet } from "../data";
+import { s, canvas, ctx } from "../state";
+import { getAngle, kirjoita } from "../util";
+import { SCREEN_MENU } from "../constants/ids";
+import { ARROW_MARGIN, ARROW_Y, DOT_CENTER_ADJUST, DOT_SPACING, FONT_BODY, FONT_DOT, FONT_HEADING, FONT_LABEL, FONT_SUBTITLE, FONT_TITLE, FOOTER_Y, GOAL_CHECK_Y, GOAL_DESC_Y, GOAL_DOT_ROW_Y, GOAL_GLOW_RADIUS, GOAL_GLOW_RANGE, GOAL_NAME_Y, GOAL_RING_RADIUS, GOAL_RING_RANGE, GOAL_RING_X, GOAL_RING_Y, GOAL_STATUS_X, GOAL_STATUS_Y, GOAL_STATUS_Y2, GOAL_TEXT_X, MEDAL_IMAGE_SIZE, MEDAL_IMAGE_X, MEDAL_IMAGE_Y, MENU_ZONE_TOP, NAV_ZONES, PAGE_MARGIN, PAGE_SUBTITLE_Y, PAGE_TITLE_Y, RAY_COUNT, RAY_HALF_WIDTH, RAY_SPACING, RIBBON_X, RIBBON_Y, RING_LINE_WIDTH, RING_START_ANGLE, RING_TEXT_OFFSET, RING_UNIT_OFFSET, SPARKLE_SIZE_MIN, SPARKLE_SIZE_RANGE, SPARKLE_THRESHOLD } from "../constants/ui";
 
 // Tavoitteet (tila 2)
 export function piirraTavoitteet(){

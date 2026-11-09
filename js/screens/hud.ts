@@ -1,9 +1,9 @@
-import { lataus } from "../assets.js";
-import { latausSloganitArvottu } from "../data.js";
-import { s, canvas, ctx } from "../state.js";
-import { kirjoita } from "../util.js";
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../constants/geometry.js";
-import { FONT_BODY, FONT_CAPTION, FONT_DISPLAY, FONT_MICRO, FONT_SUBTITLE, FONT_TITLE, PAUSE_BAR_HEIGHT, PAUSE_BAR_SPACING, PAUSE_BAR_WIDTH, PAUSE_ICON_MARGIN, PAUSE_ICON_TOP, VERSION_LABEL_ALPHA, VERSION_LABEL_LENGTH, VERSION_LABEL_MARGIN } from "../constants/ui.js";
+import { lataus } from "../assets";
+import { latausSloganitArvottu } from "../data";
+import { s, canvas, ctx } from "../state";
+import { kirjoita } from "../util";
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../constants/geometry";
+import { FONT_BODY, FONT_CAPTION, FONT_DISPLAY, FONT_MICRO, FONT_SUBTITLE, FONT_TITLE, PAUSE_BAR_HEIGHT, PAUSE_BAR_SPACING, PAUSE_BAR_WIDTH, PAUSE_ICON_MARGIN, PAUSE_ICON_TOP, VERSION_LABEL_ALPHA, VERSION_LABEL_LENGTH, VERSION_LABEL_MARGIN } from "../constants/ui";
 
 // Pelin aikainen HUD, versio, latausruudut ja sivun otsikko
 export function piirraHud(){

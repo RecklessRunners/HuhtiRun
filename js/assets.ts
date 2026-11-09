@@ -1,4 +1,4 @@
-import { SLOW_LOAD_TIMEOUT } from "./constants/gameplay.js";
+import { SLOW_LOAD_TIMEOUT } from "./constants/gameplay";
 // Kuvien ja äänten lataus. Latauksen tila on yhdessä oliossa, jota muut moduulit voivat lukea.
 export const lataus = {
 	kaikki: 0,            // Ladattavien tiedostojen määrä

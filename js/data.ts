@@ -1,7 +1,7 @@
-import { s } from "./state.js";
-import { formatThousands } from "./util.js";
-import { GOAL_ADDICT_TOTAL_DISTANCE, GOAL_ATHLETE_DISTANCE, GOAL_ELITE_DISTANCE, GOAL_IMMORTAL_REVIVES, GOAL_RICH_MONEY, GOAL_RUNNER_DISTANCE, LOADING_SLOGAN_COUNT } from "./constants/gameplay.js";
-import { GOAL_DATA_MAX_MONEY, GOAL_DATA_MAX_REVIVES } from "./constants/ids.js";
+import { s } from "./state";
+import { formatThousands } from "./util";
+import { GOAL_ADDICT_TOTAL_DISTANCE, GOAL_ATHLETE_DISTANCE, GOAL_ELITE_DISTANCE, GOAL_IMMORTAL_REVIVES, GOAL_RICH_MONEY, GOAL_RUNNER_DISTANCE, LOADING_SLOGAN_COUNT } from "./constants/gameplay";
+import { GOAL_DATA_MAX_MONEY, GOAL_DATA_MAX_REVIVES } from "./constants/ids";
 
 // Pelin staattinen data: kentät eli biomit, tutoriaali, latausviestit ja tekijälista
 

@@ -1,10 +1,10 @@
-import { klikkiAani } from "../assets.js";
-import { soitaAani } from "../audio.js";
-import { ohjausTavat } from "../data.js";
-import { s, canvas } from "../state.js";
-import { kirjoita } from "../util.js";
-import { CONTROL_MOUSE, SCREEN_MENU } from "../constants/ids.js";
-import { FONT_BODY, FONT_SUBTITLE, FONT_TITLE, FOOTER_Y, MENU_ZONE_TOP, PAGE_MARGIN, PAGE_SUBTITLE_Y, PAGE_TITLE_Y, SETTINGS_ROW_CONTROLS, SETTINGS_ROW_HALF_HEIGHT, SETTINGS_ROW_SOUND, SETTINGS_ROW_VIBRATION, SETTINGS_VALUE_X, SETTINGS_VALUE_ZONE_X } from "../constants/ui.js";
+import { klikkiAani } from "../assets";
+import { soitaAani } from "../audio";
+import { ohjausTavat } from "../data";
+import { s, canvas } from "../state";
+import { kirjoita } from "../util";
+import { CONTROL_MOUSE, SCREEN_MENU } from "../constants/ids";
+import { FONT_BODY, FONT_SUBTITLE, FONT_TITLE, FOOTER_Y, MENU_ZONE_TOP, PAGE_MARGIN, PAGE_SUBTITLE_Y, PAGE_TITLE_Y, SETTINGS_ROW_CONTROLS, SETTINGS_ROW_HALF_HEIGHT, SETTINGS_ROW_SOUND, SETTINGS_ROW_VIBRATION, SETTINGS_VALUE_X, SETTINGS_VALUE_ZONE_X } from "../constants/ui";
 
 // Asetukset (tila 5)
 export function piirraAsetukset(){

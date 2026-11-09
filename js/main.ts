@@ -1,10 +1,10 @@
-import { alustaAani } from "./audio.js";
-import { paivita } from "./game.js";
-import { alustaSyote } from "./input.js";
-import { kaynnistaSilmukka } from "./loop.js";
-import { lataaTallennus } from "./save.js";
-import { s } from "./state.js";
-import { alustaMaasto } from "./terrain.js";
+import { alustaAani } from "./audio";
+import { paivita } from "./game";
+import { alustaSyote } from "./input";
+import { kaynnistaSilmukka } from "./loop";
+import { lataaTallennus } from "./save";
+import { s } from "./state";
+import { alustaMaasto } from "./terrain";
 
 console.log("*************************\n* HuhtiRun              *\n*************************");
 

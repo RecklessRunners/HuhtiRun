@@ -1,4 +1,4 @@
-import { MAX_CATCHUP_STEPS, UPDATE_INTERVAL } from "./constants/gameplay.js";
+import { MAX_CATCHUP_STEPS, UPDATE_INTERVAL } from "./constants/gameplay";
 // Pelisilmukka: logiikka etenee kiinteällä 50 ms askeleella (kuten ennen setIntervalin kanssa),
 // mutta piirto ajoitetaan selaimen kuvataajuuteen requestAnimationFramella.
 // Kun välilehti on taustalla, requestAnimationFrame pysähtyy, joten peli ei juokse "tyhjää".

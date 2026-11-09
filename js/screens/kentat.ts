@@ -1,13 +1,13 @@
-import { huuto, klikkiAani, medikit, tausta } from "../assets.js";
-import { soitaAani, varise } from "../audio.js";
-import { naytaIlmoitus } from "../modals.js";
-import { osta } from "../shop.js";
-import { s, canvas, ctx } from "../state.js";
-import { alustaMaasto } from "../terrain.js";
-import { kirjoita } from "../util.js";
-import { ENEMY_START_DISTANCE, KICKSTART_BASE_PRICE, KICKSTART_PRICE_STEP, KICKSTART_STEP, PLAYER_BASE_SPEED, REVIVE_BASE_PRICE, SHIELD_ON_RUN_START, VIBRATE_CLICK, VIBRATE_LONG } from "../constants/gameplay.js";
-import { SCREEN_MENU } from "../constants/ids.js";
-import { BACK_ZONE_LEFT, BACK_ZONE_RIGHT, FONT_BODY, FONT_CAPTION, FONT_LIST, FONT_SUBTITLE, FONT_TITLE, FOOTER_Y, MEDKIT_OFFSET_X, MEDKIT_OFFSET_Y, MENU_ZONE_TOP, PAGE_MARGIN, PAGE_SUBTITLE_Y, PAGE_TITLE_Y, SHOP_DESC_Y1, SHOP_DESC_Y2, SHOP_ITEM_HALF_WIDTH, SHOP_ITEM_Y, SHOP_PRICE_OFFSET, SHOP_SLIDE_BONUS, SHOP_SLIDE_KICKSTART, SHOP_SLIDE_REVIVE, SHOP_SLOTS, SHOP_SLOT_BONUS, SHOP_SLOT_KICKSTART, SHOP_SLOT_REVIVE, SHOP_STATUS_Y, SHOP_ZONE_TOP, START_ZONE_LEFT } from "../constants/ui.js";
+import { huuto, klikkiAani, medikit, tausta } from "../assets";
+import { soitaAani, varise } from "../audio";
+import { naytaIlmoitus } from "../modals";
+import { osta } from "../shop";
+import { s, canvas, ctx } from "../state";
+import { alustaMaasto } from "../terrain";
+import { kirjoita } from "../util";
+import { ENEMY_START_DISTANCE, KICKSTART_BASE_PRICE, KICKSTART_PRICE_STEP, KICKSTART_STEP, PLAYER_BASE_SPEED, REVIVE_BASE_PRICE, SHIELD_ON_RUN_START, VIBRATE_CLICK, VIBRATE_LONG } from "../constants/gameplay";
+import { SCREEN_MENU } from "../constants/ids";
+import { BACK_ZONE_LEFT, BACK_ZONE_RIGHT, FONT_BODY, FONT_CAPTION, FONT_LIST, FONT_SUBTITLE, FONT_TITLE, FOOTER_Y, MEDKIT_OFFSET_X, MEDKIT_OFFSET_Y, MENU_ZONE_TOP, PAGE_MARGIN, PAGE_SUBTITLE_Y, PAGE_TITLE_Y, SHOP_DESC_Y1, SHOP_DESC_Y2, SHOP_ITEM_HALF_WIDTH, SHOP_ITEM_Y, SHOP_PRICE_OFFSET, SHOP_SLIDE_BONUS, SHOP_SLIDE_KICKSTART, SHOP_SLIDE_REVIVE, SHOP_SLOTS, SHOP_SLOT_BONUS, SHOP_SLOT_KICKSTART, SHOP_SLOT_REVIVE, SHOP_STATUS_Y, SHOP_ZONE_TOP, START_ZONE_LEFT } from "../constants/ui";
 
 // Kenttävalinta (tila 1)
 export function piirraKenttavalinta(){

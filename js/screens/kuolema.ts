@@ -1,9 +1,9 @@
-import { dramaattinen, loppuAani, pisteytysAani } from "../assets.js";
-import { soitaAani, varise } from "../audio.js";
-import { s, canvas } from "../state.js";
-import { alustaMaasto } from "../terrain.js";
-import { DARKNESS_MENU, MAX_RECORDS, MIN_COUNTED_SCORE, SCORE_COUNTDOWN_DIVISOR, SCORE_COUNTDOWN_END, SCORING_DELAY, VIBRATE_LONG, VIBRATE_TICK } from "../constants/gameplay.js";
-import { GOAL_DATA_GAMES_PLAYED, GOAL_DATA_MAX_MONEY, GOAL_DATA_MAX_REVIVES, SCREEN_MENU } from "../constants/ids.js";
+import { dramaattinen, loppuAani, pisteytysAani } from "../assets";
+import { soitaAani, varise } from "../audio";
+import { s, canvas } from "../state";
+import { alustaMaasto } from "../terrain";
+import { DARKNESS_MENU, MAX_RECORDS, MIN_COUNTED_SCORE, SCORE_COUNTDOWN_DIVISOR, SCORE_COUNTDOWN_END, SCORING_DELAY, VIBRATE_LONG, VIBRATE_TICK } from "../constants/gameplay";
+import { GOAL_DATA_GAMES_PLAYED, GOAL_DATA_MAX_MONEY, GOAL_DATA_MAX_REVIVES, SCREEN_MENU } from "../constants/ids";
 
 // Kuolema ja pisteytys: vihu saa pelaajan kiinni
 export function kasitteleKuolema(){

@@ -1,16 +1,16 @@
-import { hyppyAani, lataus, maksuAani } from "./assets.js";
-import { soitaAani } from "./audio.js";
-import { kasittelePelinKlikkaus } from "./game.js";
-import { kasitteleAsetustenKlikkaus } from "./screens/asetukset.js";
-import { kasitteleKentanKlikkaus } from "./screens/kentat.js";
-import { kasitteleTavoitteidenKlikkaus } from "./screens/tavoitteet.js";
-import { kasitteleTekijoidenKlikkaus } from "./screens/tekijat.js";
-import { kasitteleTilastojenKlikkaus } from "./screens/tilastot.js";
-import { kasitteleValikonKlikkaus } from "./screens/valikko.js";
-import { s, canvas } from "./state.js";
-import { BONUS_POINTS, JUMP_DURATION, JUMP_ZONE_START, KEYBOARD_MOVE_STEP } from "./constants/gameplay.js";
-import { HALF_TILE, TILE_SIZE } from "./constants/geometry.js";
-import { CONTROL_KEYBOARD, CONTROL_MOUSE, SCREEN_CREDITS, SCREEN_GOALS, SCREEN_LEVELS, SCREEN_MENU, SCREEN_SETTINGS, SCREEN_STATS } from "./constants/ids.js";
+import { hyppyAani, lataus, maksuAani } from "./assets";
+import { soitaAani } from "./audio";
+import { kasittelePelinKlikkaus } from "./game";
+import { kasitteleAsetustenKlikkaus } from "./screens/asetukset";
+import { kasitteleKentanKlikkaus } from "./screens/kentat";
+import { kasitteleTavoitteidenKlikkaus } from "./screens/tavoitteet";
+import { kasitteleTekijoidenKlikkaus } from "./screens/tekijat";
+import { kasitteleTilastojenKlikkaus } from "./screens/tilastot";
+import { kasitteleValikonKlikkaus } from "./screens/valikko";
+import { s, canvas } from "./state";
+import { BONUS_POINTS, JUMP_DURATION, JUMP_ZONE_START, KEYBOARD_MOVE_STEP } from "./constants/gameplay";
+import { HALF_TILE, TILE_SIZE } from "./constants/geometry";
+import { CONTROL_KEYBOARD, CONTROL_MOUSE, SCREEN_CREDITS, SCREEN_GOALS, SCREEN_LEVELS, SCREEN_MENU, SCREEN_SETTINGS, SCREEN_STATS } from "./constants/ids";
 
 export function alustaSyote(){
 	// Pelaajan ohjauskomennot (sidotaan vain kerran, ei joka päivityksellä)

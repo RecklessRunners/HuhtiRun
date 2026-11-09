@@ -1,5 +1,5 @@
-import { s } from "./state.js";
-import { CONTROL_MOUSE } from "./constants/ids.js";
+import { s } from "./state";
+import { CONTROL_MOUSE } from "./constants/ids";
 
 // Nykyisen pelitallennuksen versionumero
 // TÄRKEÄ! MUUTA AINA YHTÄ ISOMMAKSI, KUN PELITALLENNUSMUOTOON TULEE MUUTOKSIA!

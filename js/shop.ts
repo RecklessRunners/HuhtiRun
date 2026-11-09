@@ -1,7 +1,7 @@
-import { dramaattinen, maksuAani } from "./assets.js";
-import { soitaAani } from "./audio.js";
-import { openModal } from "./modals.js";
-import { s } from "./state.js";
+import { dramaattinen, maksuAani } from "./assets";
+import { soitaAani } from "./audio";
+import { openModal } from "./modals";
+import { s } from "./state";
 
 // Ostotoiminto kauppaa varten
 export function osta(hinta,asia,kysy){

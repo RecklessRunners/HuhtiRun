@@ -1,6 +1,6 @@
-import { ENEMY_CAUGHT_DISTANCE, INITIAL_MAX_BONUS, INITIAL_PLAYER_SPEED, INITIAL_SHIELD, MAX_RECORDS, ROAD_EDGE_TOLERANCE } from "./constants/gameplay.js";
-import { CANVAS_WIDTH, START_LANE_X } from "./constants/geometry.js";
-import { BIOME_DESERT, CONTROL_MOUSE, GOAL_DATA_SIZE, SCREEN_MENU } from "./constants/ids.js";
+import { ENEMY_CAUGHT_DISTANCE, INITIAL_MAX_BONUS, INITIAL_PLAYER_SPEED, INITIAL_SHIELD, MAX_RECORDS, ROAD_EDGE_TOLERANCE } from "./constants/gameplay";
+import { CANVAS_WIDTH, START_LANE_X } from "./constants/geometry";
+import { BIOME_DESERT, CONTROL_MOUSE, GOAL_DATA_SIZE, SCREEN_MENU } from "./constants/ids";
 // Pelin jaettu muuttuva tila. ES-moduulien tuonteja ei voi sijoittaa uudelleen,
 // joten kaikki moduulien välillä jaettu tieto on tämän olion kenttinä (s.rahat, s.tila, ...).
 

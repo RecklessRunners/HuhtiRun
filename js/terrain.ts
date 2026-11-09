@@ -1,7 +1,7 @@
-import { taustaKuva, tieOikeaYlos, tieOikealle, tieRisteys, tieSuoraan, tieVaakaan, tieVasemmalle, tieVasenYlos } from "./assets.js";
-import { biomiKuvat, biomiTieOYKuvat, biomiTieOikKuvat, biomiTieSuoraanKuvat, biomiTieVYKuvat, biomiTieVaakaanKuvat, biomiTieVasKuvat, biomiVarit } from "./data.js";
-import { s, ctx } from "./state.js";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, LAST_COLUMN, ROAD_START_COLUMN, TERRAIN_COLUMNS, TERRAIN_ROWS, TILE_SIZE } from "./constants/geometry.js";
+import { taustaKuva, tieOikeaYlos, tieOikealle, tieRisteys, tieSuoraan, tieVaakaan, tieVasemmalle, tieVasenYlos } from "./assets";
+import { biomiKuvat, biomiTieOYKuvat, biomiTieOikKuvat, biomiTieSuoraanKuvat, biomiTieVYKuvat, biomiTieVaakaanKuvat, biomiTieVasKuvat, biomiVarit } from "./data";
+import { s, ctx } from "./state";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, LAST_COLUMN, ROAD_START_COLUMN, TERRAIN_COLUMNS, TERRAIN_ROWS, TILE_SIZE } from "./constants/geometry";
 
 // Terrain column indices [0..TERRAIN_COLUMNS-1] as a fresh array (callers splice it)
 function columnIndices(){

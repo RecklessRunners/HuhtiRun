@@ -1,7 +1,7 @@
-import { hyppyKuva, ukko, varjo, vihu } from "./assets.js";
-import { s, canvas, ctx } from "./state.js";
-import { SHIELD_BLINK_LIMIT, SHIELD_FADED_ALPHA } from "./constants/gameplay.js";
-import { HALF_TILE, JUMP_BUTTON_BOTTOM_OFFSET, JUMP_BUTTON_PRESSED_HEIGHT, JUMP_BUTTON_PRESSED_OFFSET, JUMP_BUTTON_SIZE, JUMP_BUTTON_X, JUMP_SPRITE_GROW, JUMP_SPRITE_SIZE, PLAYER_Y, SHADOW_OFFSET_X, SHADOW_OFFSET_Y } from "./constants/geometry.js";
+import { hyppyKuva, ukko, varjo, vihu } from "./assets";
+import { s, canvas, ctx } from "./state";
+import { SHIELD_BLINK_LIMIT, SHIELD_FADED_ALPHA } from "./constants/gameplay";
+import { HALF_TILE, JUMP_BUTTON_BOTTOM_OFFSET, JUMP_BUTTON_PRESSED_HEIGHT, JUMP_BUTTON_PRESSED_OFFSET, JUMP_BUTTON_SIZE, JUMP_BUTTON_X, JUMP_SPRITE_GROW, JUMP_SPRITE_SIZE, PLAYER_Y, SHADOW_OFFSET_X, SHADOW_OFFSET_Y } from "./constants/geometry";
 
 export function piirraVarjo(){
 	if(s.hyppy && s.hengissa){

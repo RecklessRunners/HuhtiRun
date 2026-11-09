@@ -1,5 +1,5 @@
-import { ambientti, korkeaAani, menuMusiikki, tausta } from "./assets.js";
-import { s } from "./state.js";
+import { ambientti, korkeaAani, menuMusiikki, tausta } from "./assets";
+import { s } from "./state";
 
 export function varise(aika){
 	if(s.asetukset.varina && navigator.vibrate){

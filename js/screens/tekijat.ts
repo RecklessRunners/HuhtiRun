@@ -1,10 +1,10 @@
-import { klikkiAani, ukko } from "../assets.js";
-import { soitaAani } from "../audio.js";
-import { tekijat } from "../data.js";
-import { s, canvas, ctx } from "../state.js";
-import { kirjoita } from "../util.js";
-import { SCREEN_MENU } from "../constants/ids.js";
-import { CREDITS_END_OFFSET, CREDITS_END_Y, CREDITS_FADE_IN_Y, CREDITS_FADE_LENGTH, CREDITS_FADE_OUT_Y, CREDITS_IMAGE_SIZE, CREDITS_IMAGE_X, CREDITS_IMAGE_Y, CREDITS_LINE_HEIGHT, CREDITS_LIST_TOP, CREDITS_NAME_X, CREDITS_RESTART_SCROLL, CREDITS_SCROLL_SPEED, FONT_BODY, FONT_LIST, FONT_SUBTITLE, FONT_TITLE, FOOTER_LINE_HEIGHT, FOOTER_Y, MENU_ZONE_TOP, NAV_ZONES, PAGE_MARGIN, PAGE_SUBTITLE_Y, PAGE_TITLE_Y, VERSION_FULL_LENGTH, VERSION_SHORT_LENGTH, VERSION_ZONE_HEIGHT } from "../constants/ui.js";
+import { klikkiAani, ukko } from "../assets";
+import { soitaAani } from "../audio";
+import { tekijat } from "../data";
+import { s, canvas, ctx } from "../state";
+import { kirjoita } from "../util";
+import { SCREEN_MENU } from "../constants/ids";
+import { CREDITS_END_OFFSET, CREDITS_END_Y, CREDITS_FADE_IN_Y, CREDITS_FADE_LENGTH, CREDITS_FADE_OUT_Y, CREDITS_IMAGE_SIZE, CREDITS_IMAGE_X, CREDITS_IMAGE_Y, CREDITS_LINE_HEIGHT, CREDITS_LIST_TOP, CREDITS_NAME_X, CREDITS_RESTART_SCROLL, CREDITS_SCROLL_SPEED, FONT_BODY, FONT_LIST, FONT_SUBTITLE, FONT_TITLE, FOOTER_LINE_HEIGHT, FOOTER_Y, MENU_ZONE_TOP, NAV_ZONES, PAGE_MARGIN, PAGE_SUBTITLE_Y, PAGE_TITLE_Y, VERSION_FULL_LENGTH, VERSION_SHORT_LENGTH, VERSION_ZONE_HEIGHT } from "../constants/ui";
 
 // Tietoja ja tekijät (tila 4)
 export function piirraTekijat(){

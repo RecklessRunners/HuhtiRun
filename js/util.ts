@@ -1,5 +1,5 @@
-import { ctx } from "./state.js";
-import { DEFAULT_FONT_SIZE } from "./constants/ui.js";
+import { ctx } from "./state";
+import { DEFAULT_FONT_SIZE } from "./constants/ui";
 
 // Etunollat
 // Groups the digits of a number in thousands with a space, e.g. 20000 -> "20 000"

@@ -122,7 +122,7 @@ export function piirraPaavalikko(){
 		kirjoita(">",canvas.width-ARROW_MARGIN,ARROW_Y,true,FONT_TITLE,"#E0E0E0","'Source Sans Pro'");
 
 		for(let biomiI=0;biomiI<biomiTyypit.length;biomiI++){
-			let palloX = (canvas.width/2)+(biomiI*DOT_SPACING)-(biomiTyypit.length*DOT_SPACING/2)+DOT_CENTER_ADJUST;
+			const palloX = (canvas.width/2)+(biomiI*DOT_SPACING)-(biomiTyypit.length*DOT_SPACING/2)+DOT_CENTER_ADJUST;
 			if(biomiI==s.biomi){
 				kirjoita("●",palloX,DOT_ROW_Y,true,FONT_DOT);
 			}else{

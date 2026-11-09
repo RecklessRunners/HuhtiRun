@@ -74,7 +74,7 @@ export function kasitteleKuolema(){
 						
 						localStorage.parhaatMatkat=JSON.stringify(s.parhaatMatkat);
 
-						s.tavoiteData[GOAL_DATA_GAMES_PLAYED]=parseFloat(s.tavoiteData[GOAL_DATA_GAMES_PLAYED])+1; // Laske kaikkien pelattujen pelien määrä
+						s.tavoiteData[GOAL_DATA_GAMES_PLAYED]=parseFloat(String(s.tavoiteData[GOAL_DATA_GAMES_PLAYED]))+1; // Laske kaikkien pelattujen pelien määrä
 						localStorage.tavoiteData=JSON.stringify(s.tavoiteData);
 
 						s.rahat += s.pisteet;

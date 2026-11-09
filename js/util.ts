@@ -3,11 +3,11 @@ import { DEFAULT_FONT_SIZE } from "./constants/ui";
 
 // Etunollat
 // Groups the digits of a number in thousands with a space, e.g. 20000 -> "20 000"
-export function formatThousands(num){
+export function formatThousands(num: number | string){
 	return String(num).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
-export function pad(number,length) {
+export function pad(number: number | string,length: number) {
 	let str = ''+number;
 	while (str.length < length) {
 		str = '0' + str;
@@ -15,11 +15,11 @@ export function pad(number,length) {
 	return str;
 }
 
-export function tuhaterotin(num){
+export function tuhaterotin(num: number){
 	return num;
 }
 
-export function kirjoita(teksti,x,y,lihavoitu,fonttikoko,vari,fontti){
+export function kirjoita(teksti: string|number,x: number,y: number,lihavoitu?: boolean,fonttikoko?: number,vari?: string,fontti?: string){
 
 	lihavoitu	= lihavoitu		|| false;
 	fonttikoko	= fonttikoko	|| DEFAULT_FONT_SIZE;
@@ -32,13 +32,13 @@ export function kirjoita(teksti,x,y,lihavoitu,fonttikoko,vari,fontti){
 	}else{
 		ctx.font = fonttikoko+"px "+fontti+",sans-serif";
 	}
-	ctx.fillText(teksti,x+1,y+1);
+	ctx.fillText(String(teksti),x+1,y+1);
 
 	ctx.fillStyle = vari;
-	ctx.fillText(teksti,x,y);
+	ctx.fillText(String(teksti),x,y);
 }
 
-export function getAngle(x, y, angle, h) {
+export function getAngle(x: number, y: number, angle: number, h: number) {
 	const radians = angle * (Math.PI / 180);
 	return { x: x + h * Math.cos(radians), y: y + h * Math.sin(radians) }; // Muuntaa kulman X:ksi ja Y:ksi
 }

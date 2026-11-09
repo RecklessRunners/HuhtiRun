@@ -20,7 +20,7 @@ export function piirraKenttavalinta(){
 	kirjoita((REVIVE_BASE_PRICE*Math.pow(2,s.elvytysjuomat)-1)+" (HR)",canvas.width/SHOP_SLOTS*SHOP_SLOT_REVIVE,SHOP_ITEM_Y+s.veriSiirtymaNyt/SHOP_SLIDE_REVIVE+SHOP_PRICE_OFFSET,true,FONT_CAPTION,"silver");
 	kirjoita("Mahdollistaa henkiin",canvas.width/SHOP_SLOTS*SHOP_SLOT_REVIVE,SHOP_DESC_Y1+s.veriSiirtymaNyt/SHOP_SLIDE_REVIVE);
 	kirjoita("heräämisen kuollessasi",canvas.width/SHOP_SLOTS*SHOP_SLOT_REVIVE,SHOP_DESC_Y2+s.veriSiirtymaNyt/SHOP_SLIDE_REVIVE);
-	let elvytysteksti;
+	let elvytysteksti = "";
 	if(s.elvytysjuomat==0){
 		elvytysteksti = "EI ELVYTYSKERTOJA";
 	}

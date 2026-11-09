@@ -1,7 +1,7 @@
 import { ambientti, korkeaAani, menuMusiikki, tausta } from "./assets";
 import { s } from "./state";
 
-export function varise(aika){
+export function varise(aika: number){
 	if(s.asetukset.varina && navigator.vibrate){
 		navigator.vibrate(aika);
 		return true;
@@ -10,7 +10,7 @@ export function varise(aika){
 	}
 }
 
-export function soitaAani(aaniFilu){
+export function soitaAani(aaniFilu: HTMLAudioElement){
 	if(s.asetukset.aani){
 		// play() palauttaa lupauksen, joka hylätään jos selain estää automaattisen toiston
 		const lupaus = aaniFilu.play();

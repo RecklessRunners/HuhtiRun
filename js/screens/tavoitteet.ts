@@ -79,7 +79,7 @@ export function piirraTavoitteet(){
 	kirjoita("Näitä sinun pitää kerätä!",PAGE_MARGIN,PAGE_SUBTITLE_Y-s.veriSiirtymaNyt/2,true,FONT_BODY,"#FFF","'Source Sans Pro'");
 
 	for(let tavoiteI=0;tavoiteI<tavoitteet.length;tavoiteI++){
-		let palloX = (canvas.width/2)+(tavoiteI*DOT_SPACING)-(tavoitteet.length*DOT_SPACING/2)+DOT_CENTER_ADJUST;
+		const palloX = (canvas.width/2)+(tavoiteI*DOT_SPACING)-(tavoitteet.length*DOT_SPACING/2)+DOT_CENTER_ADJUST;
 		let palloVari = "silver";
 		if(tavoitteet[tavoiteI].vaatimus()>=1){
 			palloVari="#47A94B";

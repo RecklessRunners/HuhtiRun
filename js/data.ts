@@ -101,7 +101,7 @@ export const latausSloganit = [
 	"Lasketaan rahoja",
 	"Sidotaan kengännauhoja"
 ];
-export const latausSloganitArvottu = [];
+export const latausSloganitArvottu: string[] = [];
 for(let i=0;i<LOADING_SLOGAN_COUNT;i++){
 	const satunnainenSloganId = Math.floor(Math.random()*latausSloganit.length);
 	latausSloganitArvottu.push(latausSloganit[satunnainenSloganId]);

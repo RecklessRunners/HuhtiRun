@@ -9,8 +9,8 @@ export const lataus = {
 	hidasAjastin: setTimeout(function(){},1)
 };
 
-function lataaKuvat(nimi, nmax){
-	const taulu = [];
+function lataaKuvat(nimi: string, nmax: number){
+	const taulu: HTMLImageElement[] = [];
 	for (let i=0;i<=nmax;i++){
 		const img = new Image();
 		img.onload=function(){
@@ -32,7 +32,7 @@ function lataaKuvat(nimi, nmax){
 	return taulu;
 }
 
-function lataaAanet(nimi, nmax){
+function lataaAanet(nimi: string, nmax: number){
 	const taulu = [];
 	for(let i=0;i<=nmax;i++){
 		const snd = new Audio();

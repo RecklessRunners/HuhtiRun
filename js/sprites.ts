@@ -19,7 +19,7 @@ export function piirraHyppyNappi(){
 	}
 }
 
-export function piirraVihu(i,piirtoX,piirtoY){
+export function piirraVihu(i: number,piirtoX: number,piirtoY: number){
 	if(s.hengissa || s.elvytysRuutu){
 		const translaatio = {
 			"x" : piirtoX + vihu[i].width / 2,
@@ -33,7 +33,7 @@ export function piirraVihu(i,piirtoX,piirtoY){
 	}
 }
 
-export function piirraUkko(i,piirtoX,piirtoY){
+export function piirraUkko(i: number,piirtoX: number,piirtoY: number){
 	if(s.hengissa){
 		if(s.suojakilpi>0){
 			if(s.suojakilpi<=SHIELD_BLINK_LIMIT && s.pelaaNo % 1){

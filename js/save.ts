@@ -59,7 +59,7 @@ export function lataaTallennus(){
 			break;
 			case "1":
 				// Mahdollista äänen päälle/pois laittaminen
-				s.asetukset["aani"] = 1;
+				(s.asetukset as Record<string, unknown>)["aani"] = 1;
 				localStorage.asetukset = JSON.stringify(s.asetukset);
 				uusiVersio = 2;
 			break;

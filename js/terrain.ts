@@ -33,7 +33,7 @@ export function alustaMaasto(){
 }
 
 
-export function jatkaTieOikeaan(ind){
+export function jatkaTieOikeaan(ind: number){
 		//Arvotaan, kuinka kauas mennään oikeaan, eli arvotaan indeksi, jossa käännytään ylös
 		s.ylos = Math.floor( Math.random()*(TERRAIN_COLUMNS-1-ind) ) + ind +1 ;
 
@@ -50,14 +50,14 @@ export function jatkaTieOikeaan(ind){
 		//Täytetään muut taustalla
 		const iTausta = columnIndices();
 		iTausta.splice(ind, s.ylos-ind+1);
-		for (let i in iTausta ){
+		for (const i in iTausta ){
 		  s.maasto[iTausta[i]][0] = taustaKuva[biomiKuvat[s.biomi][Math.floor(Math.random()*biomiKuvat[s.biomi].length)]];
 		  s.maastomuoto[iTausta[i]][0] = 0; //Kuolema
 		}
 		return s.ylos;
 	}
 
-export function jatkaTieRisteykseen(ind){
+export function jatkaTieRisteykseen(ind: number){
 	// Täytetään maastografiikka
 	for (let i=0; i<TERRAIN_COLUMNS; i++){
 		s.maasto[i][0] = taustaKuva[biomiKuvat[s.biomi][Math.floor(Math.random()*biomiKuvat[s.biomi].length)]];
@@ -94,7 +94,7 @@ export function jatkaTieRisteykseen(ind){
 		return s.ylos;
 	}
 
-export function jatkaTieVasempaan(ind){
+export function jatkaTieVasempaan(ind: number){
 		//Arvotaan, kuinka kauas mennään vasempaan, eli arvotaan indeksi, jossa vasemmalta käännytään ylös
 		s.ylos = Math.floor(Math.random()*(ind-1)); // Kuten järkikin sanoo, uusi arvottu indeksi (X-posiitio) on siis aina pienempi kuin nykyinen indeksi
 
@@ -112,7 +112,7 @@ export function jatkaTieVasempaan(ind){
 		//Täytetään muut taustalla
 		const iTausta = columnIndices();
 		iTausta.splice(s.ylos, ind-s.ylos+1);
-		for (let i in iTausta ){
+		for (const i in iTausta ){
 		  s.maasto[iTausta[i]][0] = taustaKuva[biomiKuvat[s.biomi][Math.floor(Math.random()*biomiKuvat[s.biomi].length)]];
 		  s.maastomuoto[iTausta[i]][0]=0;  //Kuolema
 		}
@@ -120,7 +120,7 @@ export function jatkaTieVasempaan(ind){
 		return s.ylos;
 	}
 
-export function jatkaTieYlos(ind){
+export function jatkaTieYlos(ind: number){
 	s.maasto[ind][0] = tieSuoraan[biomiTieSuoraanKuvat[s.biomi][Math.floor(Math.random()*biomiTieSuoraanKuvat[s.biomi].length)]];
 	s.maastomuoto[ind][0]=1;
 
@@ -135,7 +135,7 @@ export function jatkaTieYlos(ind){
 	}
 
 
-export function piirraMaasto(siirtoY){
+export function piirraMaasto(siirtoY: number){
 	ctx.fillStyle="#"+biomiVarit[s.biomi];
 	ctx.fillRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
 	

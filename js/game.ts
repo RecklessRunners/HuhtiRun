@@ -21,7 +21,7 @@ import { BIOME_CAVE, BIOME_FOREST, BIOME_SPACE, CONTROL_KEYBOARD, SCREEN_CREDITS
 import { BONUS_BAR_BOTTOM, BONUS_BAR_HEIGHT, BONUS_BAR_WIDTH, BONUS_BAR_X, BONUS_BAR_Y, BONUS_LABEL_X, BONUS_LABEL_Y, FONT_CAPTION, FONT_HEADING, FONT_SUBTITLE, FONT_TITLE, HEART_BASE_SIZE, HEART_PULSE_SIZE, HEART_PULSE_SPEED, HUD_DISTANCE_SLOT, HUD_LABEL_Y, HUD_SCORE_SLOT, HUD_SLOTS, HUD_VALUE_Y, PAUSE_BUTTON_HEIGHT, PAUSE_BUTTON_WIDTH, PAUSE_MENU_MARGIN, PAUSE_RESUME_Y, PAUSE_ROW_HALF_HEIGHT, PAUSE_ROW_HEIGHT, PAUSE_TITLE_Y, WARNING_TEXT_OFFSET } from "./constants/ui";
 
 // Pelin tutoriaalitehtävän suoritus
-export function tutoriaaliSuoritettu(tutId){
+export function tutoriaaliSuoritettu(tutId: number){
 	if(s.tutoriaaliData[tutId] == false){
 		s.tutoriaaliData[tutId] = true;
 		tiedote("Tutoriaali","Tehtävä \""+tutoriaali[tutId]+"\" suoritettu.");
@@ -29,7 +29,7 @@ export function tutoriaaliSuoritettu(tutId){
 	}
 }
 
-function tiedote(otsikko,teksti){
+function tiedote(_otsikko: string, _teksti: string){
 	s.tauko=true;
 	//alert(otsikko+"\n\n"+teksti);
 }
@@ -195,14 +195,12 @@ export function paivita(){
         
         // Missä tie?
         if (s.siirtoY>PLAYER_Y-ROAD_SCAN_MARGIN){ // Tien tutkiminen: Voi joutua muuttamaan lukua
-            const tieKoordinaatit =[];
-            let min;
-            let max;
+            const tieKoordinaatit: number[] = [];
             for (let i=0; i<s.maasto.length; i++){ // X-suuntaan
                 tieKoordinaatit.push(s.maastomuoto[i][1]);
             }
-            min = tieKoordinaatit.indexOf(1);
-            max = tieKoordinaatit.lastIndexOf(1);
+            const min = tieKoordinaatit.indexOf(1);
+            const max = tieKoordinaatit.lastIndexOf(1);
 
             s.tieMinMax = [TILE_SIZE*min, TILE_SIZE*(max+1)];
             // console.log("Koord " + tieMinMax );
@@ -254,7 +252,7 @@ export function paivita(){
 	// xxxxxxxxxxxxxxxxxxxxxxxx
 	if(!s.hyppy && s.suojakilpi<=0){
 		// TODO: siirtoX ei ole määritelty missään (heittää ReferenceErrorin), tarkoitus epäselvä
-		// eslint-disable-next-line no-undef
+		// @ts-expect-error siirtoX is not defined anywhere (see TODO above)
 		if(s.maasto[Math.round(s.ukkoX/TILE_SIZE)][PLAYER_ROW]==tieVaakaan[HORIZONTAL_GAP_TILE] && siirtoX>TILE_CONTACT_PROGRESS){
 			s.vihuSiirtyma=ENEMY_CAUGHT_DISTANCE;
 		}

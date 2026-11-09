@@ -1,16 +1,92 @@
 import { ENEMY_CAUGHT_DISTANCE, INITIAL_MAX_BONUS, INITIAL_PLAYER_SPEED, INITIAL_SHIELD, MAX_RECORDS, ROAD_EDGE_TOLERANCE } from "./constants/gameplay";
-import { CANVAS_WIDTH, START_LANE_X } from "./constants/geometry";
+import { CANVAS_WIDTH, ROAD_START_COLUMN, START_LANE_X } from "./constants/geometry";
 import { BIOME_DESERT, CONTROL_MOUSE, GOAL_DATA_SIZE, SCREEN_MENU } from "./constants/ids";
 // Pelin jaettu muuttuva tila. ES-moduulien tuonteja ei voi sijoittaa uudelleen,
 // joten kaikki moduulien välillä jaettu tieto on tämän olion kenttinä (s.rahat, s.tila, ...).
 
-export const canvas = document.querySelector("canvas");
-export const ctx = canvas.getContext ? canvas.getContext("2d") : null;
+const canvasElement = document.querySelector("canvas");
+if(!canvasElement) throw new Error("Canvas element not found");
+const context = canvasElement.getContext("2d");
+if(!context) throw new Error("2D canvas context not available");
+export const canvas: HTMLCanvasElement = canvasElement;
+export const ctx: CanvasRenderingContext2D = context;
+
+// [kuva,x,y,liikkumisnopeusX,liikkumisnopeusY,adaptiivinenLiike,asento,pyoriminen,adaptiivinenPyoriminen]
+export type FlyingObject = [HTMLImageElement, number, number, number, number, boolean, number, number, boolean];
+
+export interface GameState {
+	grd: CanvasGradient;
+	aanenVoimakkuus: number;
+	alkupotkaisu: number;
+	asetukset: { varina: boolean; aani: boolean; ohjausTapa: number };
+	asteluku: number;
+	biomi: number;
+	bonusKerroin: number;
+	elvytysRuutu: boolean;
+	elvytysjuomat: number;
+	hengissa: boolean;
+	hiiriAlasX: number;
+	hyppy: boolean;
+	inaktiivinenMenu: boolean;
+	kokonaisSuoritus: number;
+	kolikot: unknown[];
+	latauspalkkiX: number;
+	lentavatObjektit: FlyingObject[];
+	maasto: HTMLImageElement[][];
+	maastomuoto: number[][];
+	matkaYht: number;
+	maxBonuspisteet: number;
+	oliRisteys: number | false;
+	omatKentat: boolean[];
+	parhaatMatkat: number[];
+	parhaatPisteet: number[];
+	pelaaNo: number;
+	pelikerrat: number;
+	pisteytetaan: boolean;
+	rahat: number;
+	striikki: number;
+	suojakilpi: number;
+	tarkkuusLisa: number;
+	tavoiteData: number[];
+	tavoiteNo: number;
+	tavoiteX: number;
+	tekijaLaskuri: number;
+	tie: number;
+	tieMuutos: number;
+	tila: number;
+	tummuus: number;
+	tutoriaaliData: boolean[];
+	ukkoToleranssi: number;
+	vihuAsteluku: number;
+	x: number;
+	y: number;
+	ylos: number;
+	versioId: string;
+	klikkiPos: number[];
+	iUkko: number;
+	ukkoX: number;
+	pelaajaNopeus: number;
+	veriSiirtyma: number;
+	veriSiirtymaNyt: number;
+	iVihu: number;
+	vihuTavoiteX: number;
+	vihuX: number;
+	tekijaSkrolli: number;
+	vihuSiirtyma: number;
+	pisteet: number;
+	matka: number;
+	pisteytys: number;
+	bonuspisteet: number;
+	tieMinMax: number[];
+	tauko: boolean;
+	ukkoLiikkuuX: number;
+	siirtoY: number;
+}
 
 
-export const s = {
-	grd: undefined,
-	aanenVoimakkuus: undefined,
+export const s: GameState = {
+	grd: ctx.createLinearGradient(0,0,0,0),
+	aanenVoimakkuus: 0,
 	alkupotkaisu: 0, // Kertoo vastaavalla tavalla, mutta sen sijaan matkan jonka verran hahmolla on alkupotkaisua jäljellä
 	asetukset: {
 		varina 		: true,
@@ -32,8 +108,8 @@ export const s = {
 	lentavatObjektit: [
 		// [kuva,x,y,liikkumisnopeusX,liikkumisnopeusY,adaptiivinenLiike,asento,pyoriminen,adaptiivinenPyoriminen]
 	],
-	maasto: undefined,
-	maastomuoto: undefined,
+	maasto: [],
+	maastomuoto: [],
 	matkaYht: 0, // Matka jonka pelihahmo koko elinaikanansa on taittanut
 	maxBonuspisteet: INITIAL_MAX_BONUS, // Bonusmittari tulee täyteen kun hahmo on juossut tämän verran metrejä vahingoittumatta
 	oliRisteys: false, // Oliko edellinen palikka risteyspalikka
@@ -42,17 +118,16 @@ export const s = {
 	parhaatPisteet: new Array(MAX_RECORDS).fill(0), // Piste-ennätykset
 	pelaaNo: 0, // Tämä luku suurenee jatkuvasti. Mahdollistaa automatisoitujen siniaaltojen luomista.
 	pelikerrat: 0, // Kertoo monesko elvytyskerta, nollautuu kun aloitetaan uusi peli
-	pelitallennusVersio: undefined,
 	pisteytetaan: false, // Juoksevatko numerot elvytysruudussa
 	rahat: 0, // Koko omaisuus
 	striikki: 0, // Kuinka monta metriä on päästy täysin vahingoittumatta
 	suojakilpi: INITIAL_SHIELD, // Kertoo kuinka monen "peliruudun" ajan peliukkelilla on suojakilpeä jäljellä
-	tarkkuusLisa: undefined,
+	tarkkuusLisa: 0,
 	tavoiteData: new Array(GOAL_DATA_SIZE).fill(0), // Sisältää tavoitteisiin liittyvää raakadataa
 	tavoiteNo: 0, // Tavoitteen numero, jota katsotaan Tavoitteet-sivulla
 	tavoiteX: 0, // X-koordinaatti, johon pelihahmo pyrkii pääsemään
-	tekijaLaskuri: undefined,
-	tie: undefined,
+	tekijaLaskuri: 0,
+	tie: ROAD_START_COLUMN,
 	tieMuutos: 0, // ?
 	tila: SCREEN_MENU, // Missä valikossa ollaan
 	tummuus: 1, // Näytön tummuus, joka esimerkiksi luolakentässä on korkeampi
@@ -64,18 +139,18 @@ export const s = {
 	vihuAsteluku: 0, // Vihun kääntyminen radiaaneissa
 	x: 0, // Hiiren nykyinen posiitio
 	y: 0,
-	ylos: undefined,
+	ylos: 0,
 	versioId: "", // Muuttuu automaattisesti kommitin id:n mukaan
 	klikkiPos: [0,0],
 	iUkko: 0,
 	ukkoX: START_LANE_X,
 	pelaajaNopeus: INITIAL_PLAYER_SPEED,
 	veriSiirtyma: canvas.height,
-	veriSiirtymaNyt: undefined,
+	veriSiirtymaNyt: canvas.height,
 	iVihu: 1,
 	vihuTavoiteX: START_LANE_X,
 	vihuX: START_LANE_X,
-	tekijaSkrolli: undefined,
+	tekijaSkrolli: 0,
 	vihuSiirtyma: ENEMY_CAUGHT_DISTANCE,
 	pisteet: 0,
 	matka: 0,

@@ -59,7 +59,7 @@ export function alustaSyote(){
 		}
 	});
 	// Muuntaa osoittimen sijainnin canvasin omiin koordinaatteihin (canvas voi olla skaalattu CSS:llä)
-	function paivitaOsoitin(e){
+	function paivitaOsoitin(e: MouseEvent | Touch){
 		const rect = canvas.getBoundingClientRect();
 		s.x = Math.floor((e.clientX-rect.left)*canvas.width/rect.width);
 		s.y = Math.floor((e.clientY-rect.top)*canvas.height/rect.height);

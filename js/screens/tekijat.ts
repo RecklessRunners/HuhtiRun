@@ -32,8 +32,7 @@ export function piirraTekijat(){
 		
 		// Tekijöiden nimet
 		ctx.globalAlpha=1;
-		let tekijaKatJasenY;
-		let v;
+		let tekijaKatJasenY = 0;
 		tekijaKatJasenet.forEach(function(v){
 			s.tekijaLaskuri++;
 			tekijaKatJasenY = CREDITS_LIST_TOP+s.tekijaLaskuri*CREDITS_LINE_HEIGHT+s.tekijaSkrolli-CREDITS_LINE_HEIGHT;
@@ -46,7 +45,7 @@ export function piirraTekijat(){
 		});
 
 		// Kun luettelo on käyty läpi, aloita alusta
-		if(tekijaKatJasenet.length + tekijat.length - CREDITS_END_OFFSET >= s.tekijaLaskuri && tekijaKatJasenY < CREDITS_END_Y){
+		if(tekijaKatJasenet.length + Number((tekijat as {length?: number}).length) - CREDITS_END_OFFSET >= s.tekijaLaskuri && tekijaKatJasenY < CREDITS_END_Y){
 			s.tekijaSkrolli=CREDITS_RESTART_SCROLL;
 			s.tekijaLaskuri=0;
 		}

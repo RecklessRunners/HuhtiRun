@@ -4,7 +4,7 @@ import { openModal } from "./modals";
 import { s } from "./state";
 
 // Ostotoiminto kauppaa varten
-export function osta(hinta,asia,kysy){
+export function osta(hinta: number,asia?: string,kysy?: boolean){
 	asia = asia || "Tämä tuote";
 	kysy = kysy || true;
 	/*if(kysy){
@@ -22,8 +22,8 @@ export function osta(hinta,asia,kysy){
 	}else{
 		soitaAani(dramaattinen[0]);
 		openModal("noMoney");
-		document.getElementById("lisaaRahaaArvo").textContent = hinta-s.rahat;
-		document.getElementById("lisaaRahaaTuote").textContent = asia;
+		document.getElementById("lisaaRahaaArvo")!.textContent = String(hinta-s.rahat);
+		document.getElementById("lisaaRahaaTuote")!.textContent = asia;
 		return false;
 	}
 }
